@@ -1,0 +1,50 @@
+{
+  "rootDir": "./src",
+  "compilerOptions": {
+    "outDir": "./build",
+    "target": "es5",
+    "module": "commonjs",
+    "lib": [
+      "es6"
+    ],
+    "allowUnreachableCode": false,
+    "noImplicitReturns": true,
+    "allowJs": true,
+    "rootDir": "./src",
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+      "@repositories/*": [
+        "./src/repositories/*"
+      ],
+      "@service/*": [
+        "./src/service/*"
+      ],
+      "@middleware/*": [
+        "./src/middleware/*"
+      ],
+      "@models/*": [
+        "./src/models/*"
+      ],
+      "@controllers/*": [
+        "./src/controllers/*"
+      ],
+      "@/*": [
+        "./src/*"
+      ]
+    },
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "types": [
+    "@types/jest"
+  ],
+  "exclude": [
+    "./plugins/**/*",
+    "./typings/**/*",
+    "./build/**/*" // This is what fixed it!
+  ]
+}
