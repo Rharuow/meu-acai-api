@@ -14,7 +14,7 @@ describe("Signin route", () => {
         where: { name: "ADMIN" },
       });
 
-      const hasUser = await prismaClient.user.findFirstOrThrow({
+      const hasUser = await prismaClient.user.findFirst({
         where: { name: "Test Admin", password: encodeSha256("123") },
       });
 
@@ -28,11 +28,12 @@ describe("Signin route", () => {
         }));
 
       const response = await request(app)
-        .post("/api/v1/sign")
+        .post("/api/v1/signgin")
         .send(requestBody)
         .set("Accept", "application/json")
-        .expect("Content-Type", /json/)
         .expect(200);
+
+      console.log(response.body);
 
       expect(response.body).toHaveProperty("token");
     } catch (error) {

@@ -28,10 +28,11 @@ app.use("/api/v1", router);
 const start = () => {
   try {
     // Method to make express service start to listen requests in port defined by const PORT.
-    app.listen(PORT, () => {
-      console.log(`Server started on port ${PORT}`);
-      return;
-    });
+    if (process.env.NODE_ENV !== "test")
+      app.listen(PORT, () => {
+        console.log(`Server started on port ${PORT}`);
+        return;
+      });
   } catch (error) {
     console.error(error);
     process.exit(1);
