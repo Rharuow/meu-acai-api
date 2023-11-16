@@ -13,13 +13,19 @@ describe("Signin route", () => {
       const adminRole = await prismaClient.role.findFirstOrThrow({
         where: { name: "ADMIN" },
       });
-      const user = await prismaClient.user.create({
-        data: {
-          name: "Test Admin",
-          password: encodeSha256("123"),
-          roleId: adminRole.id,
-        },
+
+      const hasUser = await prismaClient.user.findFirstOrThrow({
+        where: { name: "Test Admin", password: encodeSha256("123") },
       });
+
+      !hasUser &&
+        (await prismaClient.user.create({
+          data: {
+            name: "Test Admin",
+            password: encodeSha256("123"),
+            roleId: adminRole.id,
+          },
+        }));
 
       const response = await request(app)
         .post("/api/v1/sign")
