@@ -11,9 +11,13 @@ export const signIn = async (req: Request, res: Response) => {
       where: { name: username, password: encodeSha256(password) },
     });
 
-    const token = jwt.sign(user, process.env.TOKEN_SECRET, {
-      expiresIn: Math.floor(Date.now() / 1000) + 60 * 60, // token with 1 hour of expiration
-    });
+    const token = jwt.sign(
+      { id: user.id, name: user.name, role: user.roleId },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: process.env.NODE_ENV === "test" ? 1 : "1h", // token with 1 hour of expiration
+      }
+    );
 
     return res
       .status(200)
