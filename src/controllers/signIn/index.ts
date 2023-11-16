@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
-import { prismaClient } from "@/lib/prisma";
-import { encodeSha256 } from "@/lib/crypto";
+import { prismaClient } from "@libs/prisma";
+import { encodeSha256 } from "@libs/crypto";
 
 export const signIn = async (req: Request, res: Response) => {
   const { username, password } = req.body;
@@ -15,13 +15,15 @@ export const signIn = async (req: Request, res: Response) => {
       { id: user.id, name: user.name, role: user.roleId },
       process.env.TOKEN_SECRET,
       {
-        expiresIn: process.env.NODE_ENV === "test" ? 1 : "1h", // token with 1 hour of expiration
+        expiresIn: process.env.NODE_ENV === "test" ? 1 : "24h", // token with 1 hour of expiration
       }
     );
 
-    return res
-      .status(200)
-      .json({ message: "Token session created successfully", token });
+    return res.status(200).json({
+      message: "Token session created successfully",
+      token,
+      user: { id: user.id, name: user.name, roleId: user.roleId },
+    });
   } catch (error) {
     console.log("signIn controller = ", error);
     if (error.message === "NotFoundError: No User found error")

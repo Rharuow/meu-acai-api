@@ -16,14 +16,17 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
+      "@/*": [
+        "./src/*"
+      ],
       "@repositories/*": [
         "./src/repositories/*"
       ],
-      "@service/*": [
-        "./src/service/*"
+      "@services/*": [
+        "./src/services/*"
       ],
-      "@middleware/*": [
-        "./src/middleware/*"
+      "@middlewares/*": [
+        "./src/middlewares/*"
       ],
       "@models/*": [
         "./src/models/*"
@@ -31,9 +34,9 @@
       "@controllers/*": [
         "./src/controllers/*"
       ],
-      "@/*": [
-        "./src/*"
-      ]
+      "@libs/*": [
+        "./src/libs/*"
+      ],
     },
   },
   "include": [

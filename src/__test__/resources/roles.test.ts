@@ -1,4 +1,4 @@
-import { prismaClient } from "@/lib/prisma";
+import { prismaClient } from "@/libs/prisma";
 
 describe("CRUD of role resource", () => {
   test("should create a role in db called 'ADMIN' if not exist", async () => {

@@ -12,6 +12,15 @@
     "start": "node build/app.js",
     "dev": "nodemon"
   },
+  "_moduleAliases": {
+    "@controllers": "src/controllers",
+    "@models": "src/models",
+    "@middlewares": "src/middlewares",
+    "@routes": "src/routes",
+    "@services": "src/services",
+    "@libs": "src/libs",
+    "@repositories": "src/repositories"
+  },
   "dependencies": {
     "@auth/prisma-adapter": "^1.0.6",
     "@prisma/client": "^5.6.0",
@@ -20,11 +29,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.3",
     "@types/cors": "^2.8.16",
+    "@types/express-validator": "^3.0.0",
     "@types/jest": "^29.5.8",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/module-alias": "^2.0.4",

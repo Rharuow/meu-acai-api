@@ -1,6 +1,6 @@
 import request from "supertest";
-import { encodeSha256 } from "@/lib/crypto";
-import { prismaClient } from "@/lib/prisma";
+import { encodeSha256 } from "@/libs/crypto";
+import { prismaClient } from "@/libs/prisma";
 import { app } from "@/app";
 import { verify } from "jsonwebtoken";
 
