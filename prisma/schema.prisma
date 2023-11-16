@@ -18,7 +18,7 @@ enum ROLE {
 
 model Role {
   id String @id @default(uuid())
-  name ROLE
+  name ROLE @unique
   user User[]
 }
 
