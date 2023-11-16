@@ -25,11 +25,12 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDef));
 app.use("/api/v1", router);
 
 // Methods to start server.
-const start = async () => {
+const start = () => {
   try {
     // Method to make express service start to listen requests in port defined by const PORT.
     app.listen(PORT, () => {
       console.log(`Server started on port ${PORT}`);
+      return;
     });
   } catch (error) {
     console.error(error);

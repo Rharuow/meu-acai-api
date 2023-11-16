@@ -37,7 +37,8 @@
     },
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*",
+    "jest.config.js"
   ],
   "types": [
     "@types/jest"
