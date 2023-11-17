@@ -11,7 +11,7 @@ const requestBody = {
 let token: string;
 
 describe("Sign in route", () => {
-  test("when access POST route '/api/v1/signgin' contains in body the username and password correclty", async () => {
+  test("when access POST route '/api/v1/signgin' contains in body the username and password correclty return in body the token and the user", async () => {
     try {
       const response = await request(app)
         .post("/api/v1/signgin")
@@ -20,6 +20,10 @@ describe("Sign in route", () => {
         .expect(200);
 
       expect(response.body).toHaveProperty("token");
+      expect(response.body).toHaveProperty("user");
+      expect(response.body.user).toHaveProperty("id");
+      expect(response.body.user).toHaveProperty("name");
+      expect(response.body.user).toHaveProperty("roleId");
 
       token = response.body.token;
 
