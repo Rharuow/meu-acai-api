@@ -16,9 +16,6 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
       "@repositories/*": [
         "./src/repositories/*"
       ],
@@ -36,6 +33,9 @@
       ],
       "@libs/*": [
         "./src/libs/*"
+      ],
+      "@/*": [
+        "./src/*"
       ],
     },
   },

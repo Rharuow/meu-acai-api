@@ -1,15 +1,12 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
-import { prismaClient } from "@libs/prisma";
-import { encodeSha256 } from "@libs/crypto";
+import { getUser } from "@repositories/user";
 
 export const signIn = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   try {
-    const user = await prismaClient.user.findFirstOrThrow({
-      where: { name: username, password: encodeSha256(password) },
-    });
+    const user = await getUser({ password, username });
 
     const token = jwt.sign(
       { id: user.id, name: user.name, role: user.roleId },

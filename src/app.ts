@@ -14,6 +14,22 @@ const app = express();
 // Adding middleware cores to express services
 app.use(cors());
 
+app.use((_, res, next) => {
+  res.header("Access-Control-Allow-Origin", process.env.ORIGIN_URL); // Adjust as needed for CORS
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header("X-Content-Type-Options", "nosniff");
+  res.header("X-Frame-Options", "DENY");
+  res.header(
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains"
+  ); // Use HSTS
+  res.header("X-XSS-Protection", "1; mode=block");
+  next();
+});
+
 // Adding middleware to accept json at body requests and limiting 10kb
 app.use(express.json({ limit: "10kb" }));
 
