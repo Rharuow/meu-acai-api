@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 
-export const validationQueryParams = (
+export const validationSignInParams = (
   req: Request,
   res: Response,
   next: NextFunction
