@@ -2,6 +2,8 @@ import { app } from "@/app";
 import { User } from "@prisma/client";
 import { VerifyErrors, verify } from "jsonwebtoken";
 import request from "supertest";
+import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
+import { createUserIfNotExist } from "../utils/createUserIfNotExists copy";
 
 const requestBody = {
   username: "Test Admin",
@@ -9,6 +11,11 @@ const requestBody = {
 };
 
 const futureTime = Math.floor(Date.now() / 1000) + 10;
+
+beforeAll(async () => {
+  const adminId = await createAdminRoleIfNotExist();
+  await createUserIfNotExist(adminId);
+});
 
 describe("Refresh token router", () => {
   test("when the accessToken expires, the refresh token router is called to regenerate a new access token", async () => {

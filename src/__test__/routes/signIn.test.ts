@@ -2,6 +2,8 @@ import { app } from "@/app";
 import { User } from "@prisma/client";
 import { verify } from "jsonwebtoken";
 import request from "supertest";
+import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
+import { createUserIfNotExist } from "../utils/createUserIfNotExists copy";
 
 const requestBody = {
   username: "Test Admin",
@@ -10,6 +12,11 @@ const requestBody = {
 
 let accessToken: string;
 let refreshToken: string;
+
+beforeAll(async () => {
+  const adminId = await createAdminRoleIfNotExist();
+  await createUserIfNotExist(adminId);
+});
 
 describe("Sign in route", () => {
   test("when access POST route '/api/v1/signin' contains in body the username and password correclty return in body the accessToken, refreshToken and the user", async () => {

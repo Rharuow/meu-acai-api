@@ -1,8 +1,8 @@
 import request from "supertest";
-import { encodeSha256 } from "@/libs/crypto";
-import { prismaClient } from "@/libs/prisma";
 import { app } from "@/app";
 import { verify } from "jsonwebtoken";
+import { createAdminRoleIfNotExist } from "./utils/createAdminRoleIfNotExists";
+import { createUserIfNotExist } from "./utils/createUserIfNotExists copy";
 
 type User = {
   id: string;
@@ -18,29 +18,12 @@ const requestBody = {
   password: "123",
 };
 
+beforeAll(async () => {
+  const adminId = await createAdminRoleIfNotExist();
+  await createUserIfNotExist(adminId);
+});
+
 describe("Signin route", () => {
-  beforeAll(async () => {
-    const [adminRole, hasUser] = await Promise.all([
-      await prismaClient.role.findFirstOrThrow({
-        where: { name: "ADMIN" },
-      }),
-      await prismaClient.user.findFirst({
-        where: { name: "Test Admin", password: encodeSha256("123") },
-      }),
-    ]);
-
-    return (
-      !hasUser &&
-      (await prismaClient.user.create({
-        data: {
-          name: "Test Admin",
-          password: encodeSha256("123"),
-          roleId: adminRole.id,
-        },
-      }))
-    );
-  });
-
   test("when access POST route '/api/v1/signin' contains in body the username and password correclty", async () => {
     try {
       const response = await request(app)

@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      =  env("DATABASE_URL")
 }
 
 enum ROLE {
@@ -18,12 +18,18 @@ enum ROLE {
 
 model Role {
   id String @id @default(uuid())
+  createdAt  DateTime   @default(now())
+  deletedAt  DateTime?   
+  updatedAt  DateTime   @updatedAt
   name ROLE @unique
   user User[]
 }
 
 model User {
   id String @id @default(uuid())
+  createdAt  DateTime   @default(now())
+  deletedAt  DateTime?   
+  updatedAt  DateTime   @updatedAt
   name String
   password String
   roleId String
@@ -35,12 +41,21 @@ model User {
 
 model Admin {
   id String @id @default(uuid())
+  createdAt  DateTime   @default(now())
+  deletedAt  DateTime?   
+  updatedAt  DateTime   @updatedAt
   userId String
   user User @relation(fields: [userId], references: [id])
+  toppings Topping[]
+  creams Cream[]
+  products Product[]
 }
 
 model Client {
   id String @id @default(uuid())
+  createdAt  DateTime   @default(now())
+  deletedAt  DateTime?   
+  updatedAt  DateTime   @updatedAt
   userId String
   user User @relation(fields: [userId], references: [id])
   addressId String @unique
@@ -50,6 +65,9 @@ model Client {
 
 model Member {
   id String @id @default(uuid())
+  createdAt  DateTime   @default(now())
+  deletedAt  DateTime?   
+  updatedAt  DateTime   @updatedAt
   userId String
   user User @relation(fields: [userId], references: [id])
   relationship String?
@@ -59,8 +77,59 @@ model Member {
 
 model Address {
   id String @id @default(uuid())
+  createdAt  DateTime   @default(now())
+  deletedAt  DateTime?   
+  updatedAt  DateTime   @updatedAt
   square String
   house String
   clientId String @unique
   client Client?
+}
+
+model Topping {
+  id String @id @default(uuid())
+  createdAt  DateTime   @default(now())
+  deletedAt  DateTime?   
+  updatedAt  DateTime   @updatedAt
+  name String @unique
+  photo String?
+  isSpecial Boolean @default(false)
+  available Boolean @default(false)
+  price Float
+  amount Int
+  unit String
+  adminId String
+  createdBy Admin @relation(fields: [adminId], references: [id])
+}
+
+model Cream {
+  id String @id @default(uuid())
+  createdAt  DateTime   @default(now())
+  deletedAt  DateTime?   
+  updatedAt  DateTime   @updatedAt
+  photo String?
+  name String @unique
+  isSpecial Boolean @default(false)
+  available Boolean @default(false)
+  price Float
+  amount Int
+  unit String
+  adminId String
+  createdBy Admin @relation(fields: [adminId], references: [id])
+}
+
+model Product {
+  id String @id @default(uuid())
+  size String @unique
+  name String?
+  createdAt  DateTime   @default(now())
+  photo String?
+  deletedAt  DateTime?
+  updatedAt  DateTime   @updatedAt
+  available Boolean @default(false)
+  price Float
+  maxCreamsAllowed Int
+  maxToppingsAllowed Int
+  adminId String
+  createdBy Admin @relation(fields: [adminId], references: [id])
 }
