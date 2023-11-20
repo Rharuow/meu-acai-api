@@ -19,11 +19,11 @@
       "@repositories/*": [
         "./src/repositories/*"
       ],
-      "@service/*": [
-        "./src/service/*"
+      "@services/*": [
+        "./src/services/*"
       ],
-      "@middleware/*": [
-        "./src/middleware/*"
+      "@middlewares/*": [
+        "./src/middlewares/*"
       ],
       "@models/*": [
         "./src/models/*"
@@ -31,13 +31,17 @@
       "@controllers/*": [
         "./src/controllers/*"
       ],
+      "@libs/*": [
+        "./src/libs/*"
+      ],
       "@/*": [
         "./src/*"
-      ]
+      ],
     },
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*",
+    "jest.config.js"
   ],
   "types": [
     "@types/jest"
