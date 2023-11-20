@@ -2,24 +2,38 @@ import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { getUser } from "@repositories/user";
 
-export const signIn = async (req: Request, res: Response) => {
+export const signInController = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   try {
-    const user = await getUser({ password, username });
+    const user = await getUser({ password, username }, ["Role"]);
 
-    const token = jwt.sign(
-      { id: user.id, name: user.name, role: user.roleId },
+    const accessToken = jwt.sign(
+      { id: user.id, name: user.name, roleId: user.roleId, role: user.role },
       process.env.TOKEN_SECRET,
       {
-        expiresIn: process.env.NODE_ENV === "test" ? 1 : "24h", // token with 1 hour of expiration
+        expiresIn: process.env.NODE_ENV === "test" ? 5 : "15m", // token with 15 minutes of expiration
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user.id, name: user.name, roleId: user.roleId, role: user.role },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: process.env.NODE_ENV === "test" ? 10 : "1d", // token with 1 hour of expiration
       }
     );
 
     return res.status(200).json({
       message: "Token session created successfully",
-      token,
-      user: { id: user.id, name: user.name, roleId: user.roleId },
+      accessToken: accessToken.trim(),
+      refreshToken: refreshToken.trim(),
+      user: {
+        id: user.id,
+        name: user.name,
+        roleId: user.roleId,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.log("signIn controller = ", error);

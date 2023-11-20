@@ -9,7 +9,9 @@ type Params = {
   id?: string;
 };
 
-const createQuery = (params?: Params) => {
+type Includes = "Role";
+
+const createQuery = (params?: Params, includes?: Array<Includes>) => {
   let query = {};
 
   if (params.id && params.username && params.password)
@@ -52,6 +54,13 @@ const createQuery = (params?: Params) => {
       },
     };
 
+  if (includes && includes)
+    query = {
+      ...query,
+      include: {
+        role: true,
+      },
+    };
   return query;
 };
 
@@ -76,11 +85,13 @@ const createReferenceMememoryQuery = (params?: Params) => {
   return referenceString;
 };
 
-export const getUser = async (params?: Params) => {
+export const getUser = async (params?: Params, includes?: Array<Includes>) => {
   const reference = createReferenceMememoryQuery(params);
   if (!userInMemory.hasItem(reference)) {
     console.log("QUERY IN DB");
-    const user = await prismaClient.user.findFirstOrThrow(createQuery(params));
+    const user = await prismaClient.user.findFirstOrThrow(
+      createQuery(params, includes)
+    );
     userInMemory.storeExpiringItem(
       reference,
       user,

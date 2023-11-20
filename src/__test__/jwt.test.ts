@@ -11,7 +11,7 @@ type User = {
   roleId: string;
 };
 
-let token: string;
+let accessToken: string;
 
 const requestBody = {
   username: "Test Admin",
@@ -41,20 +41,20 @@ describe("Signin route", () => {
     );
   });
 
-  test("when access POST route '/api/v1/signgin' contains in body the username and password correclty", async () => {
+  test("when access POST route '/api/v1/signin' contains in body the username and password correclty", async () => {
     try {
       const response = await request(app)
-        .post("/api/v1/signgin")
+        .post("/api/v1/signin")
         .send(requestBody)
         .set("Accept", "application/json")
         .expect(200);
 
-      expect(response.body).toHaveProperty("token");
+      expect(response.body).toHaveProperty("accessToken");
 
-      token = response.body.token;
+      accessToken = response.body.accessToken;
 
       return verify(
-        token,
+        accessToken,
         process.env.TOKEN_SECRET,
         (err: any, decoded: User) => {
           if (err) console.log("Token verification failed:", err.message);
@@ -69,11 +69,11 @@ describe("Signin route", () => {
     }
   });
 
-  test("when expiring token and trying to get user, a error is returned", async () => {
+  test("when expiring accessToken and trying to get user, a error is returned", async () => {
     const futureTime = Math.floor(Date.now() / 1000) + 5;
 
     return verify(
-      token,
+      accessToken,
       process.env.TOKEN_SECRET,
       { clockTimestamp: futureTime },
       (err: any, decode: any) => {

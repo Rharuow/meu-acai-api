@@ -1,5 +1,5 @@
 import "module-alias/register";
-import { signIn } from "@controllers/signIn";
+import { signInController } from "@controllers/signIn";
 import { Router } from "express";
 import {
   Schema,
@@ -26,7 +26,7 @@ export const validationBodySignInSchema: Schema = {
 const signInRouter = Router();
 
 signInRouter.use(
-  // check if has query parameters
+  "/signin", // check if has query parameters
   // Middleware to check each launch request query parameters
   checkExact(
     [
@@ -42,6 +42,6 @@ signInRouter.use(
   (req, res, next) => validationSignInParams(req, res, next)
 );
 
-signInRouter.post("/signgin", signIn);
+signInRouter.post("/signin", signInController);
 
 export { signInRouter };

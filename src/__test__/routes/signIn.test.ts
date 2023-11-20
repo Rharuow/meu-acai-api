@@ -8,27 +8,41 @@ const requestBody = {
   password: "123",
 };
 
-let token: string;
+let accessToken: string;
+let refreshToken: string;
 
 describe("Sign in route", () => {
-  test("when access POST route '/api/v1/signgin' contains in body the username and password correclty return in body the token and the user", async () => {
+  test("when access POST route '/api/v1/signin' contains in body the username and password correclty return in body the accessToken, refreshToken and the user", async () => {
     try {
       const response = await request(app)
-        .post("/api/v1/signgin")
+        .post("/api/v1/signin")
         .send(requestBody)
         .set("Accept", "application/json")
         .expect(200);
 
-      expect(response.body).toHaveProperty("token");
+      expect(response.body).toHaveProperty("accessToken");
+      expect(response.body).toHaveProperty("refreshToken");
       expect(response.body).toHaveProperty("user");
       expect(response.body.user).toHaveProperty("id");
       expect(response.body.user).toHaveProperty("name");
       expect(response.body.user).toHaveProperty("roleId");
 
-      token = response.body.token;
+      accessToken = response.body.token;
+      refreshToken = response.body.refreshToken;
+
+      verify(
+        refreshToken,
+        process.env.TOKEN_SECRET,
+        (err: any, decoded: User) => {
+          if (err) console.log("Token verification failed:", err.message);
+          else {
+            expect(decoded.name).toBe("Test Admin");
+          }
+        }
+      );
 
       return verify(
-        token,
+        accessToken,
         process.env.TOKEN_SECRET,
         (err: any, decoded: User) => {
           if (err) console.log("Token verification failed:", err.message);
@@ -46,7 +60,7 @@ describe("Sign in route", () => {
   test("when send unpermitted params in body, return 422", async () => {
     try {
       const response = await request(app)
-        .post("/api/v1/signgin")
+        .post("/api/v1/signin")
         .send({ ...requestBody, unpermittedParam: true })
         .set("Accept", "application/json")
         .expect(422);
@@ -65,7 +79,7 @@ describe("Sign in route", () => {
   test("when send missing params in body, return 422", async () => {
     try {
       const response = await request(app)
-        .post("/api/v1/signgin")
+        .post("/api/v1/signin")
         .send({ username: "Missing password" })
         .set("Accept", "application/json")
         .expect(422);
@@ -84,7 +98,7 @@ describe("Sign in route", () => {
   test("when send query params, return 422", async () => {
     try {
       const response = await request(app)
-        .post("/api/v1/signgin?someParam=true")
+        .post("/api/v1/signin?someParam=true")
         .send(requestBody)
         .set("Accept", "application/json")
         .expect(422);
