@@ -3,6 +3,7 @@ import { app } from "@/app";
 import { verify } from "jsonwebtoken";
 import { createAdminRoleIfNotExist } from "./utils/createAdminRoleIfNotExists";
 import { createUserIfNotExist } from "./utils/createUserIfNotExists copy";
+import { userAdmin } from "./utils/userAdmin";
 
 type User = {
   id: string;
@@ -12,11 +13,6 @@ type User = {
 };
 
 let accessToken: string;
-
-const requestBody = {
-  username: "Test Admin",
-  password: "123",
-};
 
 beforeAll(async () => {
   const adminId = await createAdminRoleIfNotExist();
@@ -28,7 +24,7 @@ describe("Signin route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
-        .send(requestBody)
+        .send(userAdmin)
         .set("Accept", "application/json")
         .expect(200);
 

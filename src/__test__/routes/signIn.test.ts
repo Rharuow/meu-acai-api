@@ -4,11 +4,7 @@ import { verify } from "jsonwebtoken";
 import request from "supertest";
 import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
 import { createUserIfNotExist } from "../utils/createUserIfNotExists copy";
-
-const requestBody = {
-  username: "Test Admin",
-  password: "123",
-};
+import { userAdmin } from "../utils/userAdmin";
 
 let accessToken: string;
 let refreshToken: string;
@@ -23,7 +19,7 @@ describe("Sign in route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
-        .send(requestBody)
+        .send(userAdmin)
         .set("Accept", "application/json")
         .expect(200);
 
@@ -68,7 +64,7 @@ describe("Sign in route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
-        .send({ ...requestBody, unpermittedParam: true })
+        .send({ ...userAdmin, unpermittedParam: true })
         .set("Accept", "application/json")
         .expect(422);
 
@@ -106,7 +102,7 @@ describe("Sign in route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin?someParam=true")
-        .send(requestBody)
+        .send(userAdmin)
         .set("Accept", "application/json")
         .expect(422);
 
@@ -119,5 +115,23 @@ describe("Sign in route", () => {
       console.log(error);
       throw new Error(error.message);
     }
+  });
+
+  test("when try to make signin with password or username invalid return 401", async () => {
+    const responseWithUsernameWrong = await request(app)
+      .post("/api/v1/signin")
+      .send({ username: "wrong", password: userAdmin.password })
+      .set("Accept", "application/json")
+      .expect(401);
+
+    const responseWithPasswordWrong = await request(app)
+      .post("/api/v1/signin")
+      .send({ username: userAdmin.username, password: "wrong" })
+      .set("Accept", "application/json")
+      .expect(401);
+
+    expect(responseWithPasswordWrong.statusCode).toBe(401);
+
+    return expect(responseWithUsernameWrong.statusCode).toBe(401);
   });
 });

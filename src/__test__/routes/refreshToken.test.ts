@@ -4,11 +4,7 @@ import { VerifyErrors, verify } from "jsonwebtoken";
 import request from "supertest";
 import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
 import { createUserIfNotExist } from "../utils/createUserIfNotExists copy";
-
-const requestBody = {
-  username: "Test Admin",
-  password: "123",
-};
+import { userAdmin } from "../utils/userAdmin";
 
 const futureTime = Math.floor(Date.now() / 1000) + 10;
 
@@ -21,7 +17,7 @@ describe("Refresh token router", () => {
   test("when the accessToken expires, the refresh token router is called to regenerate a new access token", async () => {
     const responseSignIn = await request(app)
       .post("/api/v1/signin")
-      .send(requestBody)
+      .send(userAdmin)
       .set("Accept", "application/json")
       .expect(200);
 
