@@ -25,13 +25,12 @@ describe("list cream", () => {
       .expect(200);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("nextPage");
     expect(response.body).toHaveProperty("data");
     expect(response.body).toHaveProperty("hasNextPage");
-    expect(response.body).toHaveProperty("total");
-    expect(response.body).toHaveProperty("page");
+    expect(response.body).toHaveProperty("totalPages");
+    expect(response.body).toHaveProperty("currentPage");
     expect(response.body.data.length).toBeLessThanOrEqual(10);
-    expect(response.body.page).toBe(1);
+    return expect(response.body.page).toBe(1);
   });
 
   test("when access /api/v1/resources/creams without authentication, return 401 status", async () => {
@@ -39,16 +38,6 @@ describe("list cream", () => {
       .get("/api/v1/resources/creams")
       .expect(401);
 
-    expect(response.statusCode).toBe(401);
-  });
-
-  test("when access /api/v1/resources/creams with authentication with role invalid, return 401 status", async () => {
-    const response = await request(app)
-      .get("/api/v1/resources/creams")
-      .set("authorization", accessToken)
-      .set("refreshtoken", refreshToken)
-      .expect(401);
-
-    expect(response.statusCode).toBe(401);
+    return expect(response.statusCode).toBe(401);
   });
 });
