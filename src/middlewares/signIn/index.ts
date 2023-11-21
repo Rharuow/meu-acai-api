@@ -1,8 +1,6 @@
-import { User } from "@prisma/client";
 import { getUser } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { verify } from "jsonwebtoken";
 
 export const validationSignInParams = (
   req: Request,

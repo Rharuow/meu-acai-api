@@ -49,7 +49,6 @@ describe("Refresh token router", () => {
       secondAccessToken,
       process.env.TOKEN_SECRET,
       (err: VerifyErrors, user: User) => {
-        console.log("User = ", user);
         expect(err).toBeNull();
         expect(user).toBeTruthy();
         expect(user).toHaveProperty("name");
