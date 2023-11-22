@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-export const validationQueryparams = (
+export const validationQueryParams = (
   req: Request<{}, {}, {}, qs.ParsedQs & QueryParms>,
   res: Response,
   next: NextFunction

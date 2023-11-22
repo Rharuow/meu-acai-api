@@ -1,6 +1,6 @@
 import { creamsInMemory, totalCreamsInMemory } from "@libs/memory-cache";
 import { prismaClient } from "@libs/prisma";
-import { Cream } from "@prisma/client";
+import { Admin, Cream } from "@prisma/client";
 
 type Params = {
   page: number;
@@ -51,4 +51,20 @@ export const listCreams: (
     creamsInMemory.retrieveItemValue(reference),
     totalCreamsInMemory.retrieveItemValue(`total-${reference}`),
   ];
+};
+
+export const createCream: (
+  fields: CreateCreamRequestBody & { adminId: string }
+) => Promise<Cream> = async ({ amount, name, price, unit, photo, adminId }) => {
+  const admin = await prismaClient.admin.findFirst({ where: { id: adminId } });
+  return await prismaClient.cream.create({
+    data: {
+      name,
+      amount,
+      price,
+      unit,
+      createdBy: { connect: admin },
+      ...(photo && { photo }),
+    },
+  });
 };

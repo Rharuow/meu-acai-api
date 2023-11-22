@@ -15,7 +15,6 @@ export const validationUserAccessToken = (
     if (!authorization) return unauthorized(res);
 
     const accessToken = authorization.split("Bearer ")[1];
-    console.log("accessToken: " + authorization);
 
     if (!accessToken) return unauthorized(res);
 
@@ -24,7 +23,7 @@ export const validationUserAccessToken = (
       process.env.TOKEN_SECRET,
       async (err: VerifyErrors, user: User) => {
         if (err) throw new Error(err.name + err.inner + err.message);
-        const hasUser = await getUser(user);
+        const hasUser = await getUser(user, ["Role"]);
         if (!hasUser) throw new Error("User not found");
       }
     );

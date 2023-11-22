@@ -27,3 +27,8 @@ export const listCreamsSerializer: (params: Params) => ListCreamsSerializer = ({
     totalPages,
   };
 };
+
+export const createCreamSerializer = (cream: Cream) => ({
+  message: "Cream created successfully",
+  data: cream,
+});

@@ -16,7 +16,7 @@ beforeAll(async () => {
   refreshToken = response.body.refreshToken;
 });
 
-const createCreamRequestBody = {
+const createCreamRequestBody: CreateCreamRequestBody = {
   name: "Test Cream",
   price: 9.99,
   amount: 1,

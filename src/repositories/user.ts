@@ -54,7 +54,7 @@ const createQuery = (params?: Params, includes?: Array<Includes>) => {
       },
     };
 
-  if (includes && includes)
+  if (includes && includes.includes("Role"))
     query = {
       ...query,
       include: {
@@ -64,7 +64,10 @@ const createQuery = (params?: Params, includes?: Array<Includes>) => {
   return query;
 };
 
-const createReferenceMemoryQuery = (params?: Params) => {
+const createReferenceMemoryQuery = (
+  params?: Params,
+  includes?: Array<Includes>
+) => {
   let referenceString = "user";
 
   if (!params) return referenceString;
@@ -82,13 +85,18 @@ const createReferenceMemoryQuery = (params?: Params) => {
       `username=${params.username}`
     );
 
+  if (includes && includes.length > 0) {
+    includes.forEach((include) => {
+      referenceString = referenceString.concat("-", include);
+    });
+  }
+
   return referenceString;
 };
 
 export const getUser = async (params?: Params, includes?: Array<Includes>) => {
   const reference = createReferenceMemoryQuery(params);
   if (!userInMemory.hasItem(reference)) {
-    console.log("USER IN DB");
     const user = await prismaClient.user.findFirstOrThrow(
       createQuery(params, includes)
     );

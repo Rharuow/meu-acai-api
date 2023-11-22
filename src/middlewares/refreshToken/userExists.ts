@@ -15,7 +15,7 @@ export const userExists = async (
     req.headers.authorization.split("Bearer ")[1],
     process.env.TOKEN_SECRET,
     async (err: VerifyErrors, user: User) => {
-      const hasUser = await getUser({ id: user.id });
+      const hasUser = await getUser({ id: user.id }, ["Role"]);
       if (!hasUser) status = 401;
     }
   );

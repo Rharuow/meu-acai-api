@@ -26,8 +26,8 @@ export const signInController = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: "Token session created successfully",
-      accessToken: accessToken.trim(),
-      refreshToken: refreshToken.trim(),
+      accessToken: accessToken,
+      refreshToken: refreshToken,
       user: {
         id: user.id,
         name: user.name,
