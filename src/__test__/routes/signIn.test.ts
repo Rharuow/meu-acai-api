@@ -5,13 +5,15 @@ import request from "supertest";
 import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
 import { createUserIfNotExist } from "../utils/createUserIfNotExists copy";
 import { userAdmin } from "../utils/userAdmin";
+import { createUserAdminIfNotExists } from "../utils/createUserAdminIfNotExists";
 
 let accessToken: string;
 let refreshToken: string;
 
 beforeAll(async () => {
   const adminId = await createAdminRoleIfNotExist();
-  await createUserIfNotExist(adminId);
+  const user = await createUserIfNotExist(adminId);
+  await createUserAdminIfNotExists(user);
 });
 
 describe("Sign in route", () => {

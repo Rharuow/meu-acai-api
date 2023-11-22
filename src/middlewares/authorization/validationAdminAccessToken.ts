@@ -1,6 +1,7 @@
 import { unauthorized } from "@/serializeres/erros/401";
 import { prismaClient } from "@libs/prisma";
 import { Role, User } from "@prisma/client";
+import { getUser } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 import { VerifyErrors, verify } from "jsonwebtoken";
 
@@ -9,29 +10,44 @@ export const validationAdminAccessToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  const accessToken = req.headers.authorization.split("Bearer ")[1];
+  const { authorization } = req.headers;
 
-  let status = 200;
+  if (!authorization) return unauthorized(res);
 
-  verify(
-    accessToken,
-    process.env.TOKEN_SECRET,
-    async (err: VerifyErrors, user: User & { role: Role }) => {
-      console.log(user);
-      if (err || user.role.name !== "ADMIN") {
-        console.log("err = ", err);
-        status = 401;
-        return err;
-      }
+  const accessToken = authorization.split("Bearer ")[1];
 
-      const admin = await prismaClient.admin.findFirstOrThrow({
-        where: { userId: user.id },
-      });
+  if (!accessToken) return unauthorized(res);
 
-      req.headers["adminId"] = admin.id;
-      return admin.id;
+  try {
+    const user = await new Promise<User & { role: Role }>((resolve, reject) => {
+      return verify(
+        accessToken,
+        process.env.TOKEN_SECRET,
+        async (err: VerifyErrors, decoded: User & { role: Role }) => {
+          if (err) return reject(err);
+          const userExists = await getUser({
+            id: decoded.id,
+            username: decoded.name,
+          });
+          if (!userExists) return reject("User does not exist");
+          return resolve(decoded);
+        }
+      );
+    });
+
+    if (!user || user.role.name !== "ADMIN") {
+      console.log("User is not an admin.");
+      return unauthorized(res);
     }
-  );
 
-  return status === 200 ? next() : unauthorized(res);
+    const admin = await prismaClient.admin.findFirstOrThrow({
+      where: { userId: user.id },
+    });
+
+    res.locals.adminId = admin.id;
+    return next();
+  } catch (error) {
+    console.log("Error verifying token:", error);
+    return unauthorized(res);
+  }
 };

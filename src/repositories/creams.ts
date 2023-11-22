@@ -56,14 +56,13 @@ export const listCreams: (
 export const createCream: (
   fields: CreateCreamRequestBody & { adminId: string }
 ) => Promise<Cream> = async ({ amount, name, price, unit, photo, adminId }) => {
-  const admin = await prismaClient.admin.findFirst({ where: { id: adminId } });
   return await prismaClient.cream.create({
     data: {
       name,
       amount,
       price,
       unit,
-      createdBy: { connect: admin },
+      adminId,
       ...(photo && { photo }),
     },
   });

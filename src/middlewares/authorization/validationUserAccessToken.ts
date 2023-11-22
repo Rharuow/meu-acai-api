@@ -1,10 +1,10 @@
 import { unauthorized } from "@/serializeres/erros/401";
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import { getUser } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 import { VerifyErrors, verify } from "jsonwebtoken";
 
-export const validationUserAccessToken = (
+export const validationUserAccessToken = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -18,15 +18,23 @@ export const validationUserAccessToken = (
 
     if (!accessToken) return unauthorized(res);
 
-    verify(
-      accessToken,
-      process.env.TOKEN_SECRET,
-      async (err: VerifyErrors, user: User) => {
-        if (err) throw new Error(err.name + err.inner + err.message);
-        const hasUser = await getUser(user, ["Role"]);
-        if (!hasUser) throw new Error("User not found");
-      }
-    );
+    const user = await new Promise<User & { role: Role }>((resolve, reject) => {
+      return verify(
+        accessToken,
+        process.env.TOKEN_SECRET,
+        async (err: VerifyErrors, decoded: User & { role: Role }) => {
+          if (err) return reject(err);
+          const hasUser = await getUser({
+            id: decoded.id,
+            username: decoded.name,
+          });
+          if (!hasUser) return reject("User not found");
+          return resolve(decoded);
+        }
+      );
+    });
+
+    if (!user) return unauthorized(res);
 
     return next();
   } catch (error) {

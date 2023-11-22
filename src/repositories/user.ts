@@ -50,7 +50,7 @@ const createQuery = (params?: Params, includes?: Array<Includes>) => {
     query = {
       where: {
         id: params.id,
-        password: encodeSha256(params.password),
+        name: params.username,
       },
     };
 
@@ -95,7 +95,7 @@ const createReferenceMemoryQuery = (
 };
 
 export const getUser = async (params?: Params, includes?: Array<Includes>) => {
-  const reference = createReferenceMemoryQuery(params);
+  const reference = createReferenceMemoryQuery(params, includes);
   if (!userInMemory.hasItem(reference)) {
     const user = await prismaClient.user.findFirstOrThrow(
       createQuery(params, includes)

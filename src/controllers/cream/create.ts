@@ -5,10 +5,10 @@ import { Request, Response } from "express";
 export const createCreamController = async (req: Request, res: Response) => {
   const fields = req.body as CreateCreamRequestBody;
 
-  const { adminId } = req.headers as { adminId: string };
+  const { adminId } = res.locals as { adminId: string };
 
   try {
-    const cream = await createCream({ ...fields, adminId });
+    const cream = await createCream({ ...fields, adminId: adminId });
 
     return res.json(createCreamSerializer(cream));
   } catch (error) {

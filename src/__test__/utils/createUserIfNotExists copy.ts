@@ -10,14 +10,15 @@ export const createUserIfNotExist = async (id: string) => {
     },
   });
 
-  !user &&
-    (await prismaClient.user.create({
+  if (!user)
+    return await prismaClient.user.create({
       data: {
         name: userAdmin.username,
         password: encodeSha256(userAdmin.password),
         roleId: id,
       },
-    }));
+    });
+  return user;
 };
 
 export const cleanCreateUserIfNotExist = async () => {
