@@ -214,9 +214,24 @@ describe("CRUD cream", () => {
     return expect(response.statusCode).toBe(422);
   });
 
-  test("when access PUT /api/v1/resources/creams/:id without authentication, return 401", () => {});
+  test("when access PUT /api/v1/resources/creams/:id without authentication, return 401", async () => {
+    const response = await request(app)
+      .put(creamResourcePath + `/${cream.id}`)
+      .send(updateCreamRequestBody)
+      .expect(401);
 
-  test("when access PUT /api/v1/resources/creams/:id with authentication different of 'ADMIN' role user, return 401", () => {});
+    return expect(response.statusCode).toBe(401);
+  });
+
+  test("when access PUT /api/v1/resources/creams/:id with authentication different of 'ADMIN' role user, return 401", async () => {
+    const response = await request(app)
+      .put(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsClient)
+      .send(updateCreamRequestBody)
+      .expect(401);
+
+    return expect(response.statusCode).toBe(401);
+  });
 
   // DELETE
   test("when access DELETE /api/v1/resources/creams/:id authenticated as ADMIN role, update at DB a cream resource with name 'Test Cream' to 'Test Cream Edited'", () => {});

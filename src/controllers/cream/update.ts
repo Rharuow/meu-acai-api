@@ -5,8 +5,6 @@ import { Request, Response } from "express";
 export const updateCreamController = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  console.log("id = ", id);
-
   const fields = req.body as UpdateCreamRequestBody;
 
   try {
