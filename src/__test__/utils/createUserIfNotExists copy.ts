@@ -1,31 +1,39 @@
 import { encodeSha256 } from "@libs/crypto";
 import { prismaClient } from "@libs/prisma";
-import { userAdmin } from "./userAdmin";
 
-export const createUserIfNotExist = async (id: string) => {
+export const createUserIfNotExist = async (
+  id: string,
+  { username, password }: { username: string; password: string }
+) => {
   const user = await prismaClient.user.findFirst({
     where: {
-      name: userAdmin.username,
-      password: encodeSha256(userAdmin.password),
+      name: username,
+      password: encodeSha256(password),
     },
   });
 
   if (!user)
     return await prismaClient.user.create({
       data: {
-        name: userAdmin.username,
-        password: encodeSha256(userAdmin.password),
+        name: username,
+        password: encodeSha256(password),
         roleId: id,
       },
     });
   return user;
 };
 
-export const cleanCreateUserIfNotExist = async () => {
+export const cleanCreateUserIfNotExist = async ({
+  username,
+  password,
+}: {
+  username: string;
+  password: string;
+}) => {
   const user = await prismaClient.user.findFirst({
     where: {
-      name: userAdmin.username,
-      password: encodeSha256(userAdmin.password),
+      name: username,
+      password: encodeSha256(password),
     },
   });
   await prismaClient.user.delete({ where: { id: user.id } });

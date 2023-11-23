@@ -82,7 +82,7 @@ model Address {
   updatedAt  DateTime   @updatedAt
   square String
   house String
-  clientId String @unique
+  clientId String? @unique
   client Client?
 }
 

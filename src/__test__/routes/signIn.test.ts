@@ -2,18 +2,14 @@ import { app } from "@/app";
 import { User } from "@prisma/client";
 import { verify } from "jsonwebtoken";
 import request from "supertest";
-import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
-import { createUserIfNotExist } from "../utils/createUserIfNotExists copy";
-import { userAdmin } from "../utils/userAdmin";
-import { createUserAdminIfNotExists } from "../utils/createUserAdminIfNotExists";
+import { userAsAdmin } from "../utils/users";
+import { createAllKindOfUserAndRoles } from "../utils/beforeAll/Users";
 
 let accessToken: string;
 let refreshToken: string;
 
 beforeAll(async () => {
-  const adminId = await createAdminRoleIfNotExist();
-  const user = await createUserIfNotExist(adminId);
-  await createUserAdminIfNotExists(user);
+  await createAllKindOfUserAndRoles();
 });
 
 describe("Sign in route", () => {
@@ -21,7 +17,7 @@ describe("Sign in route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
-        .send(userAdmin)
+        .send(userAsAdmin)
         .set("Accept", "application/json")
         .expect(200);
 
@@ -66,7 +62,7 @@ describe("Sign in route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
-        .send({ ...userAdmin, unpermittedParam: true })
+        .send({ ...userAsAdmin, unpermittedParam: true })
         .set("Accept", "application/json")
         .expect(422);
 
@@ -104,7 +100,7 @@ describe("Sign in route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin?someParam=true")
-        .send(userAdmin)
+        .send(userAsAdmin)
         .set("Accept", "application/json")
         .expect(422);
 
@@ -122,13 +118,13 @@ describe("Sign in route", () => {
   test("when try to make signin with password or username invalid return 401", async () => {
     const responseWithUsernameWrong = await request(app)
       .post("/api/v1/signin")
-      .send({ username: "wrong", password: userAdmin.password })
+      .send({ username: "wrong", password: userAsAdmin.password })
       .set("Accept", "application/json")
       .expect(401);
 
     const responseWithPasswordWrong = await request(app)
       .post("/api/v1/signin")
-      .send({ username: userAdmin.username, password: "wrong" })
+      .send({ username: userAsAdmin.username, password: "wrong" })
       .set("Accept", "application/json")
       .expect(401);
 

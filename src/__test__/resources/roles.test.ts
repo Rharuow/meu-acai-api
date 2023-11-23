@@ -1,10 +1,8 @@
+import { createAllKindOfUserAndRoles } from "./../utils/beforeAll/Users";
 import { prismaClient } from "@/libs/prisma";
-import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
-import { createUserIfNotExist } from "../utils/createUserIfNotExists copy";
 
 beforeAll(async () => {
-  const adminId = await createAdminRoleIfNotExist();
-  await createUserIfNotExist(adminId);
+  await createAllKindOfUserAndRoles();
 });
 
 describe("CRUD of role resource", () => {

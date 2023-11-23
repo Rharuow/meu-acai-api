@@ -2,22 +2,20 @@ import { app } from "@/app";
 import { User } from "@prisma/client";
 import { VerifyErrors, verify } from "jsonwebtoken";
 import request from "supertest";
-import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
-import { createUserIfNotExist } from "../utils/createUserIfNotExists copy";
-import { userAdmin } from "../utils/userAdmin";
+import { userAsAdmin } from "../utils/users";
+import { createAllKindOfUserAndRoles } from "../utils/beforeAll/Users";
 
 const futureTime = Math.floor(Date.now() / 1000) + 10;
 
 beforeAll(async () => {
-  const adminId = await createAdminRoleIfNotExist();
-  await createUserIfNotExist(adminId);
+  await createAllKindOfUserAndRoles();
 });
 
 describe("Refresh token router", () => {
   test("when the accessToken expires, the refresh token router is called to regenerate a new access token", async () => {
     const responseSignIn = await request(app)
       .post("/api/v1/signin")
-      .send(userAdmin)
+      .send(userAsAdmin)
       .set("Accept", "application/json")
       .expect(200);
 
