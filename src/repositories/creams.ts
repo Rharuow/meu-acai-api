@@ -102,3 +102,10 @@ export const getCream: ({ id }: { id: string }) => Promise<Cream> = async ({
   }
   return creamInMemory.retrieveItemValue(id);
 };
+
+export const deleteCream: ({ id }: { id: string }) => Promise<void> = async ({
+  id,
+}) => {
+  await prismaClient.cream.delete({ where: { id } });
+  return;
+};

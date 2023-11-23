@@ -17,6 +17,7 @@ import { validationParams } from "@middlewares/paramsRouter";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { updateCreamController } from "@controllers/cream/update";
 import { getCreamController } from "@controllers/cream/get";
+import { deleteCreamController } from "@controllers/cream/delete";
 
 export const validationCreateCreamBodySchema: Schema = {
   name: {
@@ -192,6 +193,21 @@ creamRouter.put(
   validationParams,
   validationAdminAccessToken,
   updateCreamController
+);
+
+creamRouter.delete(
+  "/creams/:id",
+  checkExact(
+    [
+      body([], "Body is not permitted"),
+      query([], "Query parameters unpermitted"), // check if has any query parameters
+      param(["id"], 'The "id" parameter is required'), // check if 'id' is present in the route parameters
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
+  deleteCreamController
 );
 
 export { creamRouter };
