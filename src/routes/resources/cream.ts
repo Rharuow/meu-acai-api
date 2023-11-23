@@ -85,6 +85,16 @@ export const validationUpdateCreamBodySchema: Schema = {
 };
 
 export const validationListCreamQueryParamsSchema: Schema = {
+  page: {
+    optional: true,
+    isNumeric: true,
+    errorMessage: "page must be a number",
+  },
+  perPage: {
+    optional: true,
+    isNumeric: true,
+    errorMessage: "perPage must be a number",
+  },
   name: {
     optional: true,
     isString: true,

@@ -7,8 +7,9 @@ export const validationQueryParams = (
 ) => {
   const { page, perPage } = req.query;
 
-  if (!page) req.query["page"] = 1;
-  if (!perPage) req.query["perPage"] = 10;
+  // Set default values if not provided
+  req.query.page = page ? Number(page) : 1;
+  req.query.perPage = perPage ? Number(perPage) : 10;
 
   return next();
 };

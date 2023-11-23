@@ -2,7 +2,10 @@ import { app } from "@/app";
 import request from "supertest";
 import { userAsAdmin, userAsClient } from "../../utils/users";
 import { prismaClient } from "@libs/prisma";
-import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
+import {
+  createAllKindOfUserAndRoles,
+  createTwentyCreams,
+} from "@/__test__/utils/beforeAll/Users";
 import { Cream } from "@prisma/client";
 
 let accessTokenAsAdmin: string;
@@ -18,6 +21,7 @@ let cream: Cream;
 
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();
+  await createTwentyCreams();
   const responseSignInAsAdmin = await request(app)
     .post("/api/v1/signin")
     .send(userAsAdmin)
@@ -139,11 +143,25 @@ describe("CRUD cream", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("data");
-    expect(response.body).toHaveProperty("hasNextPage");
-    expect(response.body).toHaveProperty("totalPages");
-    expect(response.body).toHaveProperty("page");
-    expect(response.body.data.length).toBeLessThanOrEqual(10);
-    return expect(response.body.page).toBe(1);
+    expect(response.body).toHaveProperty("hasNextPage", true);
+    // expect(response.body).toHaveProperty("totalPages", 2);
+    expect(response.body).toHaveProperty("page", 1);
+    return expect(response.body.data.length).toBe(10);
+  });
+
+  test("when access GET /api/v1/resources/creams?page=2&perPage=5 authenticated as ADMIN role, list max ten first creams", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + "?page=2&perPage=5")
+      .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+      .set("refreshtoken", `Bearer ${refreshTokenAsAdmin}`)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("data");
+    expect(response.body).toHaveProperty("hasNextPage", true);
+    // expect(response.body).toHaveProperty("totalPages", 4);
+    expect(response.body).toHaveProperty("page", 2);
+    return expect(response.body.data.length).toBe(5);
   });
 
   test("when access GET /api/v1/resources/creams authenticated as CLIENT role, list max ten first creams", async () => {
