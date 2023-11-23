@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { check, validationResult } from "express-validator";
 
 export const validationParams = (
   req: Request,
@@ -7,6 +7,7 @@ export const validationParams = (
   next: NextFunction
 ) => {
   const errors = validationResult(req);
+
   // If errors return 422, client didn't provide required or unpermitted values at query parameters
   if (!errors.isEmpty()) {
     console.log("errors = ", errors);

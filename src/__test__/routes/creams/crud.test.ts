@@ -3,6 +3,7 @@ import request from "supertest";
 import { userAsAdmin, userAsClient } from "../../utils/users";
 import { prismaClient } from "@libs/prisma";
 import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
+import { Cream } from "@prisma/client";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -12,6 +13,8 @@ let refreshTokenAsClient: string;
 
 let accessTokenAsMember: string;
 let refreshTokenAsMember: string;
+
+let cream: Cream;
 
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();
@@ -48,6 +51,10 @@ const createCreamRequestBody: CreateCreamRequestBody = {
   price: 9.99,
   amount: 1,
   unit: "unit",
+};
+
+const updateCreamRequestBody: UpdateCreamRequestBody = {
+  name: "Test Cream Edited",
 };
 
 const creamResourcePath = "/api/v1/resources/creams";
@@ -180,7 +187,32 @@ describe("CRUD cream", () => {
   });
 
   // UPDATE
-  test("when access PUT /api/v1/resources/creams/:id authenticated as ADMIN role, update at DB a cream resource with name 'Test Cream' to 'Test Cream Edited'", () => {});
+  test("when access PUT /api/v1/resources/creams/:id authenticated as ADMIN role, update at DB a cream resource with name 'Test Cream' to 'Test Cream Edited'", async () => {
+    cream = await prismaClient.cream.findFirst({
+      where: { name: "Test Cream" },
+    });
+
+    const response = await request(app)
+      .put(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .send(updateCreamRequestBody)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+
+    return await prismaClient.cream.delete({ where: { id: cream.id } });
+  });
+
+  test("when access PUT /api/v1/resources/creams/:id authenticated as ADMIN role and body empty, return 422 status", async () => {
+    const response = await request(app)
+      .put(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .expect(422);
+
+    return expect(response.statusCode).toBe(422);
+  });
 
   test("when access PUT /api/v1/resources/creams/:id without authentication, return 401", () => {});
 

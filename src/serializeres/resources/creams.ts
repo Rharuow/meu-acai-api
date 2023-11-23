@@ -32,3 +32,8 @@ export const createCreamSerializer = (cream: Cream) => ({
   message: "Cream created successfully",
   data: cream,
 });
+
+export const updateCreamSerializer = (cream: Cream) => ({
+  message: "Cream updated successfully",
+  data: cream,
+});

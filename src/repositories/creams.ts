@@ -56,6 +56,7 @@ export const listCreams: (
 export const createCream: (
   fields: CreateCreamRequestBody & { adminId: string }
 ) => Promise<Cream> = async ({ amount, name, price, unit, photo, adminId }) => {
+  creamsInMemory.clear();
   return await prismaClient.cream.create({
     data: {
       name,
@@ -65,5 +66,19 @@ export const createCream: (
       adminId,
       ...(photo && { photo }),
     },
+  });
+};
+
+export const updateCream: ({
+  id,
+  fields,
+}: {
+  id: string;
+  fields: UpdateCreamRequestBody;
+}) => Promise<Cream> = async ({ fields, id }) => {
+  creamsInMemory.clear();
+  return await prismaClient.cream.update({
+    where: { id },
+    data: fields,
   });
 };
