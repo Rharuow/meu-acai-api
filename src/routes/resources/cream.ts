@@ -207,6 +207,7 @@ creamRouter.delete(
       message: "Param(s) not permitted",
     }
   ),
+  validationAdminAccessToken,
   deleteCreamController
 );
 

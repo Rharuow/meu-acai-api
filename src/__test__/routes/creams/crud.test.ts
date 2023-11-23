@@ -254,9 +254,30 @@ describe("CRUD cream", () => {
     return expect(response.statusCode).toBe(204);
   });
 
-  test("when access DELETE /api/v1/resources/creams/:id without authentication, return 401", () => {});
+  test("when access DELETE /api/v1/resources/creams/:id without authentication, return 401", async () => {
+    const response = await request(app)
+      .delete(creamResourcePath + `/${cream.id}`)
+      .expect(401);
 
-  test("when access DELETE /api/v1/resources/creams/:id with authentication different of 'ADMIN' role user, return 401", () => {});
+    return expect(response.statusCode).toBe(401);
+  });
+
+  test("when access DELETE /api/v1/resources/creams/:id with authentication different of 'ADMIN' role user, return 401", async () => {
+    const responseAsClient = await request(app)
+      .delete(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsClient)
+      .set("refreshToken", "Bearer " + refreshTokenAsClient)
+      .expect(401);
+
+    const responseAsMember = await request(app)
+      .delete(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsMember)
+      .set("refreshToken", "Bearer " + refreshTokenAsMember)
+      .expect(401);
+
+    expect(responseAsMember.statusCode).toBe(401);
+    return expect(responseAsClient.statusCode).toBe(401);
+  });
 
   // LIST
   test("when access GET /api/v1/resources/creams authenticated as ADMIN role, list max ten first creams", async () => {
