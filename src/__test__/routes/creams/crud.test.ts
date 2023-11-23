@@ -186,12 +186,69 @@ describe("CRUD cream", () => {
     return expect(response.statusCode).toBe(401);
   });
 
-  // UPDATE
-  test("when access PUT /api/v1/resources/creams/:id authenticated as ADMIN role, update at DB a cream resource with name 'Test Cream' to 'Test Cream Edited'", async () => {
+  // GET
+  test("when access GET /api/v1/resources/:id with authentication as Admin, return 200 and the cream at body reponse", async () => {
     cream = await prismaClient.cream.findFirst({
       where: { name: "Test Cream" },
     });
 
+    const response = await request(app)
+      .get(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", refreshTokenAsAdmin)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("name", cream.name);
+    expect(response.body).toHaveProperty("amount", cream.amount);
+    expect(response.body).toHaveProperty("id", cream.id);
+    expect(response.body).toHaveProperty("available", cream.available);
+    expect(response.body).toHaveProperty("unit", cream.unit);
+    return expect(response.body).toHaveProperty("price", cream.price);
+  });
+
+  test("when access GET /api/v1/resources/:id with authentication as Client, return 200 and the cream at body reponse", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsClient)
+      .set("refreshToken", refreshTokenAsClient)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("name", cream.name);
+    expect(response.body).toHaveProperty("amount", cream.amount);
+    expect(response.body).toHaveProperty("id", cream.id);
+    expect(response.body).toHaveProperty("available", cream.available);
+    expect(response.body).toHaveProperty("unit", cream.unit);
+    return expect(response.body).toHaveProperty("price", cream.price);
+  });
+
+  test("when access GET /api/v1/resources/:id with authentication as Member, return 200 and the cream at body reponse", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsMember)
+      .set("refreshToken", refreshTokenAsMember)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("name", cream.name);
+    expect(response.body).toHaveProperty("amount", cream.amount);
+    expect(response.body).toHaveProperty("id", cream.id);
+    expect(response.body).toHaveProperty("available", cream.available);
+    expect(response.body).toHaveProperty("unit", cream.unit);
+    return expect(response.body).toHaveProperty("price", cream.price);
+  });
+
+  test("when access GET /api/v1/resources/:id without authentication, return 401 and the message at body reponse with 'Unauthorized: No access token provided'", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + `/${cream.id}`)
+      .expect(401);
+
+    return expect(response.statusCode).toBe(401);
+  });
+
+  // UPDATE
+  test("when access PUT /api/v1/resources/creams/:id authenticated as ADMIN role, update at DB a cream resource with name 'Test Cream' to 'Test Cream Edited'", async () => {
     const response = await request(app)
       .put(creamResourcePath + `/${cream.id}`)
       .set("authorization", "Bearer " + accessTokenAsAdmin)
@@ -224,13 +281,21 @@ describe("CRUD cream", () => {
   });
 
   test("when access PUT /api/v1/resources/creams/:id with authentication different of 'ADMIN' role user, return 401", async () => {
-    const response = await request(app)
+    const responseAsClient = await request(app)
       .put(creamResourcePath + `/${cream.id}`)
       .set("authorization", "Bearer " + accessTokenAsClient)
       .send(updateCreamRequestBody)
       .expect(401);
 
-    return expect(response.statusCode).toBe(401);
+    const responseAsMember = await request(app)
+      .put(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsMember)
+      .send(updateCreamRequestBody)
+      .expect(401);
+
+    expect(responseAsMember.statusCode).toBe(401);
+
+    return expect(responseAsClient.statusCode).toBe(401);
   });
 
   // DELETE

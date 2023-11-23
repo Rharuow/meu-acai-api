@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   Schema,
+  body,
   check,
   checkExact,
   checkSchema,
@@ -15,6 +16,7 @@ import { createCreamController } from "@controllers/cream/create";
 import { validationParams } from "@middlewares/paramsRouter";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { updateCreamController } from "@controllers/cream/update";
+import { getCreamController } from "@controllers/cream/get";
 
 export const validationCreateCreamBodySchema: Schema = {
   name: {
@@ -82,13 +84,58 @@ export const validationUpdateCreamBodySchema: Schema = {
   },
 };
 
+export const validationListCreamQueryParamsSchema: Schema = {
+  name: {
+    optional: true,
+    isString: true,
+    errorMessage: "name must be a string",
+  },
+  amount: {
+    optional: true,
+    isNumeric: true,
+    errorMessage: "amount must be a number",
+  },
+  price: {
+    optional: true,
+    isNumeric: true,
+    errorMessage: "price must be a number",
+  },
+  unit: {
+    optional: true,
+    isString: true,
+    errorMessage: "unit must be a string",
+  },
+  isSpecial: {
+    isBoolean: true,
+    optional: true,
+    errorMessage: "isSpecial must be a boolean",
+  },
+};
+
 const creamRouter = Router();
 
 creamRouter.get(
   "/creams",
+  checkExact(
+    [
+      checkSchema(validationListCreamQueryParamsSchema, ["query"]),
+      body([], "Query parameters unpermitted"), // check if has any query parameters
+      param([], "Query parameters unpermitted"), // check if has any router parameters
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
   validationUserAccessToken,
   validationQueryParams,
   listCreamController
+);
+
+creamRouter.get(
+  "/creams/:id",
+  validationUserAccessToken,
+  validationQueryParams,
+  getCreamController
 );
 
 creamRouter.post(
