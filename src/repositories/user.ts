@@ -50,11 +50,11 @@ const createQuery = (params?: Params, includes?: Array<Includes>) => {
     query = {
       where: {
         id: params.id,
-        password: encodeSha256(params.password),
+        name: params.username,
       },
     };
 
-  if (includes && includes)
+  if (includes && includes.includes("Role"))
     query = {
       ...query,
       include: {
@@ -64,7 +64,10 @@ const createQuery = (params?: Params, includes?: Array<Includes>) => {
   return query;
 };
 
-const createReferenceMememoryQuery = (params?: Params) => {
+const createReferenceMemoryQuery = (
+  params?: Params,
+  includes?: Array<Includes>
+) => {
   let referenceString = "user";
 
   if (!params) return referenceString;
@@ -82,13 +85,19 @@ const createReferenceMememoryQuery = (params?: Params) => {
       `username=${params.username}`
     );
 
+  if (includes && includes.length > 0) {
+    includes.forEach((include) => {
+      referenceString = referenceString.concat("-", include);
+    });
+  }
+
   return referenceString;
 };
 
 export const getUser = async (params?: Params, includes?: Array<Includes>) => {
-  const reference = createReferenceMememoryQuery(params);
+  const reference = createReferenceMemoryQuery(params, includes);
   if (!userInMemory.hasItem(reference)) {
-    console.log("QUERY IN DB");
+    console.log("USER IN DB");
     const user = await prismaClient.user.findFirstOrThrow(
       createQuery(params, includes)
     );
@@ -98,7 +107,6 @@ export const getUser = async (params?: Params, includes?: Array<Includes>) => {
       process.env.NODE_ENV === "test" ? 5 : 3600
     );
   }
-  console.log("RETURN BY MEMORY");
 
   return userInMemory.retrieveItemValue(reference);
 };

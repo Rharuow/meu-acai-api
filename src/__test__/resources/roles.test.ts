@@ -1,4 +1,9 @@
+import { createAllKindOfUserAndRoles } from "./../utils/beforeAll/Users";
 import { prismaClient } from "@/libs/prisma";
+
+beforeAll(async () => {
+  await createAllKindOfUserAndRoles();
+});
 
 describe("CRUD of role resource", () => {
   test("should create a role in db called 'ADMIN' if not exist", async () => {

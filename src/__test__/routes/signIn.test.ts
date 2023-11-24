@@ -2,21 +2,22 @@ import { app } from "@/app";
 import { User } from "@prisma/client";
 import { verify } from "jsonwebtoken";
 import request from "supertest";
-
-const requestBody = {
-  username: "Test Admin",
-  password: "123",
-};
+import { userAsAdmin } from "../utils/users";
+import { createAllKindOfUserAndRoles } from "../utils/beforeAll/Users";
 
 let accessToken: string;
 let refreshToken: string;
+
+beforeAll(async () => {
+  await createAllKindOfUserAndRoles();
+});
 
 describe("Sign in route", () => {
   test("when access POST route '/api/v1/signin' contains in body the username and password correclty return in body the accessToken, refreshToken and the user", async () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
-        .send(requestBody)
+        .send(userAsAdmin)
         .set("Accept", "application/json")
         .expect(200);
 
@@ -61,7 +62,7 @@ describe("Sign in route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
-        .send({ ...requestBody, unpermittedParam: true })
+        .send({ ...userAsAdmin, unpermittedParam: true })
         .set("Accept", "application/json")
         .expect(422);
 
@@ -99,7 +100,7 @@ describe("Sign in route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin?someParam=true")
-        .send(requestBody)
+        .send(userAsAdmin)
         .set("Accept", "application/json")
         .expect(422);
 
@@ -112,5 +113,23 @@ describe("Sign in route", () => {
       console.log(error);
       throw new Error(error.message);
     }
+  });
+
+  test("when try to make signin with password or username invalid return 401", async () => {
+    const responseWithUsernameWrong = await request(app)
+      .post("/api/v1/signin")
+      .send({ username: "wrong", password: userAsAdmin.password })
+      .set("Accept", "application/json")
+      .expect(401);
+
+    const responseWithPasswordWrong = await request(app)
+      .post("/api/v1/signin")
+      .send({ username: userAsAdmin.username, password: "wrong" })
+      .set("Accept", "application/json")
+      .expect(401);
+
+    expect(responseWithPasswordWrong.statusCode).toBe(401);
+
+    return expect(responseWithUsernameWrong.statusCode).toBe(401);
   });
 });

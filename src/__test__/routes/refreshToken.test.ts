@@ -2,19 +2,20 @@ import { app } from "@/app";
 import { User } from "@prisma/client";
 import { VerifyErrors, verify } from "jsonwebtoken";
 import request from "supertest";
-
-const requestBody = {
-  username: "Test Admin",
-  password: "123",
-};
+import { userAsAdmin } from "../utils/users";
+import { createAllKindOfUserAndRoles } from "../utils/beforeAll/Users";
 
 const futureTime = Math.floor(Date.now() / 1000) + 10;
+
+beforeAll(async () => {
+  await createAllKindOfUserAndRoles();
+});
 
 describe("Refresh token router", () => {
   test("when the accessToken expires, the refresh token router is called to regenerate a new access token", async () => {
     const responseSignIn = await request(app)
       .post("/api/v1/signin")
-      .send(requestBody)
+      .send(userAsAdmin)
       .set("Accept", "application/json")
       .expect(200);
 
@@ -46,7 +47,6 @@ describe("Refresh token router", () => {
       secondAccessToken,
       process.env.TOKEN_SECRET,
       (err: VerifyErrors, user: User) => {
-        console.log("User = ", user);
         expect(err).toBeNull();
         expect(user).toBeTruthy();
         expect(user).toHaveProperty("name");

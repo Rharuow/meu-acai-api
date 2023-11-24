@@ -8,7 +8,8 @@ import {
   param,
   query,
 } from "express-validator";
-import { validationSignInParams } from "@middlewares/signIn";
+import { validationUserAccessToken } from "@middlewares/signIn";
+import { validationParams } from "@middlewares/paramsRouter";
 
 export const validationBodySignInSchema: Schema = {
   username: {
@@ -26,20 +27,22 @@ export const validationBodySignInSchema: Schema = {
 const signInRouter = Router();
 
 signInRouter.use(
-  "/signin", // check if has query parameters
+  "/signin",
   // Middleware to check each launch request query parameters
   checkExact(
     [
       checkSchema(validationBodySignInSchema, ["body"]),
-      query([], "Query parameters unpermitted"),
-      param([], "Query parameters unpermitted"),
+      query([], "Query parameters unpermitted"), // check if has any query parameters
+      param([], "Query parameters unpermitted"), // check if has any router parameters
     ],
     {
       message: "Param(s) not permitted",
     }
   ),
   // Middleware to make validation of the previous step has some error
-  (req, res, next) => validationSignInParams(req, res, next)
+  validationParams,
+  // Middleware to validation user in jwt request
+  (req, res, next) => validationUserAccessToken(req, res, next)
 );
 
 signInRouter.post("/signin", signInController);
