@@ -97,6 +97,7 @@ const createReferenceMemoryQuery = (
 export const getUser = async (params?: Params, includes?: Array<Includes>) => {
   const reference = createReferenceMemoryQuery(params, includes);
   if (!userInMemory.hasItem(reference)) {
+    console.log("USER IN DB");
     const user = await prismaClient.user.findFirstOrThrow(
       createQuery(params, includes)
     );
@@ -106,7 +107,6 @@ export const getUser = async (params?: Params, includes?: Array<Includes>) => {
       process.env.NODE_ENV === "test" ? 5 : 3600
     );
   }
-  console.log("USER IN MEMORY");
 
   return userInMemory.retrieveItemValue(reference);
 };

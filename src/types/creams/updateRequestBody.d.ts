@@ -4,5 +4,6 @@ type UpdateCreamRequestBody = {
   price?: number;
   unit?: string;
   isSpecial?: boolean;
+  available?: boolean;
   photo?: string;
 };

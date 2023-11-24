@@ -11,18 +11,16 @@ type Params = {
   creams: Array<Cream>;
   totalPages: number;
   page: number;
-  totalCreams: number;
 };
 
 export const listCreamsSerializer: (params: Params) => ListCreamsSerializer = ({
   creams,
   totalPages,
   page,
-  totalCreams,
 }) => {
   return {
     data: creams,
-    hasNextPage: creams.length < totalCreams,
+    hasNextPage: page < totalPages,
     page,
     totalPages,
   };

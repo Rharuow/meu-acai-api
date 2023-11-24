@@ -206,6 +206,34 @@ describe("CRUD cream", () => {
     return expect(response.statusCode).toBe(200);
   });
 
+  test("when access PUT /api/v1/resources/creams/:id authenticated as ADMIN role, update at DB the first cream resource with isSpecial false to true", async () => {
+    const firstCream = await prismaClient.cream.findFirst();
+    const response = await request(app)
+      .put(creamResourcePath + `/${firstCream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .send({ isSpecial: true })
+      .expect(200);
+
+    console.log("response: ", response.body);
+
+    return expect(response.statusCode).toBe(200);
+  });
+
+  test("when access PUT /api/v1/resources/creams/:id authenticated as ADMIN role, update at DB the first cream resource with available false to true", async () => {
+    const firstCream = await prismaClient.cream.findFirst();
+    const response = await request(app)
+      .put(creamResourcePath + `/${firstCream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .send({ available: true })
+      .expect(200);
+
+    console.log("response: ", response.body);
+
+    return expect(response.statusCode).toBe(200);
+  });
+
   test("when access PUT /api/v1/resources/creams/:id authenticated as ADMIN role and body empty, return 422 status", async () => {
     const response = await request(app)
       .put(creamResourcePath + `/${cream.id}`)
@@ -340,6 +368,112 @@ describe("CRUD cream", () => {
     expect(response.body).toHaveProperty("page");
     expect(response.body.data.length).toBeLessThanOrEqual(10);
     return expect(response.body.page).toBe(1);
+  });
+
+  test("when access GET /api/v1/resources/creams?filter=name:like:Test to list creams authenticated with any role, return just one cream in data property", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + `?filter=name:like:Test to list creams 0`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("data");
+    expect(response.body.data[0]).toHaveProperty(
+      "name",
+      "Test to list creams 0"
+    );
+    expect(response.body).toHaveProperty("hasNextPage", false);
+    expect(response.body).toHaveProperty("totalPages", 1);
+    expect(response.body).toHaveProperty("page", 1);
+    return expect(response.body.data.length).toBe(1);
+  });
+
+  test("when access GET /api/v1/resources/creams?filter=available:true to list creams authenticated with any role, return the first cream", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + `?filter=available:true`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("data");
+    expect(response.body.data[0]).toHaveProperty("available", true);
+    expect(response.body).toHaveProperty("hasNextPage", false);
+    expect(response.body).toHaveProperty("totalPages", 1);
+    expect(response.body).toHaveProperty("page", 1);
+    return expect(response.body.data.length).toBe(1);
+  });
+
+  test("when access GET /api/v1/resources/creams?filter=available:false to list creams authenticated with any role, return all creams", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + `?filter=available:false`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("data");
+    expect(
+      response.body.data.every((cream: Cream) => !cream.isSpecial)
+    ).toBeTruthy();
+    expect(response.body).toHaveProperty("hasNextPage", true);
+    expect(response.body).toHaveProperty("totalPages", 2);
+    expect(response.body).toHaveProperty("page", 1);
+    return expect(response.body.data.length).toBe(10);
+  });
+
+  test("when access GET /api/v1/resources/creams?filter=isSpecial:true to list creams authenticated with any role, return the first cream", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + `?filter=isSpecial:true`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("data");
+    expect(response.body.data[0]).toHaveProperty("isSpecial", true);
+    expect(response.body).toHaveProperty("hasNextPage", false);
+    expect(response.body).toHaveProperty("totalPages", 1);
+    expect(response.body).toHaveProperty("page", 1);
+    return expect(response.body.data.length).toBe(1);
+  });
+
+  test("when access GET /api/v1/resources/creams?filter=isSpecial:false to list creams authenticated with any role, return all creams", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + `?filter=isSpecial:false`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("data");
+    expect(
+      response.body.data.every((cream: Cream) => !cream.isSpecial)
+    ).toBeTruthy();
+    expect(response.body).toHaveProperty("hasNextPage", true);
+    expect(response.body).toHaveProperty("totalPages", 2);
+    expect(response.body).toHaveProperty("page", 1);
+    return expect(response.body.data.length).toBe(10);
+  });
+
+  test("when access GET /api/v1/resources/creams?orderBy=createdAt authenticated with any role, return a list cream ordered by name", async () => {
+    const response = await request(app)
+      .get(creamResourcePath + `?orderBy=createdAt`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .expect(200);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("data");
+    expect(response.body.data[0]).toHaveProperty(
+      "name",
+      "Test to list creams 0"
+    );
+    expect(response.body).toHaveProperty("hasNextPage", true);
+    expect(response.body).toHaveProperty("totalPages", 2);
+    expect(response.body).toHaveProperty("page", 1);
+    return expect(response.body.data.length).toBe(10);
   });
 
   test("when access GET /api/v1/resources/creams without authentication, return 401 status", async () => {

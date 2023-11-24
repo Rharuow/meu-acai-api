@@ -83,6 +83,11 @@ export const validationUpdateCreamBodySchema: Schema = {
     optional: true,
     errorMessage: "isSpecial must be a boolean",
   },
+  available: {
+    isBoolean: true,
+    optional: true,
+    errorMessage: "available must be a boolean",
+  },
 };
 
 export const validationListCreamQueryParamsSchema: Schema = {
@@ -120,6 +125,17 @@ export const validationListCreamQueryParamsSchema: Schema = {
     isBoolean: true,
     optional: true,
     errorMessage: "isSpecial must be a boolean",
+  },
+  orderBy: {
+    optional: true,
+    isString: true,
+    errorMessage: "the format of the order field is field:asc or field:desc",
+  },
+  filter: {
+    optional: true,
+    isString: true,
+    errorMessage:
+      "the format of the filter field is field:value or field:operator:value",
   },
 };
 
@@ -175,9 +191,18 @@ creamRouter.put(
       param(["id"], 'The "id" parameter is required'), // check if 'id' is present in the route parameters
       // Check if at least one property exists in the request body
       check().custom((value, { req }) => {
-        const { name, amount, price, unit, photo, isSpecial } = req.body;
+        const { name, amount, price, unit, photo, isSpecial, available } =
+          req.body;
 
-        if (!name && !amount && !price && !unit && !photo && !isSpecial) {
+        if (
+          !name &&
+          !amount &&
+          !price &&
+          !unit &&
+          !photo &&
+          !isSpecial &&
+          !available
+        ) {
           throw new Error(
             "At least one property must exist in the request body"
           );

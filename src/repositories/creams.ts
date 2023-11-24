@@ -4,21 +4,61 @@ import {
   totalCreamsInMemory,
 } from "@libs/memory-cache";
 import { prismaClient } from "@libs/prisma";
-import { Admin, Cream } from "@prisma/client";
+import { Cream } from "@prisma/client";
 
-type Params = {
-  page: number;
-  perPage: number;
+type WhereType = {
+  [key: string]: string | boolean | { contains: string };
 };
 
-const createReferenceMemoryCacheQuery = (params: Params) => {
-  let referenceString = "creams";
+export type Params = {
+  page: number;
+  perPage: number;
+  orderBy:
+    | "id:asc"
+    | "id:desc"
+    | "name:asc"
+    | "name:desc"
+    | "price:asc"
+    | "price:desc"
+    | "amount:asc"
+    | "amount:desc"
+    | "createdAt:asc"
+    | "createdAt:desc"
+    | string;
+  filter?: string;
+};
 
+function parseValue(
+  operator: string,
+  value: string
+): string | boolean | { contains: string } {
+  if (operator === "like") {
+    return { contains: value };
+  } else if (operator === "true") {
+    return true;
+  } else if (operator === "false") {
+    return false;
+  } else {
+    return value;
+  }
+}
+
+const createReferenceMemoryCacheQuery = ({
+  params,
+  referenceString,
+}: {
+  referenceString: string;
+  params: Params;
+}) => {
   referenceString = referenceString.concat(
     "-",
     String(params.page),
     "-",
-    String(params.perPage)
+    String(params.perPage),
+    "-",
+    String(params.orderBy),
+    "-",
+    String(params.filter)
   );
 
   return referenceString;
@@ -26,18 +66,44 @@ const createReferenceMemoryCacheQuery = (params: Params) => {
 
 export const listCreams: (
   params: Params
-) => Promise<[Array<Cream>, number]> = async ({ page, perPage }) => {
+) => Promise<[Array<Cream>, number]> = async ({
+  page,
+  perPage,
+  orderBy,
+  filter,
+}) => {
   // create a string reference to save in memory the list of creams
-  const reference = createReferenceMemoryCacheQuery({ page, perPage });
+  const [fieldOrderBy, order] = orderBy.split(":");
+  const filterFields = filter && filter.split(",");
+  const where: WhereType = {};
+  if (filterFields)
+    filterFields.forEach((filter) => {
+      const [key, operator, value] = filter.split(":");
+      where[key] = parseValue(operator, value);
+    });
+  const reference = createReferenceMemoryCacheQuery({
+    referenceString: "cream",
+    params: {
+      page,
+      perPage,
+      orderBy,
+      filter,
+    },
+  });
   if (!creamsInMemory.hasItem(reference)) {
     console.log("CREAM IN DB");
     const [creams, totalCreams] = await Promise.all([
       await prismaClient.cream.findMany({
         skip: (page - 1) * perPage,
         take: perPage,
+        orderBy: {
+          [fieldOrderBy]: order || "asc",
+        },
+        where,
       }),
-      await prismaClient.cream.count(),
+      await prismaClient.cream.count({ where }),
     ]);
+
     creamsInMemory.storeExpiringItem(
       reference,
       creams,
@@ -49,8 +115,6 @@ export const listCreams: (
       process.env.NODE_ENV === "test" ? 5 : 3600
     );
   }
-
-  console.log(`CREAM IN MEMORY`);
 
   return [
     creamsInMemory.retrieveItemValue(reference),
