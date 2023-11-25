@@ -11,12 +11,12 @@ type Params = {
   password: string;
 };
 
-type Includes = "Role";
+type Includes = "Role" | "Admin";
 
 const createQuery = (params: Params, includes?: Array<Includes>) => {
   let query: {
     where: { name: string; password: string };
-    include?: { role: boolean };
+    include?: { role: boolean; admin: boolean };
   } = {
     where: {
       name: params.name,
@@ -24,6 +24,7 @@ const createQuery = (params: Params, includes?: Array<Includes>) => {
     },
     include: {
       role: includes && includes.includes("Role"),
+      admin: includes && includes.includes("Admin"),
     },
   };
   return query;
@@ -136,6 +137,7 @@ export const updateUser: ({
   id: string;
   fields: UpdateUserRequestBody;
 }) => Promise<User & { role?: Role }> = async ({ fields, id }) => {
+  console.info("fields = ", fields);
   userInMemory.clear();
   return await prismaClient.user.update({
     where: { id },
