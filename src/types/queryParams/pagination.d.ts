@@ -1,4 +1,4 @@
-type QueryParms = {
+export type QueryParms = {
   page: number;
   perPage: number;
   orderBy: string;

@@ -1,14 +1,14 @@
 export const userAsAdmin = {
-  username: "Test Admin",
+  name: "Test Admin",
   password: "123",
 };
 
 export const userAsClient = {
-  username: "Test Client",
+  name: "Test Client",
   password: "123",
 };
 
 export const userAsMember = {
-  username: "Test Member",
+  name: "Test Member",
   password: "123",
 };

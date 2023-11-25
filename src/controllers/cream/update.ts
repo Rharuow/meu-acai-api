@@ -1,6 +1,8 @@
-import { updateCreamSerializer } from "@/serializeres/resources/creams";
+import { unprocessableEntity } from "@serializer/erros/422";
+import { updateCreamSerializer } from "@serializer/resources/creams";
 import { updateCream } from "@repositories/creams";
 import { Request, Response } from "express";
+import { UpdateCreamRequestBody } from "@/types/creams/updateRequestBody";
 
 export const updateCreamController = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -13,6 +15,6 @@ export const updateCreamController = async (req: Request, res: Response) => {
     return res.json(updateCreamSerializer(cream));
   } catch (error) {
     console.log("update cream error", error);
-    return res.status(500);
+    return unprocessableEntity(res, { message: error.message });
   }
 };

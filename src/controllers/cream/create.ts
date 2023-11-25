@@ -1,8 +1,9 @@
-import { unpermittedParam } from "@/serializeres/erros/422";
-import { createCreamSerializer } from "@/serializeres/resources/creams";
+import { unprocessableEntity } from "@serializer/erros/422";
+import { createCreamSerializer } from "@serializer/resources/creams";
 import { Prisma } from "@prisma/client";
 import { createCream } from "@repositories/creams";
 import { Request, Response } from "express";
+import { CreateCreamRequestBody } from "@/types/creams/createRequestbody";
 
 export const createCreamController = async (req: Request, res: Response) => {
   const fields = req.body as CreateCreamRequestBody;
@@ -23,13 +24,13 @@ export const createCreamController = async (req: Request, res: Response) => {
       console.error("Unique constraint violation:", error.message);
       const { clientVersion, ...errorSanitized } = error;
       // Handle the unique constraint violation error here
-      return unpermittedParam(res, {
+      return unprocessableEntity(res, {
         errorSanitized,
         message: `Unique constraint failed on the fields: ${errorSanitized.meta.target}`,
       });
     } else {
       // Handle other errors
-      return res.status(500).json({ message: error.message });
+      return unprocessableEntity(res, { message: error.message });
     }
   }
 };

@@ -1,3 +1,5 @@
+import { CreateCreamRequestBody } from "@/types/creams/createRequestbody";
+import { UpdateCreamRequestBody } from "@/types/creams/updateRequestBody";
 import {
   creamInMemory,
   creamsInMemory,
@@ -160,7 +162,7 @@ export const getCream: ({ id }: { id: string }) => Promise<Cream> = async ({
   if (!creamInMemory.hasItem(id)) {
     creamInMemory.storeExpiringItem(
       id,
-      await prismaClient.cream.findFirst({ where: { id } }),
+      await prismaClient.cream.findUniqueOrThrow({ where: { id } }),
       process.env.NODE_ENV === "test" ? 5 : 3600 // if test env expire in 5 miliseconds else 1 hour
     );
   }

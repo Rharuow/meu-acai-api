@@ -13,7 +13,7 @@ beforeAll(async () => {
 });
 
 describe("Sign in route", () => {
-  test("when access POST route '/api/v1/signin' contains in body the username and password correclty return in body the accessToken, refreshToken and the user", async () => {
+  test("when access POST route '/api/v1/signin' contains in body the name and password correclty return in body the accessToken, refreshToken and the user", async () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
@@ -81,7 +81,7 @@ describe("Sign in route", () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
-        .send({ username: "Missing password" })
+        .send({ name: "Missing password" })
         .set("Accept", "application/json")
         .expect(422);
 
@@ -115,21 +115,21 @@ describe("Sign in route", () => {
     }
   });
 
-  test("when try to make signin with password or username invalid return 401", async () => {
-    const responseWithUsernameWrong = await request(app)
+  test("when try to make signin with password or name invalid return 401", async () => {
+    const responseWithNameWrong = await request(app)
       .post("/api/v1/signin")
-      .send({ username: "wrong", password: userAsAdmin.password })
+      .send({ name: "wrong", password: userAsAdmin.password })
       .set("Accept", "application/json")
       .expect(401);
 
     const responseWithPasswordWrong = await request(app)
       .post("/api/v1/signin")
-      .send({ username: userAsAdmin.username, password: "wrong" })
+      .send({ name: userAsAdmin.name, password: "wrong" })
       .set("Accept", "application/json")
       .expect(401);
 
     expect(responseWithPasswordWrong.statusCode).toBe(401);
 
-    return expect(responseWithUsernameWrong.statusCode).toBe(401);
+    return expect(responseWithNameWrong.statusCode).toBe(401);
   });
 });

@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
-import { getUser } from "@repositories/user";
+import { getUserByNameAndPassword } from "@repositories/user";
+import { unprocessableEntity } from "@serializer/erros/422";
 
 export const signInController = async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { name, password } = req.body;
 
   try {
-    const user = await getUser({ password, username }, ["Role"]);
+    const user = await getUserByNameAndPassword({ password, name }, ["Role"]);
 
     const accessToken = jwt.sign(
       { id: user.id, name: user.name, roleId: user.roleId, role: user.role },
@@ -41,9 +42,6 @@ export const signInController = async (req: Request, res: Response) => {
       return res
         .status(404)
         .json({ error: "User not found", message: "The user not registred." });
-    return res.status(500).json({
-      error: "Internal Server Error",
-      message: "Something went wrong on the server.",
-    });
+    return unprocessableEntity(res);
   }
 };

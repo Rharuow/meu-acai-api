@@ -4,9 +4,10 @@ import {
 } from "@/__test__/utils/beforeAll/Users";
 import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
 import { app } from "@/app";
+import { prismaClient } from "@/libs/prisma";
 import { encodeSha256 } from "@libs/crypto";
 import { Cream } from "@prisma/client";
-import { getUser } from "@repositories/user";
+import { getUserByNameAndPassword } from "@repositories/user";
 import request from "supertest";
 
 let accessTokenAsAdmin: string;
@@ -19,6 +20,13 @@ let accessTokenAsMember: string;
 let refreshTokenAsMember: string;
 
 let cream: Cream;
+
+const adminResourcePath = "/api/v1/resources/users/admins";
+
+const createAdminBody = {
+  name: "Test Admin Created",
+  password: "123",
+};
 
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();
@@ -49,14 +57,9 @@ beforeAll(async () => {
 
   accessTokenAsMember = responseSignInAsMember.body.accessToken;
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
+
+  await prismaClient.user.delete({ where: { name: createAdminBody.name } });
 });
-
-const adminResourcePath = "/api/v1/resources/users/admins";
-
-const createAdminBody = {
-  name: "Test Admin Created",
-  password: "123",
-};
 
 describe("CRUD TO ADMIN RESOURCE", () => {
   // CREATE
@@ -68,17 +71,26 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       const response = await request(app)
         .post(adminResourcePath)
         .send(createAdminBody)
-        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-        .set("authorizarion", "Bearer " + accessTokenAsAdmin)
+        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
         .expect(200);
 
-      const user = await getUser({
-        username: createAdminBody.name,
-        password: createAdminBody.password,
-      });
+      console.log("response = ", response.body);
+      console.log("createAdminBody = ", createAdminBody);
+
+      const user = await getUserByNameAndPassword(
+        {
+          name: createAdminBody.name,
+          password: createAdminBody.password,
+        },
+        ["Role"]
+      );
 
       expect(user).toBeTruthy();
       expect(user).toHaveProperty("name", createAdminBody.name);
+      expect(user.id === response.body.data.userId).toBeTruthy();
+      expect(user.name === response.body.data.name).toBeTruthy();
+      expect(user.password === response.body.data.password).toBeTruthy();
       expect(user).toHaveProperty(
         "password",
         encodeSha256(createAdminBody.password)

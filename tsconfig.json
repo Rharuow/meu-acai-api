@@ -1,5 +1,4 @@
 {
-  "rootDir": "./src",
   "compilerOptions": {
     "outDir": "./build",
     "target": "es5",
@@ -10,12 +9,14 @@
     "allowUnreachableCode": false,
     "noImplicitReturns": true,
     "allowJs": true,
-    "rootDir": "./src",
     "noImplicitAny": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
+      "@/*": [
+        "./src/*"
+      ],
       "@repositories/*": [
         "./src/repositories/*"
       ],
@@ -28,20 +29,19 @@
       "@models/*": [
         "./src/models/*"
       ],
+      "@serializer/*": [
+        "./src/serializer/*"
+      ],
       "@controllers/*": [
         "./src/controllers/*"
       ],
       "@libs/*": [
         "./src/libs/*"
       ],
-      "@/*": [
-        "./src/*"
-      ],
     },
   },
   "include": [
     "./src/**/*",
-    "jest.config.js"
   ],
   "types": [
     "@types/jest"
@@ -49,6 +49,6 @@
   "exclude": [
     "./plugins/**/*",
     "./typings/**/*",
-    "./build/**/*" // This is what fixed it!
+    "./build/**/*"
   ]
 }

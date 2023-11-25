@@ -1,4 +1,4 @@
-type UpdateCreamRequestBody = {
+export type UpdateCreamRequestBody = {
   name?: string;
   amount?: number;
   price?: number;

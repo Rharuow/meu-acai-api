@@ -1,4 +1,4 @@
-type CreateCreamRequestBody = {
+export type CreateCreamRequestBody = {
   name: string;
   amount: number;
   price: number;

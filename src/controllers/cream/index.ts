@@ -1,6 +1,8 @@
-import { listCreamsSerializer } from "@/serializeres/resources/creams";
+import { unprocessableEntity } from "@serializer/erros/422";
+import { listCreamsSerializer } from "@serializer/resources/creams";
 import { listCreams } from "@repositories/creams";
 import { Request, Response } from "express";
+import { QueryParms } from "@/types/queryParams/pagination";
 
 export const listCreamController = async (
   req: Request<{}, {}, {}, qs.ParsedQs & QueryParms>,
@@ -21,6 +23,6 @@ export const listCreamController = async (
     return res.json(listCreamsSerializer({ creams, totalPages, page }));
   } catch (error) {
     console.log("creams controller = ", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return unprocessableEntity(res, { message: error.message });
   }
 };

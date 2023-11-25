@@ -1,3 +1,4 @@
+import { QueryParms } from "@/types/queryParams/pagination";
 import { NextFunction, Request, Response } from "express";
 
 export const validationQueryParams = (

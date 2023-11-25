@@ -12,10 +12,10 @@ import { validationUserAccessToken } from "@middlewares/signIn";
 import { validationParams } from "@middlewares/paramsRouter";
 
 export const validationBodySignInSchema: Schema = {
-  username: {
+  name: {
     notEmpty: true,
     isString: true,
-    errorMessage: "username must be a string and not empty",
+    errorMessage: "name must be a string and not empty",
   },
   password: {
     notEmpty: true,
@@ -42,7 +42,7 @@ signInRouter.use(
   // Middleware to make validation of the previous step has some error
   validationParams,
   // Middleware to validation user in jwt request
-  (req, res, next) => validationUserAccessToken(req, res, next)
+  validationUserAccessToken
 );
 
 signInRouter.post("/signin", signInController);

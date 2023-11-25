@@ -30,10 +30,10 @@ model User {
   createdAt   DateTime   @default(now())
   deletedAt   DateTime?   
   updatedAt   DateTime   @updatedAt
-  name        String
+  name        String @unique
   password    String
   roleId      String
-  role        Role @relation(fields: [roleId], references: [id])
+  role        Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
   admins      Admin[]
   clients     Client[]
   members     Member[]
@@ -45,7 +45,7 @@ model Admin {
   deletedAt   DateTime?   
   updatedAt   DateTime   @updatedAt
   userId      String
-  user        User @relation(fields: [userId], references: [id])
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
   toppings    Topping[]
   creams      Cream[]
   products    Product[]
@@ -57,9 +57,9 @@ model Client {
   deletedAt   DateTime?   
   updatedAt   DateTime   @updatedAt
   userId      String
-  user        User @relation(fields: [userId], references: [id])
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
   addressId   String @unique
-  address     Address @relation(fields: [addressId], references: [id])
+  address     Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
   members     Member[]
 }
 
@@ -69,10 +69,10 @@ model Member {
   deletedAt     DateTime?   
   updatedAt     DateTime   @updatedAt
   userId        String
-  user          User @relation(fields: [userId], references: [id])
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
   relationship  String?
   clientId      String
-  client        Client @relation(fields: [clientId], references: [id])
+  client        Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }
 
 model Address {
@@ -99,7 +99,7 @@ model Topping {
   amount        Int
   unit          String
   adminId       String
-  createdBy     Admin @relation(fields: [adminId], references: [id])
+  createdBy     Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model Cream {
@@ -115,7 +115,7 @@ model Cream {
   deletedAt     DateTime?   
   updatedAt     DateTime   @updatedAt
   adminId       String
-  createdBy     Admin @relation(fields: [adminId], references: [id])
+  createdBy     Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model Product {
@@ -131,5 +131,5 @@ model Product {
   maxCreamsAllowed    Int
   maxToppingsAllowed  Int
   adminId             String
-  createdBy           Admin @relation(fields: [adminId], references: [id])
+  createdBy           Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }

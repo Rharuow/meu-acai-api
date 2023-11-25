@@ -7,6 +7,8 @@ import {
   createTwentyCreams,
 } from "@/__test__/utils/beforeAll/Users";
 import { Cream } from "@prisma/client";
+import { CreateCreamRequestBody } from "@/types/creams/createRequestbody";
+import { UpdateCreamRequestBody } from "@/types/creams/updateRequestBody";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -215,8 +217,6 @@ describe("CRUD cream", () => {
       .send({ isSpecial: true })
       .expect(200);
 
-    console.log("response: ", response.body);
-
     return expect(response.statusCode).toBe(200);
   });
 
@@ -228,8 +228,6 @@ describe("CRUD cream", () => {
       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
       .send({ available: true })
       .expect(200);
-
-    console.log("response: ", response.body);
 
     return expect(response.statusCode).toBe(200);
   });
@@ -459,7 +457,7 @@ describe("CRUD cream", () => {
 
   test("when access GET /api/v1/resources/creams?orderBy=createdAt authenticated with any role, return a list cream ordered by name", async () => {
     const response = await request(app)
-      .get(creamResourcePath + `?orderBy=createdAt`)
+      .get(creamResourcePath + `?orderBy=name`)
       .set("authorization", "Bearer " + accessTokenAsAdmin)
       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
       .expect(200);
