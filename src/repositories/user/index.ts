@@ -2,6 +2,9 @@ import "module-alias/register";
 import { encodeSha256 } from "@libs/crypto";
 import { userInMemory } from "@libs/memory-cache";
 import { prismaClient } from "@libs/prisma";
+import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
+import { Role, User } from "@prisma/client";
+import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 
 type Params = {
   name: string;
@@ -9,12 +12,6 @@ type Params = {
 };
 
 type Includes = "Role";
-
-export type CreateUserRequestBody = {
-  name: string;
-  password: string;
-  roleId: string;
-};
 
 const createQuery = (params: Params, includes?: Array<Includes>) => {
   let query: {
@@ -129,5 +126,19 @@ export const createUser = async ({
       password: encodeSha256(password),
       roleId,
     },
+  });
+};
+
+export const updateUser: ({
+  id,
+  fields,
+}: {
+  id: string;
+  fields: UpdateUserRequestBody;
+}) => Promise<User & { role?: Role }> = async ({ fields, id }) => {
+  userInMemory.clear();
+  return await prismaClient.user.update({
+    where: { id },
+    data: fields,
   });
 };

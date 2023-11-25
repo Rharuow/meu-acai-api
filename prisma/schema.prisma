@@ -34,102 +34,105 @@ model User {
   password    String
   roleId      String
   role        Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  admins      Admin[]
-  clients     Client[]
-  members     Member[]
+  adminId     String? @unique
+  admin       Admin?
+  clientId    String? @unique
+  client      Client?
+  memberId    String? @unique
+  member      Member?
 }
 
 model Admin {
-  id          String @id @default(uuid())
-  createdAt   DateTime   @default(now())
+  id          String      @id @default(uuid())
+  createdAt   DateTime    @default(now())
   deletedAt   DateTime?   
-  updatedAt   DateTime   @updatedAt
-  userId      String
-  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  updatedAt   DateTime    @updatedAt
+  userId      String      @unique
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   toppings    Topping[]
   creams      Cream[]
   products    Product[]
 }
 
 model Client {
-  id          String @id @default(uuid())
-  createdAt   DateTime   @default(now())
+  id          String      @id @default(uuid())
+  createdAt   DateTime    @default(now())
   deletedAt   DateTime?   
-  updatedAt   DateTime   @updatedAt
-  userId      String
-  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  addressId   String @unique
-  address     Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  updatedAt   DateTime    @updatedAt
+  userId      String      @unique
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addressId   String      @unique
+  address     Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
   members     Member[]
 }
 
 model Member {
-  id            String @id @default(uuid())
-  createdAt     DateTime   @default(now())
+  id            String      @id @default(uuid())
+  createdAt     DateTime    @default(now())
   deletedAt     DateTime?   
-  updatedAt     DateTime   @updatedAt
-  userId        String
-  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  updatedAt     DateTime    @updatedAt
+  userId        String      @unique
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   relationship  String?
   clientId      String
-  client        Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }
 
 model Address {
-  id            String @id @default(uuid())
-  createdAt     DateTime   @default(now())
+  id            String      @id @default(uuid())
+  createdAt     DateTime    @default(now())
   deletedAt     DateTime?   
-  updatedAt     DateTime   @updatedAt
+  updatedAt     DateTime    @updatedAt
   square        String
   house         String
-  clientId      String? @unique
+  clientId      String?     @unique
   client        Client?
 }
 
 model Topping {
-  id            String @id @default(uuid())
-  createdAt     DateTime   @default(now())
+  id            String      @id @default(uuid())
+  createdAt     DateTime    @default(now())
   deletedAt     DateTime?   
-  updatedAt     DateTime   @updatedAt
-  name          String @unique
+  updatedAt     DateTime    @updatedAt
+  name          String      @unique
   photo         String?
-  isSpecial     Boolean @default(false)
-  available     Boolean @default(false)
+  isSpecial     Boolean     @default(false)
+  available     Boolean     @default(false)
   price         Float
   amount        Int
   unit          String
   adminId       String
-  createdBy     Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  createdBy     Admin       @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model Cream {
-  id            String @id @default(uuid())
+  id            String        @id @default(uuid())
   photo         String?
-  name          String @unique
-  isSpecial     Boolean @default(false)
-  available     Boolean @default(false)
+  name          String        @unique
+  isSpecial     Boolean       @default(false)
+  available     Boolean       @default(false)
   price         Float
   amount        Int
   unit          String
-  createdAt     DateTime   @default(now())
+  createdAt     DateTime      @default(now())
   deletedAt     DateTime?   
-  updatedAt     DateTime   @updatedAt
+  updatedAt     DateTime      @updatedAt
   adminId       String
-  createdBy     Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  createdBy     Admin         @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model Product {
-  id                  String @id @default(uuid())
-  size                String @unique
+  id                  String      @id @default(uuid())
+  size                String      @unique
   name                String?
-  createdAt           DateTime   @default(now())
+  createdAt           DateTime    @default(now())
   photo               String?
   deletedAt           DateTime?
-  updatedAt           DateTime   @updatedAt
-  available           Boolean @default(false)
+  updatedAt           DateTime    @updatedAt
+  available           Boolean     @default(false)
   price               Float
   maxCreamsAllowed    Int
   maxToppingsAllowed  Int
   adminId             String
-  createdBy           Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  createdBy           Admin       @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }

@@ -394,6 +394,8 @@ describe("CRUD cream", () => {
       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
       .expect(200);
 
+    console.log("response.body = ", response.body);
+
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("data");
     expect(response.body.data[0]).toHaveProperty("available", true);

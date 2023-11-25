@@ -6,7 +6,7 @@ import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
 import { app } from "@/app";
 import { prismaClient } from "@/libs/prisma";
 import { encodeSha256 } from "@libs/crypto";
-import { Cream } from "@prisma/client";
+import { Cream, Role, User } from "@prisma/client";
 import { getUserByNameAndPassword } from "@repositories/user";
 import request from "supertest";
 
@@ -21,12 +21,16 @@ let refreshTokenAsMember: string;
 
 let cream: Cream;
 
+const userResourcePath = "/api/v1/resources/users";
+
 const adminResourcePath = "/api/v1/resources/users/admins";
 
 const createAdminBody = {
   name: "Test Admin Created",
   password: "123",
 };
+
+let admin: User & { role?: Role };
 
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();
@@ -75,10 +79,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
         .expect(200);
 
-      console.log("response = ", response.body);
-      console.log("createAdminBody = ", createAdminBody);
-
-      const user = await getUserByNameAndPassword(
+      admin = await getUserByNameAndPassword(
         {
           name: createAdminBody.name,
           password: createAdminBody.password,
@@ -86,16 +87,16 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         ["Role"]
       );
 
-      expect(user).toBeTruthy();
-      expect(user).toHaveProperty("name", createAdminBody.name);
-      expect(user.id === response.body.data.userId).toBeTruthy();
-      expect(user.name === response.body.data.name).toBeTruthy();
-      expect(user.password === response.body.data.password).toBeTruthy();
-      expect(user).toHaveProperty(
+      expect(admin).toBeTruthy();
+      expect(admin).toHaveProperty("name", createAdminBody.name);
+      expect(admin.id === response.body.data.user.admin.userId).toBeTruthy();
+      expect(admin.name === response.body.data.user.name).toBeTruthy();
+      expect(admin.password === response.body.data.user.password).toBeTruthy();
+      expect(admin).toHaveProperty(
         "password",
         encodeSha256(createAdminBody.password)
       );
-      expect(user.role).toHaveProperty("name", "ADMIN");
+      expect(admin.role).toHaveProperty("name", "ADMIN");
 
       return expect(response.statusCode).toBe(200);
     }
@@ -103,11 +104,20 @@ describe("CRUD TO ADMIN RESOURCE", () => {
 
   // UPDATE
   test(
-    "When an authenticated admin accesses PUT /api/v1/resources/users/admins/:id " +
+    "When an authenticated admin accesses PUT /api/v1/resources/users/:userId/admins/:id " +
       'with name "Test Admin Edited", ' +
       "then it should update the User with the new provided information",
     async () => {
-      return expect(false).toBeTruthy();
+      const response = await request(app)
+        .put(userResourcePath + `${admin.id}/admins/${admin.id}`)
+        .send({ name: "Test Admin Edited" })
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(200);
+
+      console.info("Response = ", response);
+
+      return expect(response.statusCode).toBe(200);
     }
   );
 

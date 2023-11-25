@@ -1,6 +1,8 @@
-import { unprocessableEntity } from "@serializer/erros/422";
-import { CreateUserRequestBody, createUser } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
+
+import { unprocessableEntity } from "@serializer/erros/422";
+import { createUser } from "@repositories/user";
+import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 
 export const createUserController = async (
   req: Request,
@@ -11,8 +13,6 @@ export const createUserController = async (
 
   try {
     const user = await createUser({ name, password, roleId });
-
-    console.log("User created = ", user);
 
     req.body.user = user;
 

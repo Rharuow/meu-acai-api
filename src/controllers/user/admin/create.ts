@@ -8,7 +8,7 @@ export const createAdminController = async (req: Request, res: Response) => {
   try {
     const admin = await createAdmin({ userId: user.id });
 
-    return createAdminSerializer({ res, user: { ...user, ...admin } });
+    return createAdminSerializer({ res, user, admin });
   } catch (error) {
     console.error("Error creating admin = ", error.message);
     return unprocessableEntity(res, {
