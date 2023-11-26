@@ -238,3 +238,10 @@ export const listUsers: (params: ParamsUser) => Promise<
     totalUsersInMemory.retrieveItemValue(`total-${reference}`),
   ];
 };
+
+export const deleteUser = async ({ id }: { id: string }) => {
+  userInMemory.clear();
+  usersInMemory.clear();
+  await prismaClient.user.delete({ where: { id } });
+  return;
+};

@@ -61,8 +61,6 @@ beforeAll(async () => {
 
   accessTokenAsMember = responseSignInAsMember.body.accessToken;
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
-
-  await prismaClient.user.delete({ where: { name: "Test Admin Edited" } });
 });
 
 describe("CRUD TO ADMIN RESOURCE", () => {
@@ -86,6 +84,8 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         },
         ["Role", "Admin"]
       );
+
+      console.log(userAdmin);
 
       expect(userAdmin).toBeTruthy();
       expect(userAdmin).toHaveProperty("name", createAdminBody.name);
@@ -176,7 +176,13 @@ describe("CRUD TO ADMIN RESOURCE", () => {
     "When an authenticated admin accesses DELETE /api/v1/resources/users/admins/:id " +
       "then it should return a 204 status and delete the first admin created",
     async () => {
-      return expect(false).toBeTruthy();
+      const response = await request(app)
+        .delete(userResourcePath + `/${userAdmin.id}`)
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", refreshTokenAsAdmin)
+        .expect(204);
+
+      return expect(response.statusCode).toBe(204);
     }
   );
 });
