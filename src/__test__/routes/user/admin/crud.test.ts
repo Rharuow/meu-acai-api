@@ -156,7 +156,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
   // LIST
   test(
     "When an authenticated admin accesses GET /api/v1/resources/users/admins " +
-      "then it should return an array containing the first admin created",
+      "then it should return an array containing the first admin created and the default admin created",
     async () => {
       const response = await request(app)
         .get("/api/v1/resources/users/admins")
@@ -164,10 +164,9 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(200);
 
-      expect(response.body.data.length).toBe(1);
+      expect(response.body.data.length).toBe(2);
       expect(response.body.page).toBe(1);
-      expect(response.body.perPage).toBe(10);
-      expect(response.body.hasNext).toBe(false);
+      expect(response.body.hasNextPage).toBe(false);
       return expect(response.statusCode).toBe(200);
     }
   );

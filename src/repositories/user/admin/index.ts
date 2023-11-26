@@ -1,6 +1,17 @@
+import { Params } from "@/repositories/utils/queryBuilder";
 import { CreateAdminRequestBody } from "@/types/user/admin/createRequestBody";
 import { UpdateAdminRequestBody } from "@/types/user/admin/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
+
+export type ParamsAdmin = Params & {
+  orderBy:
+    | "name:asc"
+    | "name:desc"
+    | "role:asc"
+    | "role:desc"
+    | "createdAt:asc"
+    | "createdAt:desc";
+};
 
 export const createAdmin = async ({ userId }: CreateAdminRequestBody) => {
   return await prismaClient.admin.create({

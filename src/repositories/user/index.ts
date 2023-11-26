@@ -1,10 +1,20 @@
 import "module-alias/register";
 import { encodeSha256 } from "@libs/crypto";
-import { userInMemory } from "@libs/memory-cache";
+import {
+  totalUsersInMemory,
+  userInMemory,
+  usersInMemory,
+} from "@libs/memory-cache";
 import { prismaClient } from "@libs/prisma";
 import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
-import { Role, User } from "@prisma/client";
+import { Admin, Client, Member, ROLE, Role, User } from "@prisma/client";
 import { CreateUserRequestBody } from "@/types/user/createRequestbody";
+import {
+  Params as FilterParams,
+  createOrder,
+  createQuery as createListQuery,
+  createReferenceMemoryCacheQuery as createListReferenceMemoryCacheQuery,
+} from "../utils/queryBuilder";
 
 type Params = {
   name: string;
@@ -13,10 +23,27 @@ type Params = {
 
 type Includes = "Role" | "Admin" | "Member" | "Client";
 
+export type ParamsUser = FilterParams & {
+  orderBy:
+    | "name:asc"
+    | "name:desc"
+    | "role:asc"
+    | "role:desc"
+    | "createdAt:asc"
+    | "createdAt:desc";
+} & {
+  includes?: ROLE;
+};
+
 const createQuery = (params: Params, includes?: Array<Includes>) => {
   let query: {
     where: { name: string; password: string };
-    include?: { role: boolean; admin: boolean };
+    include?: {
+      role: boolean;
+      admin?: boolean;
+      member?: boolean;
+      client?: boolean;
+    };
   } = {
     where: {
       name: params.name,
@@ -25,6 +52,8 @@ const createQuery = (params: Params, includes?: Array<Includes>) => {
     include: {
       role: includes && includes.includes("Role"),
       admin: includes && includes.includes("Admin"),
+      member: includes && includes.includes("Member"),
+      client: includes && includes.includes("Client"),
     },
   };
   return query;
@@ -124,6 +153,7 @@ export const createUser = async ({
   roleId,
 }: CreateUserRequestBody) => {
   userInMemory.clear();
+  usersInMemory.clear();
   return await prismaClient.user.create({
     data: {
       name,
@@ -141,8 +171,70 @@ export const updateUser: ({
   fields: UpdateUserRequestBody;
 }) => Promise<User & { role?: Role }> = async ({ fields, id }) => {
   userInMemory.clear();
+  usersInMemory.clear();
   return await prismaClient.user.update({
     where: { id },
     data: fields,
   });
+};
+
+export const listUsers: (params: ParamsUser) => Promise<
+  [
+    Array<
+      User & { role?: Role } & { admin?: Admin } & { member?: Member } & {
+        client?: Client;
+      }
+    >,
+    number
+  ]
+> = async ({ page, perPage, orderBy, filter, includes }) => {
+  const [fieldOrderBy, order] = orderBy.split(":");
+  const where = filter && createListQuery({ filterFields: filter.split(",") });
+  // create a string reference to save in memory the list of admins
+  const reference = createListReferenceMemoryCacheQuery({
+    referenceString: (includes && includes.toLowerCase()) || "users",
+    params: {
+      page,
+      perPage,
+      orderBy,
+      filter,
+    },
+  });
+
+  if (!usersInMemory.hasItem(reference)) {
+    console.log("CREAM IN DB");
+    const [users, totalUsers] = await Promise.all([
+      await prismaClient.user.findMany({
+        skip: (page - 1) * perPage,
+        take: perPage,
+        orderBy: createOrder({ fieldOrderBy, order }),
+        where: includes
+          ? { ...where, AND: { role: { name: ROLE[includes] } } }
+          : where,
+        include: {
+          admin: includes && includes === "ADMIN",
+          member: includes && includes === "MEMBER",
+          client: includes && includes === "CLIENT",
+          role: true,
+        },
+      }),
+      await prismaClient.user.count({ where }),
+    ]);
+
+    usersInMemory.storeExpiringItem(
+      reference,
+      users,
+      process.env.NODE_ENV === "test" ? 5 : 3600 // if test env expire in 5 miliseconds else 1 hour
+    );
+    totalUsersInMemory.storeExpiringItem(
+      `total-${reference}`,
+      totalUsers,
+      process.env.NODE_ENV === "test" ? 5 : 3600
+    );
+  }
+
+  return [
+    usersInMemory.retrieveItemValue(reference),
+    totalUsersInMemory.retrieveItemValue(`total-${reference}`),
+  ];
 };
