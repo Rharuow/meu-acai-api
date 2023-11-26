@@ -1,4 +1,4 @@
-import { Admin, User } from "@prisma/client";
+import { Admin, Role, User } from "@prisma/client";
 import { Response } from "express";
 
 export const createAdminSerializer = ({
@@ -29,4 +29,14 @@ export const updateAdminSerializer = ({
     message: "User updated successfully",
     data: { user: { ...user, admin } },
   });
+};
+
+export const getAdminSerializer = ({
+  res,
+  user,
+}: {
+  res: Response;
+  user: User & { admin?: Admin } & { role?: Role };
+}) => {
+  return res.json({ message: "User founded successfully", data: { user } });
 };

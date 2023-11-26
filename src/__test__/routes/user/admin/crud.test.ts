@@ -119,7 +119,12 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(200);
 
-      expect(response.body.data.user.name).toBe("Test Admin Edited");
+      userAdmin = {
+        ...userAdmin,
+        name: "Test Admin Edited",
+      };
+
+      expect(response.body.data.user.name).toBe(userAdmin.name);
       expect(response.body.data.user.id).toBe(userAdmin.id);
       expect(
         response.body.data.user.admin.id === response.body.data.user.adminId
@@ -135,10 +140,15 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       "with the ID of the first admin, " +
       "then it should return the first admin and associated user created",
     async () => {
-      const response = await request(app).get(
-        userResourcePath + `/${userAdmin.id}/admins/${userAdmin.adminId}`
-      );
+      const response = await request(app)
+        .get(userResourcePath + `/${userAdmin.id}/admins/${userAdmin.adminId}`)
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", refreshTokenAsAdmin)
+        .expect(200);
 
+      expect(response.body.data.user.name).toBe(userAdmin.name);
+      expect(response.body.data.user.admin.id).toBe(userAdmin.admin.id);
+      expect(response.body.data.user.roleId).toBe(userAdmin.roleId);
       return expect(response.statusCode).toBe(200);
     }
   );

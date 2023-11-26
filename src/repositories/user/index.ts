@@ -11,7 +11,7 @@ type Params = {
   password: string;
 };
 
-type Includes = "Role" | "Admin";
+type Includes = "Role" | "Admin" | "Member" | "Client";
 
 const createQuery = (params: Params, includes?: Array<Includes>) => {
   let query: {
@@ -103,6 +103,9 @@ export const getUser = async ({
       },
       include: {
         role: includes && includes.includes("Role"),
+        admin: includes && includes.includes("Admin"),
+        member: includes && includes.includes("Member"),
+        client: includes && includes.includes("Client"),
       },
     });
     userInMemory.storeExpiringItem(
