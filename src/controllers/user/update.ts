@@ -7,12 +7,12 @@ export const updateUserController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { userId } = req.params;
+  const { userId, id } = req.params;
 
   try {
     const user = await updateUser({ fields: req.body.user, id: userId });
 
-    req.body.user = user;
+    req.body.user = { ...user, adminId: id };
 
     return next();
   } catch (error) {

@@ -137,7 +137,6 @@ export const updateUser: ({
   id: string;
   fields: UpdateUserRequestBody;
 }) => Promise<User & { role?: Role }> = async ({ fields, id }) => {
-  console.info("fields = ", fields);
   userInMemory.clear();
   return await prismaClient.user.update({
     where: { id },

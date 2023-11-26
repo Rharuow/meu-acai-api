@@ -119,8 +119,12 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(200);
 
-      console.info("Response = ", response.body);
-
+      expect(response.body.data.user.name).toBe("Test Admin Edited");
+      expect(response.body.data.user.id).toBe(userAdmin.id);
+      expect(
+        response.body.data.user.admin.id === response.body.data.user.adminId
+      ).toBeTruthy();
+      expect(response.body.data.user.admin.id).toBe(userAdmin.admin.id);
       return expect(response.statusCode).toBe(200);
     }
   );
@@ -131,7 +135,11 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       "with the ID of the first admin, " +
       "then it should return the first admin and associated user created",
     async () => {
-      return expect(false).toBeTruthy();
+      const response = await request(app).get(
+        userResourcePath + `/${userAdmin.id}/admins/${userAdmin.adminId}`
+      );
+
+      return expect(response.statusCode).toBe(200);
     }
   );
 

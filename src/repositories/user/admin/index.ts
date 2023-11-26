@@ -24,3 +24,7 @@ export const updateAdmin = async ({
     data: fields,
   });
 };
+
+export const getAdmin = async ({ id }: { id: string }) => {
+  return await prismaClient.admin.findUnique({ where: { id } });
+};
