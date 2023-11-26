@@ -158,7 +158,17 @@ describe("CRUD TO ADMIN RESOURCE", () => {
     "When an authenticated admin accesses GET /api/v1/resources/users/admins " +
       "then it should return an array containing the first admin created",
     async () => {
-      return expect(false).toBeTruthy();
+      const response = await request(app)
+        .get("/api/v1/resources/users/admins")
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(200);
+
+      expect(response.body.data.length).toBe(1);
+      expect(response.body.page).toBe(1);
+      expect(response.body.perPage).toBe(10);
+      expect(response.body.hasNext).toBe(false);
+      return expect(response.statusCode).toBe(200);
     }
   );
 
