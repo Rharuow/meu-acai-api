@@ -1,4 +1,4 @@
-import { badRequest } from "@/serializer/erros/400";
+import { badRequest } from "@serializer/erros/400";
 import { NextFunction, Request, Response } from "express";
 
 export const idsInQueryParams = (

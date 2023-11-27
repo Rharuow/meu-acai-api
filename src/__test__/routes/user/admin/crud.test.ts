@@ -4,7 +4,7 @@ import {
 } from "@/__test__/utils/beforeAll/Users";
 import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
 import { app } from "@/app";
-import { prismaClient } from "@/libs/prisma";
+import { prismaClient } from "@libs/prisma";
 import { encodeSha256 } from "@libs/crypto";
 import { Admin, Cream, Role, User } from "@prisma/client";
 import { getUserByNameAndPassword } from "@repositories/user";

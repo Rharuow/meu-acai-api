@@ -1,6 +1,6 @@
-import { deleteManyUser, deleteUser } from "@/repositories/user";
-import { badRequest } from "@/serializer/erros/400";
-import { unprocessableEntity } from "@/serializer/erros/422";
+import { deleteManyUser, deleteUser } from "@repositories/user";
+import { badRequest } from "@serializer/erros/400";
+import { unprocessableEntity } from "@serializer/erros/422";
 import { Request, Response } from "express";
 
 export const deleteUserController = async (req: Request, res: Response) => {

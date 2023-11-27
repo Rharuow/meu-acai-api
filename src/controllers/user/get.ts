@@ -1,7 +1,7 @@
-import { getUser } from "@/repositories/user";
-import { unprocessableEntity } from "@/serializer/erros/422";
-import { getUserSerializer } from "@/serializer/resources/user";
-import { getAdminSerializer } from "@/serializer/resources/user/admin";
+import { getUser } from "@repositories/user";
+import { unprocessableEntity } from "@serializer/erros/422";
+import { getUserSerializer } from "@serializer/resources/user";
+import { getAdminSerializer } from "@serializer/resources/user/admin";
 import { Request, Response } from "express";
 
 export const getUserController = async (req: Request, res: Response) => {

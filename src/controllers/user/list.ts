@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 
 import { QueryParms } from "@/types/queryParams/pagination";
-import { ParamsUser, listUsers } from "@/repositories/user";
-import { listUsersSerializer } from "@/serializer/resources/user";
-import { unprocessableEntity } from "@/serializer/erros/422";
+import { ParamsUser, listUsers } from "@repositories/user";
+import { listUsersSerializer } from "@serializer/resources/user";
+import { unprocessableEntity } from "@serializer/erros/422";
 
 export const listUserController = async (
   req: Request<{}, {}, {}, qs.ParsedQs & QueryParms>,

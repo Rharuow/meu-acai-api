@@ -1,5 +1,5 @@
-import { updateUser } from "@/repositories/user";
-import { unprocessableEntity } from "@/serializer/erros/422";
+import { updateUser } from "@repositories/user";
+import { unprocessableEntity } from "@serializer/erros/422";
 import { NextFunction, Request, Response } from "express";
 
 export const updateUserController = async (

@@ -1,4 +1,4 @@
-import { Params } from "@/repositories/utils/queryBuilder";
+import { Params } from "@repositories/utils/queryBuilder";
 import { CreateAdminRequestBody } from "@/types/user/admin/createRequestBody";
 import { UpdateAdminRequestBody } from "@/types/user/admin/updateRequestBody";
 import { prismaClient } from "@libs/prisma";

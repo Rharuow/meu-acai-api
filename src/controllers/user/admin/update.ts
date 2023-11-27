@@ -1,6 +1,6 @@
-import { getAdmin, updateAdmin } from "@/repositories/user/admin";
-import { unprocessableEntity } from "@/serializer/erros/422";
-import { updateAdminSerializer } from "@/serializer/resources/user/admin";
+import { getAdmin, updateAdmin } from "@repositories/user/admin";
+import { unprocessableEntity } from "@serializer/erros/422";
+import { updateAdminSerializer } from "@serializer/resources/user/admin";
 import { Request, Response } from "express";
 
 export const updateAdminController = async (req: Request, res: Response) => {

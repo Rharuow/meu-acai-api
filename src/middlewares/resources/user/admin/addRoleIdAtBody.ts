@@ -1,5 +1,5 @@
-import { getRoleByName } from "@/repositories/role";
-import { internalServerError } from "@/serializer/erros/500";
+import { getRoleByName } from "@repositories/role";
+import { internalServerError } from "@serializer/erros/500";
 import { NextFunction, Request, Response } from "express";
 
 export const addRoleIdAtBody = async (

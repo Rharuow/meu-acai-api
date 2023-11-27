@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { unprocessableEntity } from "@serializer/erros/422";
 import { createManyUser, createUser } from "@repositories/user";
 import { CreateUserRequestBody } from "@/types/user/createRequestbody";
-import { prismaClient } from "@/libs/prisma";
+import { prismaClient } from "@libs/prisma";
 
 export const createUserController = async (
   req: Request,
