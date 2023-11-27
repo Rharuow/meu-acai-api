@@ -6,6 +6,9 @@ export const idsInQueryParams = (
   res: Response,
   next: NextFunction
 ) => {
+  if (!req.query.ids)
+    return badRequest({ res, message: "Invalid or missing IDs" });
+
   const ids = req.query.ids.split(",");
 
   if (!ids || !Array.isArray(ids)) {
