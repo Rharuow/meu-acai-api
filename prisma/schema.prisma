@@ -47,6 +47,7 @@ model Admin {
   createdAt   DateTime    @default(now())
   deletedAt   DateTime?   
   updatedAt   DateTime    @updatedAt
+  email       String?
   userId      String      @unique
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   toppings    Topping[]
@@ -59,6 +60,8 @@ model Client {
   createdAt   DateTime    @default(now())
   deletedAt   DateTime?   
   updatedAt   DateTime    @updatedAt
+  email       String?
+  phone       String?
   userId      String      @unique
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   addressId   String      @unique
@@ -70,6 +73,8 @@ model Member {
   id            String      @id @default(uuid())
   createdAt     DateTime    @default(now())
   deletedAt     DateTime?   
+  email         String?
+  phone         String?
   updatedAt     DateTime    @updatedAt
   userId        String      @unique
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)

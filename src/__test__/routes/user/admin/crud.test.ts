@@ -30,6 +30,10 @@ const createAdminBody = {
   password: "123",
 };
 
+const createManyAdmins = Array(15)
+  .fill(null)
+  .map((_, index) => ({ name: `Test Admin ${index + 1}`, password: "123" }));
+
 let userAdmin: User & { role?: Role } & { admin?: Admin };
 
 beforeAll(async () => {
@@ -85,8 +89,6 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         ["Role", "Admin"]
       );
 
-      console.log(userAdmin);
-
       expect(userAdmin).toBeTruthy();
       expect(userAdmin).toHaveProperty("name", createAdminBody.name);
       expect(
@@ -103,6 +105,31 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       expect(userAdmin.role).toHaveProperty("name", "ADMIN");
 
       return expect(response.statusCode).toBe(200);
+    }
+  );
+
+  test(
+    "When an authenticated admin accesses POST /api/v1/resources/users/admins/createMany" +
+      "send in body a array with name and password valid to create many admins" +
+      "then it should create many ADMINs and USERs resources in the database",
+    async () => {
+      const response = await request(app)
+        .post(adminResourcePath + "/createMany")
+        .send(createManyAdmins)
+        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+        .expect(204);
+
+      const admins = await prismaClient.user.findMany({
+        where: {
+          role: {
+            name: "ADMIN",
+          },
+        },
+      });
+
+      expect(admins.length).toBe(17); // 15 created in this test case, one to teste signin and one to create admin test
+      return expect(response.statusCode).toBe(204);
     }
   );
 
@@ -164,14 +191,29 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(200);
 
-      expect(response.body.data.length).toBe(2);
+      expect(response.body.data.length).toBe(10);
       expect(response.body.page).toBe(1);
-      expect(response.body.hasNextPage).toBe(false);
+      expect(response.body.hasNextPage).toBe(true);
       return expect(response.statusCode).toBe(200);
     }
   );
 
   // DELETE
+  test(
+    "When an autenticated admin accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
+      "then it should return a 204 status and delete all the ids sent in query parameters",
+    async () => {
+      const admins = await prismaClient.user.findMany({
+        where: {
+          name: {
+            startsWith: "Test Admin ",
+          },
+        },
+      });
+      // const response = await request(app).delete(`/api/v1/resources/users/deleteMany?ids=${}`)
+    }
+  );
+
   test(
     "When an authenticated admin accesses DELETE /api/v1/resources/users/admins/:id " +
       "then it should return a 204 status and delete the first admin created",

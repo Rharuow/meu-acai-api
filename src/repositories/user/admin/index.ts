@@ -21,6 +21,19 @@ export const createAdmin = async ({ userId }: CreateAdminRequestBody) => {
   });
 };
 
+export const createManyAdmins = async ({
+  usersIds,
+}: {
+  usersIds: Array<string>;
+}) => {
+  return await prismaClient.admin.createMany({
+    data: usersIds.map((userId) => ({
+      userId,
+    })),
+    skipDuplicates: true,
+  });
+};
+
 export const updateAdmin = async ({
   userId,
   id,

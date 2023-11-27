@@ -1,6 +1,12 @@
-import { createAdminController } from "@/controllers/user/admin/create";
+import {
+  createAdminController,
+  createManyAdminsController,
+} from "@/controllers/user/admin/create";
 import { updateAdminController } from "@/controllers/user/admin/update";
-import { createUserController } from "@/controllers/user/create";
+import {
+  createManyUserController,
+  createUserController,
+} from "@/controllers/user/create";
 import { getUserController } from "@/controllers/user/get";
 import { listUserController } from "@/controllers/user/list";
 import { updateUserController } from "@/controllers/user/update";
@@ -17,6 +23,13 @@ adminRouter.post(
   addRoleIdAtBody,
   createUserController,
   createAdminController
+);
+
+adminRouter.post(
+  "/admins/createMany",
+  addRoleIdAtBody,
+  createManyUserController,
+  createManyAdminsController
 );
 
 adminRouter.put(

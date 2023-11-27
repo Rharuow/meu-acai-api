@@ -163,6 +163,15 @@ export const createUser = async ({
   });
 };
 
+export const createManyUser = async (users: Array<CreateUserRequestBody>) => {
+  userInMemory.clear();
+  usersInMemory.clear();
+  return await prismaClient.user.createMany({
+    data: users,
+    skipDuplicates: true,
+  });
+};
+
 export const updateUser: ({
   id,
   fields,
@@ -244,4 +253,16 @@ export const deleteUser = async ({ id }: { id: string }) => {
   usersInMemory.clear();
   await prismaClient.user.delete({ where: { id } });
   return;
+};
+
+export const deleteManyUser = async ({ ids }: { ids: Array<string> }) => {
+  userInMemory.clear();
+  usersInMemory.clear();
+  return await prismaClient.user.deleteMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
 };
