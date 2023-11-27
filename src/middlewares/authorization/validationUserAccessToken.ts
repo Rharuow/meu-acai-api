@@ -1,6 +1,6 @@
-import { unauthorized } from "@/serializeres/erros/401";
+import { unauthorized } from "@serializer/erros/401";
 import { Role, User } from "@prisma/client";
-import { getUser } from "@repositories/user";
+import { getUser, getUserByNameAndPassword } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 import { VerifyErrors, verify } from "jsonwebtoken";
 
@@ -26,7 +26,6 @@ export const validationUserAccessToken = async (
           if (err) return reject(err);
           const hasUser = await getUser({
             id: decoded.id,
-            username: decoded.name,
           });
           if (!hasUser) return reject("User not found");
           return resolve(decoded);

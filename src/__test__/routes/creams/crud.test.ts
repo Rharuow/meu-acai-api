@@ -7,6 +7,8 @@ import {
   createTwentyCreams,
 } from "@/__test__/utils/beforeAll/Users";
 import { Cream } from "@prisma/client";
+import { CreateCreamRequestBody } from "@/types/creams/createRequestbody";
+import { UpdateCreamRequestBody } from "@/types/creams/updateRequestBody";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -215,8 +217,6 @@ describe("CRUD cream", () => {
       .send({ isSpecial: true })
       .expect(200);
 
-    console.log("response: ", response.body);
-
     return expect(response.statusCode).toBe(200);
   });
 
@@ -228,8 +228,6 @@ describe("CRUD cream", () => {
       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
       .send({ available: true })
       .expect(200);
-
-    console.log("response: ", response.body);
 
     return expect(response.statusCode).toBe(200);
   });
@@ -396,13 +394,19 @@ describe("CRUD cream", () => {
       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
       .expect(200);
 
+    const creamsWithAvailableTrue = await prismaClient.cream.count({
+      where: {
+        available: true,
+      },
+    });
+
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("data");
     expect(response.body.data[0]).toHaveProperty("available", true);
     expect(response.body).toHaveProperty("hasNextPage", false);
     expect(response.body).toHaveProperty("totalPages", 1);
     expect(response.body).toHaveProperty("page", 1);
-    return expect(response.body.data.length).toBe(1);
+    return expect(response.body.data.length).toBe(creamsWithAvailableTrue);
   });
 
   test("when access GET /api/v1/resources/creams?filter=available:false to list creams authenticated with any role, return all creams", async () => {
@@ -415,7 +419,7 @@ describe("CRUD cream", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("data");
     expect(
-      response.body.data.every((cream: Cream) => !cream.isSpecial)
+      response.body.data.every((cream: Cream) => !cream.available)
     ).toBeTruthy();
     expect(response.body).toHaveProperty("hasNextPage", true);
     expect(response.body).toHaveProperty("totalPages", 2);
@@ -430,13 +434,22 @@ describe("CRUD cream", () => {
       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
       .expect(200);
 
+    const creamWithIsSpecialTrue = await prismaClient.cream.count({
+      where: {
+        isSpecial: true,
+      },
+    });
+
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("data");
     expect(response.body.data[0]).toHaveProperty("isSpecial", true);
+    expect(
+      response.body.data.every((cream: Cream) => cream.isSpecial)
+    ).toBeTruthy();
     expect(response.body).toHaveProperty("hasNextPage", false);
     expect(response.body).toHaveProperty("totalPages", 1);
     expect(response.body).toHaveProperty("page", 1);
-    return expect(response.body.data.length).toBe(1);
+    return expect(response.body.data.length).toBe(creamWithIsSpecialTrue);
   });
 
   test("when access GET /api/v1/resources/creams?filter=isSpecial:false to list creams authenticated with any role, return all creams", async () => {
@@ -459,7 +472,7 @@ describe("CRUD cream", () => {
 
   test("when access GET /api/v1/resources/creams?orderBy=createdAt authenticated with any role, return a list cream ordered by name", async () => {
     const response = await request(app)
-      .get(creamResourcePath + `?orderBy=createdAt`)
+      .get(creamResourcePath + `?orderBy=name`)
       .set("authorization", "Bearer " + accessTokenAsAdmin)
       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
       .expect(200);

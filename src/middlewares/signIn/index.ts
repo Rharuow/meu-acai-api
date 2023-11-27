@@ -1,4 +1,4 @@
-import { getUser } from "@repositories/user";
+import { getUserByNameAndPassword } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 
 export const validationUserAccessToken = async (
@@ -7,8 +7,8 @@ export const validationUserAccessToken = async (
   next: NextFunction
 ) => {
   try {
-    await getUser({
-      username: req.body.username,
+    await getUserByNameAndPassword({
+      name: req.body.name,
       password: req.body.password,
     });
 

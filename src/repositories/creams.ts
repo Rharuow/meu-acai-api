@@ -1,3 +1,5 @@
+import { CreateCreamRequestBody } from "@/types/creams/createRequestbody";
+import { UpdateCreamRequestBody } from "@/types/creams/updateRequestBody";
 import {
   creamInMemory,
   creamsInMemory,
@@ -5,82 +7,29 @@ import {
 } from "@libs/memory-cache";
 import { prismaClient } from "@libs/prisma";
 import { Cream } from "@prisma/client";
+import {
+  Params,
+  createOrder,
+  createQuery,
+  createReferenceMemoryCacheQuery,
+} from "./utils/queryBuilder";
+import { orderCreamByOptions } from "@/routes/resources/cream";
 
-type WhereType = {
-  [key: string]: string | boolean | { contains: string };
-};
-
-export type Params = {
-  page: number;
-  perPage: number;
-  orderBy:
-    | "id:asc"
-    | "id:desc"
-    | "name:asc"
-    | "name:desc"
-    | "price:asc"
-    | "price:desc"
-    | "amount:asc"
-    | "amount:desc"
-    | "createdAt:asc"
-    | "createdAt:desc"
-    | string;
-  filter?: string;
-};
-
-function parseValue(
-  operator: string,
-  value: string
-): string | boolean | { contains: string } {
-  if (operator === "like") {
-    return { contains: value };
-  } else if (operator === "true") {
-    return true;
-  } else if (operator === "false") {
-    return false;
-  } else {
-    return value;
-  }
-}
-
-const createReferenceMemoryCacheQuery = ({
-  params,
-  referenceString,
-}: {
-  referenceString: string;
-  params: Params;
-}) => {
-  referenceString = referenceString.concat(
-    "-",
-    String(params.page),
-    "-",
-    String(params.perPage),
-    "-",
-    String(params.orderBy),
-    "-",
-    String(params.filter)
-  );
-
-  return referenceString;
+export type ParamsCream = Params & {
+  orderBy: (typeof orderCreamByOptions)[number];
 };
 
 export const listCreams: (
-  params: Params
+  params: ParamsCream
 ) => Promise<[Array<Cream>, number]> = async ({
   page,
   perPage,
   orderBy,
   filter,
 }) => {
-  // create a string reference to save in memory the list of creams
   const [fieldOrderBy, order] = orderBy.split(":");
-  const filterFields = filter && filter.split(",");
-  const where: WhereType = {};
-  if (filterFields)
-    filterFields.forEach((filter) => {
-      const [key, operator, value] = filter.split(":");
-      where[key] = parseValue(operator, value);
-    });
+  const where = filter && createQuery({ filterFields: filter.split(",") });
+  // create a string reference to save in memory the list of creams
   const reference = createReferenceMemoryCacheQuery({
     referenceString: "cream",
     params: {
@@ -96,9 +45,7 @@ export const listCreams: (
       await prismaClient.cream.findMany({
         skip: (page - 1) * perPage,
         take: perPage,
-        orderBy: {
-          [fieldOrderBy]: order || "asc",
-        },
+        orderBy: createOrder({ fieldOrderBy, order }),
         where,
       }),
       await prismaClient.cream.count({ where }),
@@ -160,7 +107,7 @@ export const getCream: ({ id }: { id: string }) => Promise<Cream> = async ({
   if (!creamInMemory.hasItem(id)) {
     creamInMemory.storeExpiringItem(
       id,
-      await prismaClient.cream.findFirst({ where: { id } }),
+      await prismaClient.cream.findUniqueOrThrow({ where: { id } }),
       process.env.NODE_ENV === "test" ? 5 : 3600 // if test env expire in 5 miliseconds else 1 hour
     );
   }

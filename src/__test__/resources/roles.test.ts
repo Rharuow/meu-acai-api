@@ -1,5 +1,5 @@
 import { createAllKindOfUserAndRoles } from "./../utils/beforeAll/Users";
-import { prismaClient } from "@/libs/prisma";
+import { prismaClient } from "@libs/prisma";
 
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();

@@ -1,4 +1,4 @@
-import { Cream, Role, User } from "@prisma/client";
+import { Admin, Client, Cream, Member, Role, User } from "@prisma/client";
 import { MemoryCache } from "memory-cache-node";
 
 export const userInMemory = new MemoryCache<string, User & { role?: Role }>(
@@ -17,6 +17,23 @@ export const creamInMemory = new MemoryCache<string, Cream>(
 );
 
 export const totalCreamsInMemory = new MemoryCache<string, number>(
+  process.env.NODE_ENV === "test" ? 5 : 60 * 60, // 1 hour to expire items
+  100 // number of items
+);
+
+export const usersInMemory = new MemoryCache<
+  string,
+  Array<
+    User & { role?: Role } & { admin?: Admin } & { member?: Member } & {
+      client?: Client;
+    }
+  >
+>(
+  process.env.NODE_ENV === "test" ? 5 : 60 * 60, // 1 hour to expire items
+  100 // number of items
+);
+
+export const totalUsersInMemory = new MemoryCache<string, number>(
   process.env.NODE_ENV === "test" ? 5 : 60 * 60, // 1 hour to expire items
   100 // number of items
 );

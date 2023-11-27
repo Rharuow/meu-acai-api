@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "test": "jest --forceExit --watch --config ./jest.config.js",
+    "test": "jest --forceExit --watch --config ./jest.config.ts",
     "start": "node build/app.js",
     "dev": "nodemon"
   },
@@ -16,6 +16,7 @@
     "@controllers": "src/controllers",
     "@models": "src/models",
     "@middlewares": "src/middlewares",
+    "@serializer": "src/serializer",
     "@routes": "src/routes",
     "@services": "src/services",
     "@libs": "src/libs",
@@ -24,7 +25,6 @@
   "dependencies": {
     "@auth/prisma-adapter": "^1.0.6",
     "@prisma/client": "^5.6.0",
-    "@supabase/supabase-js": "^2.38.4",
     "@types/express": "^4.17.21",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

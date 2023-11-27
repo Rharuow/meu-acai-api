@@ -1,3 +1,4 @@
+import { unprocessableEntity } from "@serializer/erros/422";
 import { getCream } from "@repositories/creams";
 import { Request, Response } from "express";
 
@@ -10,6 +11,6 @@ export const getCreamController = async (req: Request, res: Response) => {
     return res.json(cream);
   } catch (error) {
     console.log("get cream error", error);
-    return res.status(500);
+    return unprocessableEntity(res, { message: error.message });
   }
 };

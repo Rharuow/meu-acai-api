@@ -1,4 +1,4 @@
-import { unauthorized } from "@/serializeres/erros/401";
+import { unauthorized } from "@serializer/erros/401";
 import { prismaClient } from "@libs/prisma";
 import { Role, User } from "@prisma/client";
 import { getUser } from "@repositories/user";
@@ -27,7 +27,6 @@ export const validationAdminAccessToken = async (
           if (err) return reject(err);
           const userExists = await getUser({
             id: decoded.id,
-            username: decoded.name,
           });
           if (!userExists) return reject("User does not exist");
           return resolve(decoded);

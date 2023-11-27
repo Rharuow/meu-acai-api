@@ -3,11 +3,11 @@ import { prismaClient } from "@libs/prisma";
 
 export const createUserIfNotExist = async (
   id: string,
-  { username, password }: { username: string; password: string }
+  { name, password }: { name: string; password: string }
 ) => {
   const user = await prismaClient.user.findFirst({
     where: {
-      name: username,
+      name: name,
       password: encodeSha256(password),
     },
   });
@@ -15,7 +15,7 @@ export const createUserIfNotExist = async (
   if (!user)
     return await prismaClient.user.create({
       data: {
-        name: username,
+        name: name,
         password: encodeSha256(password),
         roleId: id,
       },
@@ -24,15 +24,15 @@ export const createUserIfNotExist = async (
 };
 
 export const cleanCreateUserIfNotExist = async ({
-  username,
+  name,
   password,
 }: {
-  username: string;
+  name: string;
   password: string;
 }) => {
   const user = await prismaClient.user.findFirst({
     where: {
-      name: username,
+      name: name,
       password: encodeSha256(password),
     },
   });

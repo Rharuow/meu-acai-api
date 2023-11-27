@@ -20,7 +20,7 @@ beforeAll(async () => {
 });
 
 describe("Signin route", () => {
-  test("when access POST route '/api/v1/signin' contains in body the username and password correclty", async () => {
+  test("when access POST route '/api/v1/signin' contains in body the name and password correclty", async () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
