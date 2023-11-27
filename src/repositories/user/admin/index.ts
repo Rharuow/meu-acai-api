@@ -26,6 +26,7 @@ export const createManyAdmins = async ({
 }: {
   usersIds: Array<string>;
 }) => {
+  console.log("usersIds  =", usersIds);
   return await prismaClient.admin.createMany({
     data: usersIds.map((userId) => ({
       userId,

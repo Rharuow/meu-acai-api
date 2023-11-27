@@ -21,6 +21,8 @@ let refreshTokenAsMember: string;
 
 let cream: Cream;
 
+let admins: Array<User & { role?: Role } & { admin?: Admin }>;
+
 const userResourcePath = "/api/v1/resources/users";
 
 const adminResourcePath = "/api/v1/resources/users/admins";
@@ -120,15 +122,19 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
         .expect(204);
 
-      const admins = await prismaClient.user.findMany({
+      admins = await prismaClient.user.findMany({
+        include: {
+          admin: true,
+          role: true,
+        },
         where: {
-          role: {
-            name: "ADMIN",
+          name: {
+            in: createManyAdmins.map((adm) => adm.name),
           },
         },
       });
 
-      expect(admins.length).toBe(17); // 15 created in this test case, one to teste signin and one to create admin test
+      expect(admins.length).toBe(15);
       return expect(response.statusCode).toBe(204);
     }
   );
@@ -203,14 +209,17 @@ describe("CRUD TO ADMIN RESOURCE", () => {
     "When an autenticated admin accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
       "then it should return a 204 status and delete all the ids sent in query parameters",
     async () => {
-      const admins = await prismaClient.user.findMany({
-        where: {
-          name: {
-            startsWith: "Test Admin ",
-          },
-        },
-      });
-      // const response = await request(app).delete(`/api/v1/resources/users/deleteMany?ids=${}`)
+      const response = await request(app)
+        .delete(
+          `${userResourcePath}/deleteMany?ids=${admins
+            .map((admin) => admin.id)
+            .join(",")}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(204);
+
+      return expect(response.statusCode).toBe(204);
     }
   );
 

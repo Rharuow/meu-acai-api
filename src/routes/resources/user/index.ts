@@ -12,16 +12,16 @@ const userRouter = Router();
 userRouter.use("/users", validationAdminAccessToken, adminRouter);
 
 userRouter.delete(
-  "/users/:id",
-  validationAdminAccessToken,
-  deleteUserController
-);
-
-userRouter.delete(
   "/users/deleteMany",
   idsInQueryParams,
   validationAdminAccessToken,
   deleteManyUsersController
+);
+
+userRouter.delete(
+  "/users/:id",
+  validationAdminAccessToken,
+  deleteUserController
 );
 
 export { userRouter };

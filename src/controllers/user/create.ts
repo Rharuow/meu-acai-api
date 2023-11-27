@@ -54,7 +54,7 @@ export const createManyUserController = async (
           })
         : [];
 
-    req.body.usersIds = createdResourceIds;
+    req.body.usersIds = createdResourceIds.map((user) => user.id);
 
     return next();
   } catch (error) {

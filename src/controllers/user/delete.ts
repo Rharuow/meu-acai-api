@@ -17,13 +17,13 @@ export const deleteUserController = async (req: Request, res: Response) => {
 };
 
 export const deleteManyUsersController = async (
-  req: Request<{}, {}, {}, qs.ParsedQs & { ids: Array<string> }>,
+  req: Request<{}, {}, {}, qs.ParsedQs & { usersIds: Array<string> }>,
   res: Response
 ) => {
-  const { ids } = req.query;
+  const { usersIds } = req.query;
 
   try {
-    await deleteManyUser({ ids });
+    await deleteManyUser({ ids: usersIds });
     return res.status(204).send("cream is deleted");
   } catch (error) {
     console.error("error deleting many users", error.message);
