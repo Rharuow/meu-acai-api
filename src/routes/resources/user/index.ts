@@ -6,10 +6,13 @@ import {
   deleteUserController,
 } from "@controllers/user/delete";
 import { idsInQueryParams } from "@middlewares/resources/user/idsInQueryParams";
+import { clientRouter } from "./client";
 
 const userRouter = Router();
 
 userRouter.use("/users", validationAdminAccessToken, adminRouter);
+
+userRouter.use("/users", validationAdminAccessToken, clientRouter);
 
 userRouter.delete(
   "/users/deleteMany",

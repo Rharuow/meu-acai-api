@@ -251,8 +251,25 @@ export const listUsers: (params: ParamsUser) => Promise<
 export const deleteUser = async ({ id }: { id: string }) => {
   userInMemory.clear();
   usersInMemory.clear();
-  await prismaClient.user.delete({ where: { id } });
-  return;
+  const hasClient = await prismaClient.client.findUnique({
+    where: {
+      userId: id,
+    },
+  });
+
+  if (hasClient) {
+    await prismaClient.address.update({
+      where: {
+        clientId: hasClient.id,
+      },
+      data: {
+        clientId: null,
+      },
+    });
+  }
+  const user = await prismaClient.user.delete({ where: { id } });
+
+  return user;
 };
 
 export const deleteManyUser = async ({ ids }: { ids: Array<string> }) => {

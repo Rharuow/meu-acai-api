@@ -14,11 +14,18 @@ export type ParamsAdmin = Params & {
 };
 
 export const createAdmin = async ({ userId }: CreateAdminRequestBody) => {
-  return await prismaClient.admin.create({
+  const admin = await prismaClient.admin.create({
     data: {
       userId,
     },
   });
+  await prismaClient.user.update({
+    where: { id: userId },
+    data: {
+      adminId: admin.id,
+    },
+  });
+  return admin;
 };
 
 export const createManyAdmins = async ({
@@ -26,13 +33,37 @@ export const createManyAdmins = async ({
 }: {
   usersIds: Array<string>;
 }) => {
-  console.log("usersIds  =", usersIds);
-  return await prismaClient.admin.createMany({
+  const admins = await prismaClient.admin.createMany({
     data: usersIds.map((userId) => ({
       userId,
     })),
     skipDuplicates: true,
   });
+
+  // Fetch the IDs of the created admins
+  const adminIds = await prismaClient.admin.findMany({
+    where: {
+      userId: { in: usersIds },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  // Extract the IDs from the fetched admins
+  const extractedAdminIds = adminIds.map((admin) => admin.id);
+
+  // Update the adminId field in the User model
+  for (let i = 0; i < usersIds.length; i++) {
+    const userId = usersIds[i];
+    const adminId = extractedAdminIds[i];
+
+    await prismaClient.user.update({
+      where: { id: userId },
+      data: { adminId },
+    });
+  }
+  return admins;
 };
 
 export const updateAdmin = async ({

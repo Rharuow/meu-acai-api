@@ -4,6 +4,7 @@ import { unprocessableEntity } from "@serializer/erros/422";
 import { createManyUser, createUser } from "@repositories/user";
 import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 import { prismaClient } from "@libs/prisma";
+import { Prisma } from "@prisma/client";
 
 export const createUserController = async (
   req: Request,
@@ -19,8 +20,23 @@ export const createUserController = async (
 
     return next();
   } catch (error) {
-    console.error("Error creating user = ", error);
-    return unprocessableEntity(res);
+    console.log(" create user controller = ", error);
+    // Check if the error is due to a unique constraint violation
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      console.error("Unique constraint violation:", error.message);
+      const { clientVersion, ...errorSanitized } = error;
+      // Handle the unique constraint violation error here
+      return unprocessableEntity(res, {
+        errorSanitized,
+        message: `Unique constraint failed on the fields: ${errorSanitized.meta.target}`,
+      });
+    } else {
+      // Handle other errors
+      return unprocessableEntity(res, { message: error.message });
+    }
   }
 };
 

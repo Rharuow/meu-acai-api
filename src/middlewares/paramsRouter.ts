@@ -12,7 +12,7 @@ export const validationParams = (
 
   // If errors return 422, client didn't provide required or unpermitted values at query parameters
   if (!errors.isEmpty()) {
-    console.log("errors = ", errors);
+    errors.array().map((err) => console.log("errors = ", err));
     return unprocessableEntity(res, errors);
   }
   return next();

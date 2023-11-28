@@ -28,7 +28,7 @@ model Role {
 model User {
   id          String @id @default(uuid())
   createdAt   DateTime   @default(now())
-  deletedAt   DateTime?   
+  deletedAt   DateTime?
   updatedAt   DateTime   @updatedAt
   name        String @unique
   password    String
@@ -92,6 +92,7 @@ model Address {
   house         String
   clientId      String?     @unique
   client        Client?
+  @@unique([house, square], name: "unique_house_square")
 }
 
 model Topping {

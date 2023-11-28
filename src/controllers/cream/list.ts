@@ -20,7 +20,7 @@ export const listCreamController = async (
 
     const totalPages = Math.ceil(totalCreams / perPage);
 
-    return res.json(listCreamsSerializer({ creams, totalPages, page }));
+    return listCreamsSerializer({ creams, totalPages, page, res });
   } catch (error) {
     console.log("creams controller = ", error);
     return unprocessableEntity(res, { message: error.message });

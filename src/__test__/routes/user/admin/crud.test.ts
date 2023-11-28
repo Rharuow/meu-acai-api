@@ -6,7 +6,7 @@ import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
 import { app } from "@/app";
 import { prismaClient } from "@libs/prisma";
 import { encodeSha256 } from "@libs/crypto";
-import { Admin, Cream, Role, User } from "@prisma/client";
+import { Admin, Role, User } from "@prisma/client";
 import { getUserByNameAndPassword } from "@repositories/user";
 import request from "supertest";
 
@@ -54,7 +54,6 @@ let userAdmin: User & { role?: Role } & { admin?: Admin };
 
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();
-  await createTwentyCreams();
   const responseSignInAsAdmin = await request(app)
     .post("/api/v1/signin")
     .send(userAsAdmin)
@@ -296,7 +295,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
   test(
     "When an authenticated CLIENT accesses POST /api/v1/resources/users/admins/createMany " +
       "send in body a array with name and password valid to create many admins" +
-      "then it shouldn'r create many ADMINs and USERs resources in the database and return 401",
+      "then it shouldn't create many ADMINs and USERs resources in the database and return 401",
     async () => {
       const response = await request(app)
         .post(adminResourcePath + "/createMany")
@@ -312,7 +311,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
   test(
     "When an authenticated Member accesses POST /api/v1/resources/users/admins/createMany " +
       "send in body a array with name and password valid to create many admins" +
-      "then it shouldn'r create many ADMINs and USERs resources in the database and return 401",
+      "then it shouldn't create many ADMINs and USERs resources in the database and return 401",
     async () => {
       const response = await request(app)
         .post(adminResourcePath + "/createMany")
@@ -328,7 +327,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
   test(
     "When accesses POST /api/v1/resources/users/admins/createMany WITHOUT authentication " +
       "send in body a array with name and password valid to create many admins" +
-      "then it shouldn'r create many ADMINs and USERs resources in the database and return 401",
+      "then it shouldn't create many ADMINs and USERs resources in the database and return 401",
     async () => {
       const response = await request(app)
         .post(adminResourcePath + "/createMany")
@@ -455,7 +454,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       const response = await request(app)
         .get(userResourcePath + `/${userAdmin.id}/admins/${userAdmin.adminId}`)
         .set("authorization", "Bearer " + accessTokenAsAdmin)
-        .set("refreshToken", refreshTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(200);
 
       expect(response.body.data.user.name).toBe(userAdmin.name);
@@ -473,7 +472,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       const response = await request(app)
         .get(userResourcePath + `/${userAdmin.id}/admins/${userAdmin.adminId}`)
         .set("authorization", "Bearer " + accessTokenAsClient)
-        .set("refreshToken", refreshTokenAsClient)
+        .set("refreshToken", "Bearer " + refreshTokenAsClient)
         .expect(401);
 
       return expect(response.statusCode).toBe(401);
@@ -488,7 +487,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       const response = await request(app)
         .get(userResourcePath + `/${userAdmin.id}/admins/${userAdmin.adminId}`)
         .set("authorization", "Bearer " + accessTokenAsMember)
-        .set("refreshToken", refreshTokenAsMember)
+        .set("refreshToken", "Bearer " + refreshTokenAsMember)
         .expect(401);
 
       return expect(response.statusCode).toBe(401);
@@ -658,7 +657,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       const response = await request(app)
         .delete(userResourcePath + `/${userAdmin.id}`)
         .set("authorization", "Bearer " + accessTokenAsAdmin)
-        .set("refreshToken", refreshTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(204);
 
       return expect(response.statusCode).toBe(204);
@@ -672,7 +671,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       const response = await request(app)
         .delete(userResourcePath + `/${userAdmin.id}`)
         .set("authorization", "Bearer " + accessTokenAsClient)
-        .set("refreshToken", refreshTokenAsClient)
+        .set("refreshToken", "Bearer " + refreshTokenAsClient)
         .expect(401);
 
       return expect(response.statusCode).toBe(401);
@@ -686,7 +685,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       const response = await request(app)
         .delete(userResourcePath + `/${userAdmin.id}`)
         .set("authorization", "Bearer " + accessTokenAsMember)
-        .set("refreshToken", refreshTokenAsMember)
+        .set("refreshToken", "Bearer " + refreshTokenAsMember)
         .expect(401);
 
       return expect(response.statusCode).toBe(401);
@@ -700,7 +699,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       const response = await request(app)
         .delete(userResourcePath + "/123")
         .set("authorization", "Bearer " + accessTokenAsAdmin)
-        .set("refreshToken", refreshTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(422);
 
       return expect(response.statusCode).toBe(422);
@@ -726,7 +725,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
       const response = await request(app)
         .delete(userResourcePath)
         .set("authorization", "Bearer " + accessTokenAsAdmin)
-        .set("refreshToken", refreshTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(404);
 
       return expect(response.statusCode).toBe(404);
