@@ -11,7 +11,6 @@ export const refreshTokenController = async (req: Request, res: Response) => {
     process.env.TOKEN_SECRET,
     (err: any, user: User & { role?: Role }) => {
       if (err) {
-        console.log("refreshToken controller = ", err);
         return res
           .status(401)
           .json({ message: "Unauthorized: Invalid refresh token" });

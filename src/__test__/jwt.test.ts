@@ -43,7 +43,6 @@ describe("Signin route", () => {
         }
       );
     } catch (error) {
-      console.log(error);
       throw new Error(error.message);
     }
   });

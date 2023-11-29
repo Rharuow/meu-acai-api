@@ -1,7 +1,4 @@
-import {
-  createAllKindOfUserAndRoles,
-  createTwentyCreams,
-} from "@/__test__/utils/beforeAll/Users";
+import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
 import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
 import { app } from "@/app";
 import { prismaClient } from "@libs/prisma";
@@ -346,10 +343,12 @@ describe("CRUD TO ADMIN RESOURCE", () => {
     async () => {
       const response = await request(app)
         .put(userResourcePath + `/${userAdmin.id}/admins/${userAdmin.admin.id}`)
-        .send({ user: { name: "Test Admin Edited" } })
+        .send({ name: "Test Admin Edited" })
         .set("authorization", "Bearer " + accessTokenAsAdmin)
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(200);
+
+      console.log("response =", response.body);
 
       userAdmin = {
         ...userAdmin,
@@ -375,9 +374,9 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .put(userResourcePath + `/${userAdmin.id}/admins/${userAdmin.admin.id}`)
         .set("authorization", "Bearer " + accessTokenAsAdmin)
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-        .expect(422);
+        .expect(400);
 
-      return expect(response.statusCode).toBe(422);
+      return expect(response.statusCode).toBe(400);
     }
   );
 
@@ -388,7 +387,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
     async () => {
       const response = await request(app)
         .put(userResourcePath + `/${userAdmin.id}/admins/${userAdmin.admin.id}`)
-        .send({ user: { name: "Test Admin Edited" } })
+        .send({ name: "Test Admin Edited" })
         .set("authorization", "Bearer " + accessTokenAsClient)
         .set("refreshToken", "Bearer " + refreshTokenAsClient)
         .expect(401);
@@ -418,7 +417,7 @@ describe("CRUD TO ADMIN RESOURCE", () => {
     async () => {
       const response = await request(app)
         .put(userResourcePath + `/${userAdmin.id}/admins/${userAdmin.admin.id}`)
-        .send({ user: { name: "Test Admin Edited" } })
+        .send({ name: "Test Admin Edited" })
         .set("authorization", "Bearer " + accessTokenAsMember)
         .set("refreshToken", "Bearer " + refreshTokenAsMember)
         .expect(401);
@@ -438,8 +437,6 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .set("authorization", "Bearer " + accessTokenAsAdmin)
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(422);
-
-      console.log(response.body);
 
       return expect(response.statusCode).toBe(422);
     }

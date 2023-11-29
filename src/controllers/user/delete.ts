@@ -11,7 +11,6 @@ export const deleteUserController = async (req: Request, res: Response) => {
 
     return res.status(204).send("cream is deleted");
   } catch (error) {
-    console.error("error deleting user", error.message);
     return unprocessableEntity(res);
   }
 };
@@ -26,7 +25,6 @@ export const deleteManyUsersController = async (
     await deleteManyUser({ ids: usersIds });
     return res.status(204).send("cream is deleted");
   } catch (error) {
-    console.error("error deleting many users", error.message);
     return badRequest({ res });
   }
 };

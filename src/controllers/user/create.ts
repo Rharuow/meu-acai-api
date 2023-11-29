@@ -20,13 +20,11 @@ export const createUserController = async (
 
     return next();
   } catch (error) {
-    console.log(" create user controller = ", error);
     // Check if the error is due to a unique constraint violation
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      console.error("Unique constraint violation:", error.message);
       const { clientVersion, ...errorSanitized } = error;
       // Handle the unique constraint violation error here
       return unprocessableEntity(res, {
@@ -74,7 +72,6 @@ export const createManyUserController = async (
 
     return next();
   } catch (error) {
-    console.error("Error creating user = ", error);
     return unprocessableEntity(res);
   }
 };

@@ -14,7 +14,6 @@ export const updateCreamController = async (req: Request, res: Response) => {
 
     return res.json(updateCreamSerializer(cream));
   } catch (error) {
-    console.log("update cream error", error);
     return unprocessableEntity(res, { message: error.message });
   }
 };

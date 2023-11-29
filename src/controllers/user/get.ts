@@ -16,8 +16,6 @@ export const getUserController = async (req: Request, res: Response) => {
       ? getAdminSerializer({ res, user })
       : getUserSerializer({ res, user });
   } catch (error) {
-    console.error("Error get a user = ", error.message);
-
     return unprocessableEntity(res, { message: "Error get a user" });
   }
 };

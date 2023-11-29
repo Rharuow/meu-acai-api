@@ -24,7 +24,6 @@ export const listUserController = async (
 
     return res.json(listUsersSerializer({ users, totalPages, page }));
   } catch (error) {
-    console.log("users list controller = ", error);
     return unprocessableEntity(res, { message: error.message });
   }
 };

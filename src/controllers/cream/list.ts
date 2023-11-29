@@ -22,7 +22,6 @@ export const listCreamController = async (
 
     return listCreamsSerializer({ creams, totalPages, page, res });
   } catch (error) {
-    console.log("creams controller = ", error);
     return unprocessableEntity(res, { message: error.message });
   }
 };

@@ -25,7 +25,6 @@ export const createAddressController = async (
 
     if (addressAlreadyExist) {
       req.body.addressId = addressAlreadyExist.id;
-      console.log("addressAlreadyExist", req.body);
       return next();
     }
 
@@ -33,13 +32,11 @@ export const createAddressController = async (
 
     if (req.body.next) {
       req.body.addressId = address.id;
-      console.log("req.body.next ", req.body);
       return next();
     }
 
     return createAddressSerializer({ res, address });
   } catch (error) {
-    console.error("error creating address = ", error.message);
     return badRequest({ res, message: "Error while creating address" });
   }
 };

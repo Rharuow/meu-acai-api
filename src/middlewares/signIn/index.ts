@@ -14,7 +14,6 @@ export const validationUserAccessToken = async (
 
     return next();
   } catch (error) {
-    console.log("Middleware signIn validation user req body params = ", error);
     return res.status(401).json({ message: "Token with user invalid" });
   }
 };

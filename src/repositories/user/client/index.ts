@@ -24,6 +24,13 @@ export const createClient = async ({
     },
   });
 
+  await prismaClient.user.update({
+    where: { id: userId },
+    data: {
+      clientId: client.id,
+    },
+  });
+
   await prismaClient.address.update({
     where: { id: addressId },
     data: {

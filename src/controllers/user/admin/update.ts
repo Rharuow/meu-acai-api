@@ -15,7 +15,6 @@ export const updateAdminController = async (req: Request, res: Response) => {
 
     return updateAdminSerializer({ res, user, admin });
   } catch (error) {
-    console.error("Error updating admin = ", error.message);
     return unprocessableEntity(res, {
       message: "Error updating admin = " + error.message,
     });

@@ -35,7 +35,6 @@ export const validationAdminAccessToken = async (
     });
 
     if (!user || user.role.name !== "ADMIN") {
-      console.log("User is not an admin.");
       return unauthorized(res);
     }
 
@@ -46,7 +45,6 @@ export const validationAdminAccessToken = async (
     res.locals.adminId = admin.id;
     return next();
   } catch (error) {
-    console.log("Error verifying token:", error);
     return unauthorized(res);
   }
 };

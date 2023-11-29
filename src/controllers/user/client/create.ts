@@ -17,13 +17,11 @@ export const createClientController = async (req: Request, res: Response) => {
 
     return createClientSerializer({ res, user, client });
   } catch (error) {
-    console.log(" create client controller = ", error);
     // Check if the error is due to a unique constraint violation
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      console.error("Unique constraint violation:", error.message);
       const { clientVersion, ...errorSanitized } = error;
       // Handle the unique constraint violation error here
       return unprocessableEntity(res, {
@@ -50,7 +48,6 @@ export const createManyClientsController = async (
 
     return createManyClientSerializer({ res });
   } catch (error) {
-    console.error("Error creating client = ", error.message);
     return unprocessableEntity(res, {
       message: "Error creating client = " + error.message,
     });

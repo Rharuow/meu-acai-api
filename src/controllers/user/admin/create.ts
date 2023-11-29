@@ -13,7 +13,6 @@ export const createAdminController = async (req: Request, res: Response) => {
 
     return createAdminSerializer({ res, user, admin });
   } catch (error) {
-    console.error("Error creating admin = ", error.message);
     return unprocessableEntity(res, {
       message: "Error creating admin = " + error.message,
     });
@@ -31,7 +30,6 @@ export const createManyAdminsController = async (
 
     return createManyAdminSerializer({ res });
   } catch (error) {
-    console.error("Error creating admin = ", error.message);
     return unprocessableEntity(res, {
       message: "Error creating admin = " + error.message,
     });

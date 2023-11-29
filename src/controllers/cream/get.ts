@@ -10,7 +10,6 @@ export const getCreamController = async (req: Request, res: Response) => {
 
     return res.json(cream);
   } catch (error) {
-    console.log("get cream error", error);
     return unprocessableEntity(res, { message: error.message });
   }
 };

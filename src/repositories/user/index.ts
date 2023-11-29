@@ -94,7 +94,6 @@ export const getUserByNameAndPassword = async (
     includes,
   });
   if (!userInMemory.hasItem(reference)) {
-    console.log("USER IN DB");
     const user = await prismaClient.user.findUniqueOrThrow(
       createQuery(params, includes)
     );
@@ -125,7 +124,6 @@ export const getUser = async ({
     includes,
   });
   if (!userInMemory.hasItem(reference)) {
-    console.log("USER IN DB");
     const user = await prismaClient.user.findUnique({
       where: {
         id,
@@ -181,9 +179,14 @@ export const updateUser: ({
 }) => Promise<User & { role?: Role }> = async ({ fields, id }) => {
   userInMemory.clear();
   usersInMemory.clear();
+  const { name, password, roleId } = fields;
   return await prismaClient.user.update({
     where: { id },
-    data: fields,
+    data: {
+      ...(name && { name }),
+      ...(password && { password }),
+      ...(roleId && { roleId }),
+    },
   });
 };
 
@@ -211,7 +214,6 @@ export const listUsers: (params: ParamsUser) => Promise<
   });
 
   if (!usersInMemory.hasItem(reference)) {
-    console.log("CREAM IN DB");
     const [users, totalUsers] = await Promise.all([
       await prismaClient.user.findMany({
         skip: (page - 1) * perPage,

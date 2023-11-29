@@ -53,7 +53,6 @@ describe("Sign in route", () => {
         }
       );
     } catch (error) {
-      console.log(error);
       throw new Error(error.message);
     }
   });
@@ -72,7 +71,6 @@ describe("Sign in route", () => {
 
       return expect(response.statusCode).toBe(422);
     } catch (error) {
-      console.log(error);
       throw new Error(error.message);
     }
   });
@@ -91,7 +89,6 @@ describe("Sign in route", () => {
 
       return expect(response.statusCode).toBe(422);
     } catch (error) {
-      console.log(error);
       throw new Error(error.message);
     }
   });
@@ -110,7 +107,6 @@ describe("Sign in route", () => {
 
       return expect(response.statusCode).toBe(422);
     } catch (error) {
-      console.log(error);
       throw new Error(error.message);
     }
   });

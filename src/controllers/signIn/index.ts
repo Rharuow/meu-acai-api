@@ -37,7 +37,6 @@ export const signInController = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.log("signIn controller = ", error);
     if (error.message === "NotFoundError: No User found error")
       return res
         .status(404)

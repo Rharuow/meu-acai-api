@@ -34,6 +34,12 @@ const createClientBody = {
   },
 };
 
+const updateClientBody = {
+  name: "Test Client Edited",
+  email: "test.client@mail.com",
+  phone: "(84)999999999",
+};
+
 const createClientBodyMissingPassword = {
   name: "Test Client Missing Parameters",
 };
@@ -359,14 +365,14 @@ describe("CRUD TO CLIENT RESOURCE", () => {
         .put(
           userResourcePath + `/${userClient.id}/clients/${userClient.client.id}`
         )
-        .send({ user: { name: "Test Client Edited" } })
+        .send(updateClientBody)
         .set("authorization", "Bearer " + accessTokenAsAdmin)
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(200);
 
       userClient = {
         ...userClient,
-        name: "Test Client Edited",
+        ...updateClientBody,
       };
 
       expect(response.body.data.user.name).toBe(userClient.name);
