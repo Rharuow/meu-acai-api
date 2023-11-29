@@ -140,98 +140,98 @@ describe("CRUD TO CLIENT RESOURCE", () => {
     }
   );
 
-  // test(
-  //   "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients " +
-  //     "without body data" +
-  //     "then it shouldn't create a new User and a new Client resource in the database and return 422",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath)
-  //       .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-  //       .expect(422);
+  test(
+    "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients " +
+      "without body data" +
+      "then it shouldn't create a new User and a new Client resource in the database and return 422",
+    async () => {
+      const response = await request(app)
+        .post(clientResourcePath)
+        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+        .expect(422);
 
-  //     return expect(response.statusCode).toBe(422);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(422);
+    }
+  );
 
-  // test(
-  //   "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients " +
-  //     "with body missing password " +
-  //     "then it shouldn't create a new User and a new Client resource in the database and return 422",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath)
-  //       .send(createClientBodyMissingPassword)
-  //       .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-  //       .expect(422);
+  test(
+    "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients " +
+      "with body missing password " +
+      "then it shouldn't create a new User and a new Client resource in the database and return 422",
+    async () => {
+      const response = await request(app)
+        .post(clientResourcePath)
+        .send(createClientBodyMissingPassword)
+        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+        .expect(422);
 
-  //     return expect(response.statusCode).toBe(422);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(422);
+    }
+  );
 
-  // test(
-  //   "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients " +
-  //     "with body missing name " +
-  //     "then it shouldn't create a new User and a new Client resource in the database and return 422",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath)
-  //       .send(createClientBodyMissingName)
-  //       .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-  //       .expect(422);
+  test(
+    "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients " +
+      "with body missing name " +
+      "then it shouldn't create a new User and a new Client resource in the database and return 422",
+    async () => {
+      const response = await request(app)
+        .post(clientResourcePath)
+        .send(createClientBodyMissingName)
+        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+        .expect(422);
 
-  //     return expect(response.statusCode).toBe(422);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(422);
+    }
+  );
 
-  // test(
-  //   "When accesses POST /api/v1/resources/users/clients WITHOUT authentication" +
-  //     'with name "Test Client Created" and password "123", ' +
-  //     "then it shouldn't create a new User and a new Client resource in the database and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath)
-  //       .send(createClientBody)
-  //       .expect(401);
+  test(
+    "When accesses POST /api/v1/resources/users/clients WITHOUT authentication" +
+      'with name "Test Client Created" and password "123", ' +
+      "then it shouldn't create a new User and a new Client resource in the database and return 401",
+    async () => {
+      const response = await request(app)
+        .post(clientResourcePath)
+        .send(createClientBody)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an authenticated CLIENT accesses POST /api/v1/resources/users/clients" +
-  //     'with name "Test Client Created" and password "123", ' +
-  //     "then it shouldn't create a new User and a new Client resource in the database and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath)
-  //       .send(createClientBody)
-  //       .set("authorization", `Bearer ${accessTokenAsClient}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
-  //       .expect(401);
+  test(
+    "When an authenticated CLIENT accesses POST /api/v1/resources/users/clients" +
+      'with name "Test Client Created" and password "123", ' +
+      "then it shouldn't create a new User and a new Client resource in the database and return 401",
+    async () => {
+      const response = await request(app)
+        .post(clientResourcePath)
+        .send(createClientBody)
+        .set("authorization", `Bearer ${accessTokenAsClient}`)
+        .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an authenticated MEMBER accesses POST /api/v1/resources/users/clients" +
-  //     'with name "Test Client Created" and password "123", ' +
-  //     "then it shouldn't create a new User and a new Client resource in the database and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath)
-  //       .send(createClientBody)
-  //       .set("authorization", `Bearer ${accessTokenAsMember}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsMember}`)
-  //       .expect(401);
+  test(
+    "When an authenticated MEMBER accesses POST /api/v1/resources/users/clients" +
+      'with name "Test Client Created" and password "123", ' +
+      "then it shouldn't create a new User and a new Client resource in the database and return 401",
+    async () => {
+      const response = await request(app)
+        .post(clientResourcePath)
+        .send(createClientBody)
+        .set("authorization", `Bearer ${accessTokenAsMember}`)
+        // .set("refreshToken", `Bearer ${refreshTokenAsMember}`)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
   // test(
   //   "When an authenticated CLIENT accesses POST /api/v1/resources/users/clients/createMany" +

@@ -80,16 +80,19 @@ export const validationCreateClientBodySchema: Schema = {
 export const validationUpdateClientBodySchema: Schema = {
   name: {
     notEmpty: false,
+    optional: true,
     isString: true,
     errorMessage: "name must be a string and not empty",
   },
   password: {
     notEmpty: false,
+    optional: true,
     isString: true,
     errorMessage: "password must be a string and not empty",
   },
   roleId: {
     notEmpty: false,
+    optional: true,
     isString: true,
     errorMessage: "role must be a string and not empty",
   },
