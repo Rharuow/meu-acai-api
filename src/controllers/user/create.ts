@@ -80,7 +80,6 @@ export const createManyUserController = async (
 
     return next();
   } catch (error) {
-    console.error("Failed to create user = ", error);
     return unprocessableEntity(res);
   }
 };

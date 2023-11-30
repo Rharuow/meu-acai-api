@@ -16,6 +16,8 @@ let refreshTokenAsClient: string;
 let accessTokenAsMember: string;
 let refreshTokenAsMember: string;
 
+let clientsToDelete: Array<User>;
+
 const userResourcePath = "/api/v1/resources/users";
 
 const clientResourcePath = "/api/v1/resources/users/clients";
@@ -49,8 +51,8 @@ const createManyClients = Array(15)
     name: `Test Client ${index + 1}`,
     password: "123",
     address: {
-      square: (index + 3).toString(),
-      house: (index + 3).toString(),
+      square: (index + 3 + 100).toString(),
+      house: (index + 3 + 100).toString(),
     },
   }));
 
@@ -258,94 +260,92 @@ describe("CRUD TO CLIENT RESOURCE", () => {
     }
   );
 
-  // test(
-  //   "When an authenticated client accesses PUT /api/v1/resources/users/:userId/clients/:id " +
-  //     "without body" +
-  //     "then it shouldn't update the User with the new provided information and return 422",
-  //   async () => {
-  //     const response = await request(app)
-  //       .put(
-  //         userResourcePath + `/${userClient.id}/admins/${userClient.client.id}`
-  //       )
-  //       .set("authorization", "Bearer " + accessTokenAsAdmin)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-  //       .expect(422);
+  test(
+    "When an authenticated client accesses PUT /api/v1/resources/users/:userId/clients/:id " +
+      "without body" +
+      "then it shouldn't update the User with the new provided information and return 422",
+    async () => {
+      const response = await request(app)
+        .put(
+          userResourcePath + `/${userClient.id}/admins/${userClient.client.id}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(400);
 
-  //     return expect(response.statusCode).toBe(422);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(400);
+    }
+  );
 
-  // test(
-  //   "When an authenticated CLIENT accesses PUT /api/v1/resources/users/:userId/clients/:id " +
-  //     'with name "Test Client Edited", ' +
-  //     "then it shouldn't update the User with the new provided information and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .put(
-  //         userResourcePath + `/${userClient.id}/clients/${userClient.client.id}`
-  //       )
-  //       .send({ user: { name: "Test Client Edited" } })
-  //       .set("authorization", "Bearer " + accessTokenAsClient)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsClient)
-  //       .expect(401);
+  test(
+    "When an authenticated CLIENT accesses PUT /api/v1/resources/users/:userId/clients/:id " +
+      'with name "Test Client Edited", ' +
+      "then it shouldn't update the User with the new provided information and return 401",
+    async () => {
+      const response = await request(app)
+        .put(
+          userResourcePath + `/${userClient.id}/clients/${userClient.client.id}`
+        )
+        .send({ user: { name: "Test Client Edited" } })
+        .set("authorization", "Bearer " + accessTokenAsClient)
+        .set("refreshToken", "Bearer " + refreshTokenAsClient)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When accesses PUT /api/v1/resources/users/:userId/clients/:id without authentication" +
-  //     'with name "Test Client Edited", ' +
-  //     "then it shouldn't update the User with the new provided information and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .put(
-  //         userResourcePath + `/${userClient.id}/clients/${userClient.client.id}`
-  //       )
-  //       .send({ user: { name: "Test Client Edited" } })
-  //       .expect(401);
+  test(
+    "When accesses PUT /api/v1/resources/users/:userId/clients/:id without authentication" +
+      'with name "Test Client Edited", ' +
+      "then it shouldn't update the User with the new provided information and return 401",
+    async () => {
+      const response = await request(app)
+        .put(
+          userResourcePath + `/${userClient.id}/clients/${userClient.client.id}`
+        )
+        .send({ user: { name: "Test Client Edited" } })
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an authenticated MEMBER accesses PUT /api/v1/resources/users/:userId/clients/:id " +
-  //     'with name "Test Client Edited", ' +
-  //     "then it shouldn't update the User with the new provided information and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .put(
-  //         userResourcePath + `/${userClient.id}/clients/${userClient.client.id}`
-  //       )
-  //       .send({ user: { name: "Test Client Edited" } })
-  //       .set("authorization", "Bearer " + accessTokenAsMember)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsMember)
-  //       .expect(401);
+  test(
+    "When an authenticated MEMBER accesses PUT /api/v1/resources/users/:userId/clients/:id " +
+      'with name "Test Client Edited", ' +
+      "then it shouldn't update the User with the new provided information and return 401",
+    async () => {
+      const response = await request(app)
+        .put(
+          userResourcePath + `/${userClient.id}/clients/${userClient.client.id}`
+        )
+        .send({ user: { name: "Test Client Edited" } })
+        .set("authorization", "Bearer " + accessTokenAsMember)
+        .set("refreshToken", "Bearer " + refreshTokenAsMember)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an authenticated ADMIN accesses PUT /api/v1/resources/users/:userId/clients/:id " +
-  //     "with invalid params, " +
-  //     "then it shouldn't update the User with the new provided information and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .put(
-  //         userResourcePath + `/${userClient.id}/clients/${userClient.client.id}`
-  //       )
-  //       .send({ invalid: { params: "Test Client Edited" } })
-  //       .set("authorization", "Bearer " + accessTokenAsAdmin)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-  //       .expect(422);
+  test(
+    "When an authenticated ADMIN accesses PUT /api/v1/resources/users/:userId/clients/:id " +
+      "with invalid params, " +
+      "then it shouldn't update the User with the new provided information and return 401",
+    async () => {
+      const response = await request(app)
+        .put(
+          userResourcePath + `/${userClient.id}/clients/${userClient.client.id}`
+        )
+        .send({ invalid: { params: "Test Client Edited" } })
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(422);
 
-  //     console.log(response.body);
-
-  //     return expect(response.statusCode).toBe(422);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(422);
+    }
+  );
 
   // GET
   test(
@@ -368,65 +368,132 @@ describe("CRUD TO CLIENT RESOURCE", () => {
     }
   );
 
-  // test(
-  //   "When an authenticated CLIENT accesses GET /api/v1/resources/users/clients/:id " +
-  //     "with the ID of the first client, " +
-  //     "then it should return 401 status code",
-  //   async () => {
-  //     const response = await request(app)
-  //       .get(
-  //         userResourcePath + `/${userClient.id}/clients/${userClient.clientId}`
-  //       )
-  //       .set("authorization", "Bearer " + accessTokenAsClient)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsClient)
-  //       .expect(401);
+  test(
+    "When an authenticated CLIENT accesses GET /api/v1/resources/users/clients/:id " +
+      "with the ID of the first client, " +
+      "then it should return 401 status code",
+    async () => {
+      const response = await request(app)
+        .get(
+          userResourcePath + `/${userClient.id}/clients/${userClient.clientId}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsClient)
+        .set("refreshToken", "Bearer " + refreshTokenAsClient)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an authenticated MEMBER accesses GET /api/v1/resources/users/clients/:id " +
-  //     "with the ID of the first client, " +
-  //     "then it should return 401 status code",
-  //   async () => {
-  //     const response = await request(app)
-  //       .get(
-  //         userResourcePath + `/${userClient.id}/clients/${userClient.clientId}`
-  //       )
-  //       .set("authorization", "Bearer " + accessTokenAsMember)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsMember)
-  //       .expect(401);
+  test(
+    "When an authenticated MEMBER accesses GET /api/v1/resources/users/clients/:id " +
+      "with the ID of the first client, " +
+      "then it should return 401 status code",
+    async () => {
+      const response = await request(app)
+        .get(
+          userResourcePath + `/${userClient.id}/clients/${userClient.clientId}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsMember)
+        .set("refreshToken", "Bearer " + refreshTokenAsMember)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When accesses GET /api/v1/resources/users/clients/:id without authentication" +
-  //     "with the ID of the first client, " +
-  //     "then it should return 401 status code",
-  //   async () => {
-  //     const response = await request(app)
-  //       .get(
-  //         userResourcePath + `/${userClient.id}/clients/${userClient.clientId}`
-  //       )
-  //       .expect(401);
+  test(
+    "When accesses GET /api/v1/resources/users/clients/:id without authentication" +
+      "with the ID of the first client, " +
+      "then it should return 401 status code",
+    async () => {
+      const response = await request(app)
+        .get(
+          userResourcePath + `/${userClient.id}/clients/${userClient.clientId}`
+        )
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
   // LIST
   test(
     "When an authenticated ADMIN accesses GET /api/v1/resources/users/clients " +
       "then it should return an array containing the first client created and the default client created",
     async () => {
+      const roleId = (
+        await prismaClient.role.findUnique({
+          where: {
+            name: "CLIENT",
+          },
+          select: {
+            id: true,
+          },
+        })
+      ).id;
+
+      await prismaClient.address.createMany({
+        data: createManyClients.map((client) => ({
+          house: client.address.house,
+          square: client.address.square,
+        })),
+      });
+
+      const addressesIds = await prismaClient.address.findMany({
+        where: {
+          OR: createManyClients.map((client) => ({
+            house: client.address.house,
+            square: client.address.square,
+          })),
+        },
+      });
+
+      await prismaClient.user.createMany({
+        data: createManyClients.map((client) => ({
+          name: client.name,
+          password: client.password,
+          roleId,
+        })),
+      });
+
+      const usersIds = await prismaClient.user.findMany({
+        where: {
+          OR: createManyClients.map((client) => ({
+            name: client.name,
+            password: client.password,
+          })),
+        },
+      });
+
+      await prismaClient.client.createMany({
+        data: createManyClients.map((client, index) => ({
+          addressId: addressesIds[index].id,
+          userId: usersIds[index].id,
+        })),
+      });
+
       const response = await request(app)
         .get(clientResourcePath)
         .set("authorization", "Bearer " + accessTokenAsAdmin)
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(200);
+
+      await prismaClient.client.deleteMany({
+        where: {
+          addressId: {
+            in: addressesIds.map((addressId) => addressId.id),
+          },
+        },
+      });
+
+      await prismaClient.address.deleteMany({
+        where: {
+          id: {
+            in: addressesIds.map((addressId) => addressId.id),
+          },
+        },
+      });
 
       expect(response.body.data.length).toBe(10);
       expect(response.body.page).toBe(1);
@@ -435,137 +502,45 @@ describe("CRUD TO CLIENT RESOURCE", () => {
     }
   );
 
-  // test(
-  //   "When an authenticated CLIENT accesses GET /api/v1/resources/users/clients " +
-  //     "then it should return 401 status code",
-  //   async () => {
-  //     const response = await request(app)
-  //       .get(clientResourcePath)
-  //       .set("authorization", "Bearer " + accessTokenAsClient)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsClient)
-  //       .expect(401);
-
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
-
-  // test(
-  //   "When an authenticated MEMBER accesses GET /api/v1/resources/users/clients " +
-  //     "then it should return 401 status code",
-  //   async () => {
-  //     const response = await request(app)
-  //       .get(clientResourcePath)
-  //       .set("authorization", "Bearer " + accessTokenAsMember)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsMember)
-  //       .expect(401);
-
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
-
-  // test(
-  //   "When accesses GET /api/v1/resources/users/clients without authentication " +
-  //     "then it should return 401 status code",
-  //   async () => {
-  //     const response = await request(app).get(clientResourcePath).expect(401);
-
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
-
-  // DELETE
   test(
-    "When an autenticated ADMIN accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
-      "then it should return a 204 status and delete all the ids sent in query parameters",
+    "When an authenticated CLIENT accesses GET /api/v1/resources/users/clients " +
+      "then it should return 401 status code",
     async () => {
-      const clients = await prismaClient.user.findMany({
-        where: {
-          name: {
-            startsWith: "Test Client ",
-          },
-        },
-      });
-
       const response = await request(app)
-        .delete(
-          `${userResourcePath}/deleteMany?ids=${clients
-            .map((clt) => clt.id)
-            .join(",")}`
-        )
-        .set("authorization", "Bearer " + accessTokenAsAdmin)
-        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-        .expect(204);
+        .get(clientResourcePath)
+        .set("authorization", "Bearer " + accessTokenAsClient)
+        .set("refreshToken", "Bearer " + refreshTokenAsClient)
+        .expect(401);
 
-      return expect(response.statusCode).toBe(204);
+      return expect(response.statusCode).toBe(401);
     }
   );
 
-  // test(
-  //   "When an autenticated CLIENT accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
-  //     "then it should return a 401 status code",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(
-  //         `${userResourcePath}/deleteMany?ids=${clients
-  //           .map((clt) => clt.id)
-  //           .join(",")}`
-  //       )
-  //       .set("authorization", "Bearer " + accessTokenAsClient)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsClient)
-  //       .expect(401);
+  test(
+    "When an authenticated MEMBER accesses GET /api/v1/resources/users/clients " +
+      "then it should return 401 status code",
+    async () => {
+      const response = await request(app)
+        .get(clientResourcePath)
+        .set("authorization", "Bearer " + accessTokenAsMember)
+        .set("refreshToken", "Bearer " + refreshTokenAsMember)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an autenticated ADMIN accesses DELETE /api/v1/resources/users/deleteMany without ids query params" +
-  //     "then it should return a 400 status code",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(`${userResourcePath}/deleteMany`)
-  //       .set("authorization", "Bearer " + accessTokenAsAdmin)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-  //       .expect(400);
+  test(
+    "When accesses GET /api/v1/resources/users/clients without authentication " +
+      "then it should return 401 status code",
+    async () => {
+      const response = await request(app).get(clientResourcePath).expect(401);
 
-  //     return expect(response.statusCode).toBe(400);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an autenticated MEMBER accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
-  //     "then it should return a 401 status code",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(
-  //         `${userResourcePath}/deleteMany?ids=${clients
-  //           .map((clt) => clt.id)
-  //           .join(",")}`
-  //       )
-  //       .set("authorization", "Bearer " + accessTokenAsMember)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsMember)
-  //       .expect(401);
-
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
-
-  // test(
-  //   "When accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2 without authentication " +
-  //     "then it should return a 401 status code",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(
-  //         `${userResourcePath}/deleteMany?ids=${clients
-  //           .map((clt) => clt.id)
-  //           .join(",")}`
-  //       )
-  //       .expect(401);
-
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
-
+  // DELETE
   test(
     "When an authenticated ADMIN accesses DELETE /api/v1/resources/users/clients/:id " +
       "then it should return a 204 status and delete the first admin created",
@@ -580,71 +555,163 @@ describe("CRUD TO CLIENT RESOURCE", () => {
     }
   );
 
-  // test(
-  //   "When an authenticated CLIENT accesses DELETE /api/v1/resources/users/clients/:id " +
-  //     "then it should return a 401 status",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(userResourcePath + `/${userClient.id}`)
-  //       .set("authorization", "Bearer " + accessTokenAsClient)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsClient)
-  //       .expect(401);
+  test(
+    "When an authenticated CLIENT accesses DELETE /api/v1/resources/users/clients/:id " +
+      "then it should return a 401 status",
+    async () => {
+      const response = await request(app)
+        .delete(userResourcePath + `/${userClient.id}`)
+        .set("authorization", "Bearer " + accessTokenAsClient)
+        .set("refreshToken", "Bearer " + refreshTokenAsClient)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an authenticated MEMBER accesses DELETE /api/v1/resources/users/clients/:id " +
-  //     "then it should return a 401 status",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(userResourcePath + `/${userClient.id}`)
-  //       .set("authorization", "Bearer " + accessTokenAsMember)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsMember)
-  //       .expect(401);
+  test(
+    "When an authenticated MEMBER accesses DELETE /api/v1/resources/users/clients/:id " +
+      "then it should return a 401 status",
+    async () => {
+      const response = await request(app)
+        .delete(userResourcePath + `/${userClient.id}`)
+        .set("authorization", "Bearer " + accessTokenAsMember)
+        .set("refreshToken", "Bearer " + refreshTokenAsMember)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an authenticated ADMIN accesses DELETE /api/v1/resources/users/clients/:id with id invalid" +
-  //     "then it should return a 422 status",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(userResourcePath + "/123")
-  //       .set("authorization", "Bearer " + accessTokenAsAdmin)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-  //       .expect(422);
+  test(
+    "When an authenticated ADMIN accesses DELETE /api/v1/resources/users/clients/:id with id invalid" +
+      "then it should return a 422 status",
+    async () => {
+      const response = await request(app)
+        .delete(userResourcePath + "/123")
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(422);
 
-  //     return expect(response.statusCode).toBe(422);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(422);
+    }
+  );
 
-  // test(
-  //   "When accesses DELETE /api/v1/resources/users/clients/:id without authentication " +
-  //     "then it should return a 401 status",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(userResourcePath + `/${userClient.id}`)
-  //       .expect(401);
+  test(
+    "When accesses DELETE /api/v1/resources/users/clients/:id without authentication " +
+      "then it should return a 401 status",
+    async () => {
+      const response = await request(app)
+        .delete(userResourcePath + `/${userClient.id}`)
+        .expect(401);
 
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 
-  // test(
-  //   "When an authenticated admin accesses DELETE /api/v1/resources/users/clients " +
-  //     "then it should return a 404 status",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(userResourcePath)
-  //       .set("authorization", "Bearer " + accessTokenAsAdmin)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-  //       .expect(404);
+  test(
+    "When an authenticated admin accesses DELETE /api/v1/resources/users/clients " +
+      "then it should return a 404 status",
+    async () => {
+      const response = await request(app)
+        .delete(userResourcePath)
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(404);
 
-  //     return expect(response.statusCode).toBe(404);
-  //   }
-  // );
+      return expect(response.statusCode).toBe(404);
+    }
+  );
+
+  test(
+    "When an autenticated ADMIN accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
+      "then it should return a 204 status and delete all the ids sent in query parameters",
+    async () => {
+      clientsToDelete = await prismaClient.user.findMany({
+        where: {
+          name: {
+            startsWith: "Test Client ",
+          },
+        },
+      });
+
+      const response = await request(app)
+        .delete(
+          `${userResourcePath}/deleteMany?ids=${clientsToDelete
+            .map((clt) => clt.id)
+            .join(",")}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(204);
+
+      return expect(response.statusCode).toBe(204);
+    }
+  );
+
+  test(
+    "When an autenticated CLIENT accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
+      "then it should return a 401 status code",
+    async () => {
+      const response = await request(app)
+        .delete(
+          `${userResourcePath}/deleteMany?ids=${clientsToDelete
+            .map((clt) => clt.id)
+            .join(",")}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsClient)
+        .set("refreshToken", "Bearer " + refreshTokenAsClient)
+        .expect(401);
+
+      return expect(response.statusCode).toBe(401);
+    }
+  );
+
+  test(
+    "When an autenticated ADMIN accesses DELETE /api/v1/resources/users/deleteMany without ids query params" +
+      "then it should return a 400 status code",
+    async () => {
+      const response = await request(app)
+        .delete(`${userResourcePath}/deleteMany`)
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(400);
+
+      return expect(response.statusCode).toBe(400);
+    }
+  );
+
+  test(
+    "When an autenticated MEMBER accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
+      "then it should return a 401 status code",
+    async () => {
+      const response = await request(app)
+        .delete(
+          `${userResourcePath}/deleteMany?ids=${clientsToDelete
+            .map((clt) => clt.id)
+            .join(",")}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsMember)
+        .set("refreshToken", "Bearer " + refreshTokenAsMember)
+        .expect(401);
+
+      return expect(response.statusCode).toBe(401);
+    }
+  );
+
+  test(
+    "When accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2 without authentication " +
+      "then it should return a 401 status code",
+    async () => {
+      const response = await request(app)
+        .delete(
+          `${userResourcePath}/deleteMany?ids=${clientsToDelete
+            .map((clt) => clt.id)
+            .join(",")}`
+        )
+        .expect(401);
+
+      return expect(response.statusCode).toBe(401);
+    }
+  );
 });

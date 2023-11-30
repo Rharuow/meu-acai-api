@@ -277,6 +277,22 @@ export const deleteUser = async ({ id }: { id: string }) => {
 export const deleteManyUser = async ({ ids }: { ids: Array<string> }) => {
   userInMemory.clear();
   usersInMemory.clear();
+  const hasClients = await prismaClient.client.findMany({
+    where: {
+      OR: ids.map((id) => ({ id })),
+    },
+  });
+
+  if (hasClients && hasClients.length > 0)
+    await prismaClient.address.updateMany({
+      data: {
+        clientId: null,
+      },
+      where: {
+        OR: hasClients.map((client) => ({ clientId: client.id })),
+      },
+    });
+
   return await prismaClient.user.deleteMany({
     where: {
       id: {
