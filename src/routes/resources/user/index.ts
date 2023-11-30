@@ -5,7 +5,7 @@ import {
   deleteManyUsersController,
   deleteUserController,
 } from "@controllers/user/delete";
-import { idsInQueryParams } from "@middlewares/resources/user/idsInQueryParams";
+import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
 import { clientRouter } from "./client";
 
 const userRouter = Router();

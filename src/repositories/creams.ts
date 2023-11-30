@@ -119,3 +119,13 @@ export const deleteCream: ({ id }: { id: string }) => Promise<void> = async ({
   await prismaClient.cream.delete({ where: { id } });
   return;
 };
+
+export const deleteManyCreams = async ({ ids }: { ids: Array<string> }) => {
+  await prismaClient.cream.deleteMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+};

@@ -496,6 +496,7 @@ describe("CRUD cream", () => {
     return expect(responseAsClient.statusCode).toBe(401);
   });
 
+  // DELETE MANY
   test(
     "when access DELETE /api/v1/resources/creams/deleteMany?ids=id1&id2 " +
       "where the ids are ids of creamss " +
@@ -508,6 +509,10 @@ describe("CRUD cream", () => {
           },
         },
       });
+      console.log(
+        creamResourcePath +
+          `/deleteMany?ids=${creamsToDelete.map((cream) => cream.id).join(",")}`
+      );
       const response = await request(app)
         .delete(
           creamResourcePath +

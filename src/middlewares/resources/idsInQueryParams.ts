@@ -15,7 +15,7 @@ export const idsInQueryParams = (
     return badRequest({ res, message: "Invalid or missing IDs" });
   }
 
-  req.query.usersIds = ids;
+  req.query.resourceIds = ids;
 
   return next();
 };
