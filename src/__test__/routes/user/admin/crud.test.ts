@@ -37,15 +37,10 @@ const createAdminBodyMissingName = {
 
 const createManyAdmins = Array(15)
   .fill(null)
-  .map((_, index) => ({ name: `Test Admin ${index + 1}`, password: "123" }));
-
-const createManyAdminsMissingPassword = Array(15)
-  .fill(null)
-  .map((_, index) => ({ name: `Test Admin Missing ${index + 1}` }));
-
-const createManyAdminsMissingName = Array(15)
-  .fill(null)
-  .map((_, index) => ({ password: `missing name ${index + 1}` }));
+  .map((_, index) => ({
+    name: `Test Many Admins ${index + 1}`,
+    password: "123",
+  }));
 
 let userAdmin: User & { role?: Role } & { admin?: Admin };
 
@@ -207,128 +202,6 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .send(createAdminBody)
         .set("authorization", `Bearer ${accessTokenAsMember}`)
         .set("refreshToken", `Bearer ${refreshTokenAsMember}`)
-        .expect(401);
-
-      return expect(response.statusCode).toBe(401);
-    }
-  );
-
-  test(
-    "When an authenticated admin accesses POST /api/v1/resources/users/admins/createMany" +
-      "send in body a array with name and password valid to create many admins" +
-      "then it should create many ADMINs and USERs resources in the database",
-    async () => {
-      const response = await request(app)
-        .post(adminResourcePath + "/createMany")
-        .send(createManyAdmins)
-        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-        .expect(204);
-
-      admins = await prismaClient.user.findMany({
-        include: {
-          admin: true,
-          role: true,
-        },
-        where: {
-          name: {
-            in: createManyAdmins.map((adm) => adm.name),
-          },
-        },
-      });
-
-      expect(admins.length).toBe(15);
-      return expect(response.statusCode).toBe(204);
-    }
-  );
-
-  test(
-    "When an authenticated admin accesses POST /api/v1/resources/users/admins/createMany" +
-      "send in body a array with name valid to create many admins but missing password" +
-      "then it shouldn't create many ADMINs and USERs resources in the database and return 422",
-    async () => {
-      const response = await request(app)
-        .post(adminResourcePath + "/createMany")
-        .send(createManyAdminsMissingPassword)
-        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-        .expect(422);
-
-      return expect(response.statusCode).toBe(422);
-    }
-  );
-
-  test(
-    "When an authenticated admin accesses POST /api/v1/resources/users/admins/createMany" +
-      "send in body a array with password valid to create many admins but missing name" +
-      "then it shouldn't create many ADMINs and USERs resources in the database and return 422",
-    async () => {
-      const response = await request(app)
-        .post(adminResourcePath + "/createMany")
-        .send(createManyAdminsMissingName)
-        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-        .expect(422);
-
-      return expect(response.statusCode).toBe(422);
-    }
-  );
-
-  test(
-    "When an authenticated admin accesses POST /api/v1/resources/users/admins/createMany" +
-      "without body data" +
-      "then it shouldn't create many ADMINs and USERs resources in the database and return 422",
-    async () => {
-      const response = await request(app)
-        .post(adminResourcePath + "/createMany")
-        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-        .expect(422);
-
-      return expect(response.statusCode).toBe(422);
-    }
-  );
-
-  test(
-    "When an authenticated CLIENT accesses POST /api/v1/resources/users/admins/createMany " +
-      "send in body a array with name and password valid to create many admins" +
-      "then it shouldn't create many ADMINs and USERs resources in the database and return 401",
-    async () => {
-      const response = await request(app)
-        .post(adminResourcePath + "/createMany")
-        .set("authorization", `Bearer ${accessTokenAsClient}`)
-        .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
-        .send(createManyAdmins)
-        .expect(401);
-
-      return expect(response.statusCode).toBe(401);
-    }
-  );
-
-  test(
-    "When an authenticated Member accesses POST /api/v1/resources/users/admins/createMany " +
-      "send in body a array with name and password valid to create many admins" +
-      "then it shouldn't create many ADMINs and USERs resources in the database and return 401",
-    async () => {
-      const response = await request(app)
-        .post(adminResourcePath + "/createMany")
-        .set("authorization", `Bearer ${accessTokenAsMember}`)
-        .set("refreshToken", `Bearer ${refreshTokenAsMember}`)
-        .send(createManyAdmins)
-        .expect(401);
-
-      return expect(response.statusCode).toBe(401);
-    }
-  );
-
-  test(
-    "When accesses POST /api/v1/resources/users/admins/createMany WITHOUT authentication " +
-      "send in body a array with name and password valid to create many admins" +
-      "then it shouldn't create many ADMINs and USERs resources in the database and return 401",
-    async () => {
-      const response = await request(app)
-        .post(adminResourcePath + "/createMany")
-        .send(createManyAdmins)
         .expect(401);
 
       return expect(response.statusCode).toBe(401);
@@ -507,6 +380,25 @@ describe("CRUD TO ADMIN RESOURCE", () => {
     "When an authenticated admin accesses GET /api/v1/resources/users/admins " +
       "then it should return an array containing the first admin created and the default admin created",
     async () => {
+      const roleId = (
+        await prismaClient.role.findUnique({
+          where: {
+            name: "ADMIN",
+          },
+          select: {
+            id: true,
+          },
+        })
+      ).id;
+
+      await prismaClient.user.createMany({
+        data: createManyAdmins.map((admin) => ({
+          name: admin.name,
+          password: admin.password,
+          roleId,
+        })),
+      });
+
       const response = await request(app)
         .get("/api/v1/resources/users/admins")
         .set("authorization", "Bearer " + accessTokenAsAdmin)
@@ -565,6 +457,14 @@ describe("CRUD TO ADMIN RESOURCE", () => {
     "When an autenticated admin accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
       "then it should return a 204 status and delete all the ids sent in query parameters",
     async () => {
+      admins = await prismaClient.user.findMany({
+        where: {
+          name: {
+            startsWith: "Test Many Admins ",
+          },
+        },
+      });
+
       const response = await request(app)
         .delete(
           `${userResourcePath}/deleteMany?ids=${admins

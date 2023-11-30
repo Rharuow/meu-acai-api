@@ -56,14 +56,6 @@ const createManyClients = Array(15)
     },
   }));
 
-const createManyClientsMissingPassword = Array(15)
-  .fill(null)
-  .map((_, index) => ({ name: `Test Client Missing ${index + 1}` }));
-
-const createManyClientsMissingName = Array(15)
-  .fill(null)
-  .map((_, index) => ({ password: `missing name ${index + 1}` }));
-
 let userClient: User & { role?: Role } & { client?: Client };
 
 beforeAll(async () => {

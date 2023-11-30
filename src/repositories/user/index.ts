@@ -161,15 +161,6 @@ export const createUser = async ({
   });
 };
 
-export const createManyUser = async (users: Array<CreateUserRequestBody>) => {
-  userInMemory.clear();
-  usersInMemory.clear();
-  return await prismaClient.user.createMany({
-    data: users,
-    skipDuplicates: true,
-  });
-};
-
 export const updateUser: ({
   id,
   fields,

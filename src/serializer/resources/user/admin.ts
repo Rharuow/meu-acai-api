@@ -16,16 +16,6 @@ export const createAdminSerializer = ({
   });
 };
 
-export const createManyAdminSerializer = ({
-  res,
-  message,
-}: {
-  res: Response;
-  message?: string;
-}) => {
-  return res.status(204).send(message || "Users created successfully");
-};
-
 export const updateAdminSerializer = ({
   res,
   user,
