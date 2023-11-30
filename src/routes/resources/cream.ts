@@ -17,7 +17,11 @@ import { validationParams } from "@middlewares/paramsRouter";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { updateCreamController } from "@controllers/cream/update";
 import { getCreamController } from "@controllers/cream/get";
-import { deleteCreamController } from "@controllers/cream/delete";
+import {
+  deleteCreamController,
+  deleteManyCreamsController,
+} from "@controllers/cream/delete";
+import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
 
 export const validationCreateCreamBodySchema: Schema = {
   name: {
@@ -211,6 +215,13 @@ creamRouter.put(
   validationParams,
   validationAdminAccessToken,
   updateCreamController
+);
+
+creamRouter.delete(
+  "/creams/deleteMany",
+  idsInQueryParams,
+  validationAdminAccessToken,
+  deleteManyCreamsController
 );
 
 creamRouter.delete(
