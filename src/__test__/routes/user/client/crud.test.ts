@@ -1,7 +1,4 @@
-import {
-  createAllKindOfUserAndRoles,
-  createTwentyCreams,
-} from "@/__test__/utils/beforeAll/Users";
+import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
 import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
 import { app } from "@/app";
 import { prismaClient } from "@libs/prisma";
@@ -488,8 +485,6 @@ describe("CRUD TO CLIENT RESOURCE", () => {
           },
         },
       });
-
-      console.log(clients);
 
       const response = await request(app)
         .delete(

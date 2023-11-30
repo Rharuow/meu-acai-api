@@ -46,8 +46,6 @@ export const createManyUserController = async (
 ) => {
   const users = req.body as Array<CreateUserRequestBody>;
 
-  console.log("users = ", users);
-
   try {
     const usersCreated = await createManyUser(
       users.map((user) => ({

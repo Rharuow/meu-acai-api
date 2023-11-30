@@ -5,11 +5,11 @@ import { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 
 export const createClientController = async (req: Request, res: Response) => {
-  const { user } = req.body;
+  const { user, address } = req.body;
   try {
     const client = await createClient({
       userId: user.id,
-      address: user.address,
+      address,
     });
 
     return createClientSerializer({ res, user, client });
