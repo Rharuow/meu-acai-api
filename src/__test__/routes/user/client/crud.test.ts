@@ -233,34 +233,34 @@ describe("CRUD TO CLIENT RESOURCE", () => {
     }
   );
 
-  // test(
-  //   "When an authenticated CLIENT accesses POST /api/v1/resources/users/clients/createMany" +
-  //     "send in body a array with name and password valid to create many clients" +
-  //     "then it should create many CLIENTs and USERs resources in the database",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath + "/createMany")
-  //       .send(createManyClients)
-  //       .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-  //       .expect(204);
+  test(
+    "When an authenticated CLIENT accesses POST /api/v1/resources/users/clients/createMany" +
+      "send in body a array with name and password valid to create many clients" +
+      "then it should create many CLIENTs and USERs resources in the database",
+    async () => {
+      const response = await request(app)
+        .post(clientResourcePath + "/createMany")
+        .send(createManyClients)
+        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+        .expect(204);
 
-  //     clients = await prismaClient.user.findMany({
-  //       include: {
-  //         client: true,
-  //         role: true,
-  //       },
-  //       where: {
-  //         name: {
-  //           in: createManyClients.map((clt) => clt.name),
-  //         },
-  //       },
-  //     });
+      clients = await prismaClient.user.findMany({
+        include: {
+          client: true,
+          role: true,
+        },
+        where: {
+          name: {
+            in: createManyClients.map((clt) => clt.name),
+          },
+        },
+      });
 
-  //     expect(clients.length).toBe(15);
-  //     return expect(response.statusCode).toBe(204);
-  //   }
-  // );
+      expect(clients.length).toBe(15);
+      return expect(response.statusCode).toBe(204);
+    }
+  );
 
   // test(
   //   "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients/createMany" +

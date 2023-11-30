@@ -13,7 +13,7 @@ import {
   validationParams,
   validationQueryParams,
 } from "@middlewares/paramsRouter";
-import { Router } from "express";
+import { NextFunction, Response, Request, Router } from "express";
 import { updateClientController } from "@controllers/user/client/update";
 import { addRoleIdAtBody } from "@middlewares/resources/user/client/addRoleIdAtBody";
 import { addIncludesClientAndRoleAtBody } from "@middlewares/resources/user/client/addIncludesClientAndRoleAtBody";
@@ -29,6 +29,7 @@ import {
 import { createAddressController } from "@controllers/address/create";
 import { addNextToBody } from "@middlewares/resources/user/client/addNextToBody";
 import { updateBodyUser } from "@middlewares/resources/user/updateBody";
+import { addRoleIdAtBodyInArray } from "@middlewares/resources/user/client/addRoleIdAtBodyInArray";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {
@@ -134,7 +135,7 @@ clientRouter.post(
 
 clientRouter.post(
   "/clients/createMany",
-  addRoleIdAtBody,
+  addRoleIdAtBodyInArray,
   createManyUserController,
   createManyClientsController
 );

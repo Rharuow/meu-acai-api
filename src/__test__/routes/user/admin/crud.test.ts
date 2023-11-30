@@ -348,8 +348,6 @@ describe("CRUD TO ADMIN RESOURCE", () => {
         .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
         .expect(200);
 
-      console.log("response =", response.body);
-
       userAdmin = {
         ...userAdmin,
         name: "Test Admin Edited",

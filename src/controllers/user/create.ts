@@ -48,8 +48,9 @@ export const createManyUserController = async (
   try {
     const usersCreated = await createManyUser(
       users.map((user) => ({
-        ...user,
-        roleId: req.body.roleId,
+        roleId: user.roleId,
+        name: user.name,
+        password: user.password,
       }))
     );
 
