@@ -21,6 +21,8 @@ let refreshTokenAsMember: string;
 
 let cream: Cream;
 
+let creamsToDelete: Array<Cream>;
+
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();
   await createTwentyCreams();
@@ -269,42 +271,6 @@ describe("CRUD cream", () => {
     return expect(responseAsClient.statusCode).toBe(401);
   });
 
-  // DELETE
-  test("when access DELETE /api/v1/resources/creams/:id authenticated as ADMIN role, update at DB a cream resource with name 'Test Cream' to 'Test Cream Edited'", async () => {
-    const response = await request(app)
-      .delete(creamResourcePath + `/${cream.id}`)
-      .set("authorization", "Bearer " + accessTokenAsAdmin)
-      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-      .expect(204);
-
-    return expect(response.statusCode).toBe(204);
-  });
-
-  test("when access DELETE /api/v1/resources/creams/:id without authentication, return 401", async () => {
-    const response = await request(app)
-      .delete(creamResourcePath + `/${cream.id}`)
-      .expect(401);
-
-    return expect(response.statusCode).toBe(401);
-  });
-
-  test("when access DELETE /api/v1/resources/creams/:id with authentication different of 'ADMIN' role user, return 401", async () => {
-    const responseAsClient = await request(app)
-      .delete(creamResourcePath + `/${cream.id}`)
-      .set("authorization", "Bearer " + accessTokenAsClient)
-      .set("refreshToken", "Bearer " + refreshTokenAsClient)
-      .expect(401);
-
-    const responseAsMember = await request(app)
-      .delete(creamResourcePath + `/${cream.id}`)
-      .set("authorization", "Bearer " + accessTokenAsMember)
-      .set("refreshToken", "Bearer " + refreshTokenAsMember)
-      .expect(401);
-
-    expect(responseAsMember.statusCode).toBe(401);
-    return expect(responseAsClient.statusCode).toBe(401);
-  });
-
   // LIST
   test("when access GET /api/v1/resources/creams authenticated as ADMIN role, list max ten first creams", async () => {
     const response = await request(app)
@@ -316,7 +282,7 @@ describe("CRUD cream", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("data");
     expect(response.body).toHaveProperty("hasNextPage", true);
-    expect(response.body).toHaveProperty("totalPages", 2);
+    expect(response.body).toHaveProperty("totalPages", 3);
     expect(response.body).toHaveProperty("page", 1);
     return expect(response.body.data.length).toBe(10);
   });
@@ -331,7 +297,7 @@ describe("CRUD cream", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("data");
     expect(response.body).toHaveProperty("hasNextPage", true);
-    expect(response.body).toHaveProperty("totalPages", 4);
+    expect(response.body).toHaveProperty("totalPages", 5);
     expect(response.body).toHaveProperty("page", 2);
     return expect(response.body.data.length).toBe(5);
   });
@@ -479,12 +445,9 @@ describe("CRUD cream", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("data");
-    expect(response.body.data[0]).toHaveProperty(
-      "name",
-      "Test to list creams 0"
-    );
+    expect(response.body.data[0]).toHaveProperty("name", "Test Cream Edited");
     expect(response.body).toHaveProperty("hasNextPage", true);
-    expect(response.body).toHaveProperty("totalPages", 2);
+    expect(response.body).toHaveProperty("totalPages", 3);
     expect(response.body).toHaveProperty("page", 1);
     return expect(response.body.data.length).toBe(10);
   });
@@ -496,4 +459,67 @@ describe("CRUD cream", () => {
 
     return expect(response.statusCode).toBe(401);
   });
+
+  // DELETE
+  test("when access DELETE /api/v1/resources/creams/:id authenticated as ADMIN role, update at DB a cream resource with name 'Test Cream' to 'Test Cream Edited'", async () => {
+    const response = await request(app)
+      .delete(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsAdmin)
+      .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+      .expect(204);
+
+    return expect(response.statusCode).toBe(204);
+  });
+
+  test("when access DELETE /api/v1/resources/creams/:id without authentication, return 401", async () => {
+    const response = await request(app)
+      .delete(creamResourcePath + `/${cream.id}`)
+      .expect(401);
+
+    return expect(response.statusCode).toBe(401);
+  });
+
+  test("when access DELETE /api/v1/resources/creams/:id with authentication different of 'ADMIN' role user, return 401", async () => {
+    const responseAsClient = await request(app)
+      .delete(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsClient)
+      .set("refreshToken", "Bearer " + refreshTokenAsClient)
+      .expect(401);
+
+    const responseAsMember = await request(app)
+      .delete(creamResourcePath + `/${cream.id}`)
+      .set("authorization", "Bearer " + accessTokenAsMember)
+      .set("refreshToken", "Bearer " + refreshTokenAsMember)
+      .expect(401);
+
+    expect(responseAsMember.statusCode).toBe(401);
+    return expect(responseAsClient.statusCode).toBe(401);
+  });
+
+  test(
+    "when access DELETE /api/v1/resources/creams/deleteMany?ids=id1&id2 " +
+      "where the ids are ids of creamss " +
+      "should return 204 and delete all the creams thats contains the ids.",
+    async () => {
+      creamsToDelete = await prismaClient.cream.findMany({
+        where: {
+          name: {
+            startsWith: "Test to list creams",
+          },
+        },
+      });
+      const response = await request(app)
+        .delete(
+          creamResourcePath +
+            `/deleteMany?ids=${creamsToDelete
+              .map((cream) => cream.id)
+              .join(",")}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(204);
+
+      return expect(response.statusCode).toBe(204);
+    }
+  );
 });
