@@ -5,6 +5,7 @@ import { createManyUser, createUser } from "@repositories/user";
 import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 import { prismaClient } from "@libs/prisma";
 import { Prisma } from "@prisma/client";
+import { badRequest } from "@serializer/erros/400";
 
 export const createUserController = async (
   req: Request,
@@ -45,6 +46,8 @@ export const createManyUserController = async (
 ) => {
   const users = req.body as Array<CreateUserRequestBody>;
 
+  console.log("users = ", users);
+
   try {
     const usersCreated = await createManyUser(
       users.map((user) => ({
@@ -54,25 +57,32 @@ export const createManyUserController = async (
       }))
     );
 
-    // Retrieve the IDs of the created resources
-    const createdResourceIds =
-      usersCreated.count > 0
-        ? await prismaClient.user.findMany({
-            where: {
-              name: {
-                in: users.map((user) => user.name),
-              },
-            },
-            select: {
-              id: true,
-            },
-          })
-        : [];
+    if (usersCreated.count <= 0)
+      return badRequest({ res, message: "The users already exists." });
 
-    req.body.usersIds = createdResourceIds.map((user) => user.id);
+    // Retrieve the IDs of the created resources
+    const createdResourceIds = await prismaClient.user.findMany({
+      where: {
+        name: {
+          in: users.map((user) => user.name),
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    req.body.users = users.map((user) => ({
+      ...user,
+      id: createdResourceIds.find(
+        (createdUser) => createdUser.name === user.name
+      ).id,
+    }));
 
     return next();
   } catch (error) {
+    console.error("Failed to create user = ", error);
     return unprocessableEntity(res);
   }
 };

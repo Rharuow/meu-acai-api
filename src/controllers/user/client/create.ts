@@ -1,18 +1,15 @@
-import { createClient, createManyClients } from "@repositories/user/client";
-import {
-  createClientSerializer,
-  createManyClientSerializer,
-} from "@serializer/resources/user/client";
+import { createClient } from "@repositories/user/client";
+import { createClientSerializer } from "@serializer/resources/user/client";
 import { unprocessableEntity } from "@serializer/erros/422";
 import { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 
 export const createClientController = async (req: Request, res: Response) => {
-  const { user, addressId } = req.body;
+  const { user } = req.body;
   try {
     const client = await createClient({
       userId: user.id,
-      addressId,
+      address: user.address,
     });
 
     return createClientSerializer({ res, user, client });
@@ -32,24 +29,5 @@ export const createClientController = async (req: Request, res: Response) => {
       // Handle other errors
       return unprocessableEntity(res, { message: error.message });
     }
-  }
-};
-
-export const createManyClientsController = async (
-  req: Request,
-  res: Response
-) => {
-  const { users } = req.body as {
-    users: Array<{ id: string; addressId: string }>;
-  };
-
-  try {
-    await createManyClients({ users });
-
-    return createManyClientSerializer({ res });
-  } catch (error) {
-    return unprocessableEntity(res, {
-      message: "Error creating client = " + error.message,
-    });
   }
 };

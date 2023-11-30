@@ -1,4 +1,6 @@
+import { Address } from "@prisma/client";
+
 export type CreateClientRequestBody = {
   userId: string;
-  addressId: string;
+  address: Address;
 };

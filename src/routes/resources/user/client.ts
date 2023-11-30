@@ -1,11 +1,5 @@
-import {
-  createClientController,
-  createManyClientsController,
-} from "@controllers/user/client/create";
-import {
-  createManyUserController,
-  createUserController,
-} from "@controllers/user/create";
+import { createClientController } from "@controllers/user/client/create";
+import { createUserController } from "@controllers/user/create";
 import { getUserController } from "@controllers/user/get";
 import { listUserController } from "@controllers/user/list";
 import { updateUserController } from "@controllers/user/update";
@@ -13,14 +7,13 @@ import {
   validationParams,
   validationQueryParams,
 } from "@middlewares/paramsRouter";
-import { NextFunction, Response, Request, Router } from "express";
+import { Router } from "express";
 import { updateClientController } from "@controllers/user/client/update";
 import { addRoleIdAtBody } from "@middlewares/resources/user/client/addRoleIdAtBody";
 import { addIncludesClientAndRoleAtBody } from "@middlewares/resources/user/client/addIncludesClientAndRoleAtBody";
 import { addIncludesClientAtQuery } from "@middlewares/resources/user/client/addIncludesClientAtQuery";
 import {
   Schema,
-  check,
   checkExact,
   checkSchema,
   param,
@@ -29,7 +22,6 @@ import {
 import { createAddressController } from "@controllers/address/create";
 import { addNextToBody } from "@middlewares/resources/user/client/addNextToBody";
 import { updateBodyUser } from "@middlewares/resources/user/updateBody";
-import { addRoleIdAtBodyInArray } from "@middlewares/resources/user/client/addRoleIdAtBodyInArray";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {
@@ -128,16 +120,8 @@ clientRouter.post(
   ),
   validationParams,
   addNextToBody,
-  createAddressController,
   createUserController,
   createClientController
-);
-
-clientRouter.post(
-  "/clients/createMany",
-  addRoleIdAtBodyInArray,
-  createManyUserController,
-  createManyClientsController
 );
 
 clientRouter.put(

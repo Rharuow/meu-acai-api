@@ -19,8 +19,6 @@ let refreshTokenAsClient: string;
 let accessTokenAsMember: string;
 let refreshTokenAsMember: string;
 
-let clients: Array<User & { role?: Role } & { clients?: Client }>;
-
 const userResourcePath = "/api/v1/resources/users";
 
 const clientResourcePath = "/api/v1/resources/users/clients";
@@ -232,128 +230,6 @@ describe("CRUD TO CLIENT RESOURCE", () => {
       return expect(response.statusCode).toBe(401);
     }
   );
-
-  test(
-    "When an authenticated CLIENT accesses POST /api/v1/resources/users/clients/createMany" +
-      "send in body a array with name and password valid to create many clients" +
-      "then it should create many CLIENTs and USERs resources in the database",
-    async () => {
-      const response = await request(app)
-        .post(clientResourcePath + "/createMany")
-        .send(createManyClients)
-        .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-        .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-        .expect(204);
-
-      clients = await prismaClient.user.findMany({
-        include: {
-          client: true,
-          role: true,
-        },
-        where: {
-          name: {
-            in: createManyClients.map((clt) => clt.name),
-          },
-        },
-      });
-
-      expect(clients.length).toBe(15);
-      return expect(response.statusCode).toBe(204);
-    }
-  );
-
-  // test(
-  //   "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients/createMany" +
-  //     "send in body a array with name valid to create many clients but missing password" +
-  //     "then it shouldn't create any CLIENTs and USERs resources in the database and return 422",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath + "/createMany")
-  //       .send(createManyClientsMissingPassword)
-  //       .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-  //       .expect(422);
-
-  //     return expect(response.statusCode).toBe(422);
-  //   }
-  // );
-
-  // test(
-  //   "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients/createMany" +
-  //     "send in body a array with password valid to create many clients but missing name" +
-  //     "then it shouldn't create any CLIENTs and USERs resources in the database and return 422",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath + "/createMany")
-  //       .send(createManyClientsMissingName)
-  //       .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-  //       .expect(422);
-
-  //     return expect(response.statusCode).toBe(422);
-  //   }
-  // );
-
-  // test(
-  //   "When an authenticated ADMIN accesses POST /api/v1/resources/users/clients/createMany" +
-  //     "without body data" +
-  //     "then it shouldn't create any CLIENTs and USERs resources in the database and return 422",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath + "/createMany")
-  //       .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-  //       .expect(422);
-
-  //     return expect(response.statusCode).toBe(422);
-  //   }
-  // );
-
-  // test(
-  //   "When an authenticated CLIENT accesses POST /api/v1/resources/users/clients/createMany " +
-  //     "send in body a array with name and password valid to create many clients" +
-  //     "then it shouldn't create any CLIENTs and USERs resources in the database and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath + "/createMany")
-  //       .set("authorization", `Bearer ${accessTokenAsClient}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
-  //       .send(createManyClients)
-  //       .expect(401);
-
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
-
-  // test(
-  //   "When an authenticated Member accesses POST /api/v1/resources/users/clients/createMany " +
-  //     "send in body a array with name and password valid to create many clients" +
-  //     "then it shouldn't create any CLIENTs and USERs resources in the database and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath + "/createMany")
-  //       .set("authorization", `Bearer ${accessTokenAsMember}`)
-  //       .set("refreshToken", `Bearer ${refreshTokenAsMember}`)
-  //       .send(createManyClients)
-  //       .expect(401);
-
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
-
-  // test(
-  //   "When accesses POST /api/v1/resources/users/clients/createMany WITHOUT authentication " +
-  //     "send in body a array with name and password valid to create many clients" +
-  //     "then it shouldn't create any CLIENTs and USERs resources in the database and return 401",
-  //   async () => {
-  //     const response = await request(app)
-  //       .post(clientResourcePath + "/createMany")
-  //       .send(createManyClients)
-  //       .expect(401);
-
-  //     return expect(response.statusCode).toBe(401);
-  //   }
-  // );
 
   // UPDATE
   test(
@@ -601,23 +477,33 @@ describe("CRUD TO CLIENT RESOURCE", () => {
   // );
 
   // DELETE
-  // test(
-  //   "When an autenticated ADMIN accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
-  //     "then it should return a 204 status and delete all the ids sent in query parameters",
-  //   async () => {
-  //     const response = await request(app)
-  //       .delete(
-  //         `${userResourcePath}/deleteMany?ids=${clients
-  //           .map((clt) => clt.id)
-  //           .join(",")}`
-  //       )
-  //       .set("authorization", "Bearer " + accessTokenAsAdmin)
-  //       .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-  //       .expect(204);
+  test(
+    "When an autenticated ADMIN accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
+      "then it should return a 204 status and delete all the ids sent in query parameters",
+    async () => {
+      const clients = await prismaClient.user.findMany({
+        where: {
+          name: {
+            startsWith: "Test Client ",
+          },
+        },
+      });
 
-  //     return expect(response.statusCode).toBe(204);
-  //   }
-  // );
+      console.log(clients);
+
+      const response = await request(app)
+        .delete(
+          `${userResourcePath}/deleteMany?ids=${clients
+            .map((clt) => clt.id)
+            .join(",")}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(204);
+
+      return expect(response.statusCode).toBe(204);
+    }
+  );
 
   // test(
   //   "When an autenticated CLIENT accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +

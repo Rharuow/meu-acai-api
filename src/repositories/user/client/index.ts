@@ -2,6 +2,10 @@ import { Params } from "@repositories/utils/queryBuilder";
 import { CreateClientRequestBody } from "@/types/user/client/createRequestBody";
 import { UpdateClientRequestBody } from "@/types/user/client/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
+import {
+  createAddress,
+  getAddressByHouseAndSquare,
+} from "@repositories/address";
 
 export type ParamsClient = Params & {
   orderBy:
@@ -15,11 +19,15 @@ export type ParamsClient = Params & {
 
 export const createClient = async ({
   userId,
-  addressId,
+  address: { house, square },
 }: CreateClientRequestBody) => {
+  let address = await getAddressByHouseAndSquare({ house, square });
+
+  if (!address) address = await createAddress({ house, square });
+
   const client = await prismaClient.client.create({
     data: {
-      addressId,
+      addressId: address.id,
       userId,
     },
   });
@@ -32,51 +40,11 @@ export const createClient = async ({
   });
 
   await prismaClient.address.update({
-    where: { id: addressId },
+    where: { id: address.id },
     data: {
       clientId: client.id,
     },
   });
-  return client;
-};
-
-export const createManyClients = async ({
-  users,
-}: {
-  users: Array<{ id: string; addressId: string }>;
-}) => {
-  const usersIds = users.map((user) => user.id);
-  const client = await prismaClient.client.createMany({
-    data: users.map((user) => ({
-      addressId: user.addressId,
-      userId: user.id,
-    })),
-    skipDuplicates: true,
-  });
-
-  // Fetch the IDs of the created clients
-  const clientIds = await prismaClient.client.findMany({
-    where: {
-      userId: { in: usersIds },
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  // Extract the IDs from the fetched clients
-  const extractedClientIds = clientIds.map((client) => client.id);
-
-  // Update the clientId field in the User model
-  for (let i = 0; i < usersIds.length; i++) {
-    const userId = usersIds[i];
-    const clientId = extractedClientIds[i];
-
-    await prismaClient.user.update({
-      where: { id: userId },
-      data: { clientId },
-    });
-  }
   return client;
 };
 

@@ -1,12 +1,11 @@
 import { prismaClient } from "@libs/prisma";
 
-export const createAddress = async ({
-  house,
-  square,
-}: {
-  square: string;
+type Address = {
   house: string;
-}) => {
+  square: string;
+};
+
+export const createAddress = async ({ house, square }: Address) => {
   const address = await prismaClient.address.create({
     data: {
       house,
@@ -14,6 +13,23 @@ export const createAddress = async ({
     },
   });
   return address;
+};
+
+export const createManyAddress = async (addresses: Array<Address>) => {
+  await prismaClient.address.createMany({
+    data: addresses,
+  });
+
+  const extractedAddresses = await prismaClient.address.findMany({
+    where: {
+      OR: addresses.map((address) => ({
+        house: address.house,
+        square: address.square,
+      })),
+    },
+  });
+
+  return extractedAddresses;
 };
 
 export const getAddressByHouseAndSquare = async ({

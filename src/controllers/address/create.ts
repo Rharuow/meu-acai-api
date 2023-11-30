@@ -1,10 +1,17 @@
-import { createAddressSerializer } from "@serializer/resources/address";
+import {
+  createAddressSerializer,
+  createManyAddressSerializer,
+} from "@serializer/resources/address";
 import {
   createAddress,
+  createManyAddress,
   getAddressByHouseAndSquare,
 } from "@repositories/address";
 import { NextFunction, Request, Response } from "express";
 import { badRequest } from "@serializer/erros/400";
+import { CreateUserRequestBody } from "@/types/user/createRequestbody";
+import { CreateAddressRequestBody } from "@/types/address/createRequestBody";
+import { unprocessableEntity } from "@serializer/erros/422";
 
 export const createAddressController = async (
   req: Request,
