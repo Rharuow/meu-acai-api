@@ -498,7 +498,7 @@ describe("CRUD cream", () => {
 
   // DELETE MANY
   test(
-    "when access DELETE /api/v1/resources/creams/deleteMany?ids=id1&id2 " +
+    "when an autenticated admin accesses DELETE /api/v1/resources/creams/deleteMany?ids=id1&id2 " +
       "where the ids are ids of creamss " +
       "should return 204 and delete all the creams thats contains the ids.",
     async () => {
@@ -509,10 +509,6 @@ describe("CRUD cream", () => {
           },
         },
       });
-      console.log(
-        creamResourcePath +
-          `/deleteMany?ids=${creamsToDelete.map((cream) => cream.id).join(",")}`
-      );
       const response = await request(app)
         .delete(
           creamResourcePath +
@@ -525,6 +521,72 @@ describe("CRUD cream", () => {
         .expect(204);
 
       return expect(response.statusCode).toBe(204);
+    }
+  );
+
+  test(
+    "When an autenticated CLIENT accesses DELETE /api/v1/resources/creams/deleteMany?ids=id1&id2" +
+      "then it should return a 401 status code",
+    async () => {
+      const response = await request(app)
+        .delete(
+          `${creamResourcePath}/deleteMany?ids=${creamsToDelete
+            .map((cream) => cream.id)
+            .join(",")}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsClient)
+        .set("refreshToken", "Bearer " + refreshTokenAsClient)
+        .expect(401);
+
+      return expect(response.statusCode).toBe(401);
+    }
+  );
+
+  test(
+    "When an autenticated ADMIN accesses DELETE /api/v1/resources/creams/deleteMany without ids query params" +
+      "then it should return a 400 status code",
+    async () => {
+      const response = await request(app)
+        .delete(`${creamResourcePath}/deleteMany`)
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(400);
+
+      return expect(response.statusCode).toBe(400);
+    }
+  );
+
+  test(
+    "When an autenticated MEMBER accesses DELETE /api/v1/resources/creams/deleteMany?ids=id1&id2" +
+      "then it should return a 401 status code",
+    async () => {
+      const response = await request(app)
+        .delete(
+          `${creamResourcePath}/deleteMany?ids=${creamsToDelete
+            .map((cream) => cream.id)
+            .join(",")}`
+        )
+        .set("authorization", "Bearer " + accessTokenAsMember)
+        .set("refreshToken", "Bearer " + refreshTokenAsMember)
+        .expect(401);
+
+      return expect(response.statusCode).toBe(401);
+    }
+  );
+
+  test(
+    "When accesses DELETE /api/v1/resources/creams/deleteMany?ids=id1&id2 without authentication " +
+      "then it should return a 401 status code",
+    async () => {
+      const response = await request(app)
+        .delete(
+          `${creamResourcePath}/deleteMany?ids=${creamsToDelete
+            .map((cream) => cream.id)
+            .join(",")}`
+        )
+        .expect(401);
+
+      return expect(response.statusCode).toBe(401);
     }
   );
 });
