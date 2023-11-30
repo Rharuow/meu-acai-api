@@ -14,25 +14,18 @@ export type ParamsAdmin = Params & {
 };
 
 export const createAdmin = async ({ userId }: CreateAdminRequestBody) => {
-  return await prismaClient.admin.create({
+  const admin = await prismaClient.admin.create({
     data: {
       userId,
     },
   });
-};
-
-export const createManyAdmins = async ({
-  usersIds,
-}: {
-  usersIds: Array<string>;
-}) => {
-  console.log("usersIds  =", usersIds);
-  return await prismaClient.admin.createMany({
-    data: usersIds.map((userId) => ({
-      userId,
-    })),
-    skipDuplicates: true,
+  await prismaClient.user.update({
+    where: { id: userId },
+    data: {
+      adminId: admin.id,
+    },
   });
+  return admin;
 };
 
 export const updateAdmin = async ({

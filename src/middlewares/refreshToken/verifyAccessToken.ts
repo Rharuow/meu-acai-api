@@ -23,7 +23,6 @@ export const verifyAccessToken = (
     process.env.TOKEN_SECRET,
     (err: VerifyErrors | null, user: User | undefined) => {
       if (err) {
-        console.log("err refresh token = ", err);
         status = 401;
       }
       req.body.user = user;

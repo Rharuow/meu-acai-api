@@ -10,7 +10,6 @@ export const deleteCreamController = async (req: Request, res: Response) => {
 
     return res.status(204).send("cream is deleted");
   } catch (error) {
-    console.log("delete cream controller = ", error);
     return unprocessableEntity(res, { message: error.message });
   }
 };

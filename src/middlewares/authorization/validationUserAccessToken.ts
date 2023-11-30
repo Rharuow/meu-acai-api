@@ -37,7 +37,6 @@ export const validationUserAccessToken = async (
 
     return next();
   } catch (error) {
-    console.log("Error at user authorization middleware = ", error);
     return unauthorized(res);
   }
 };

@@ -40,7 +40,6 @@ export const listCreams: (
     },
   });
   if (!creamsInMemory.hasItem(reference)) {
-    console.log("CREAM IN DB");
     const [creams, totalCreams] = await Promise.all([
       await prismaClient.cream.findMany({
         skip: (page - 1) * perPage,

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-export const addIncludesAdminAtQuery = (
+export const addIncludesClientAtQuery = (
   req: Request,
   res: Response,
   next: NextFunction

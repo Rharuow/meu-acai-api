@@ -48,7 +48,6 @@ const start = () => {
         console.log(`Server started on port ${PORT}`);
       });
   } catch (error) {
-    console.error(error);
     process.exit(1);
   }
 };

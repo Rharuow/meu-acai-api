@@ -94,7 +94,6 @@ export const getUserByNameAndPassword = async (
     includes,
   });
   if (!userInMemory.hasItem(reference)) {
-    console.log("USER IN DB");
     const user = await prismaClient.user.findUniqueOrThrow(
       createQuery(params, includes)
     );
@@ -125,7 +124,6 @@ export const getUser = async ({
     includes,
   });
   if (!userInMemory.hasItem(reference)) {
-    console.log("USER IN DB");
     const user = await prismaClient.user.findUnique({
       where: {
         id,
@@ -163,15 +161,6 @@ export const createUser = async ({
   });
 };
 
-export const createManyUser = async (users: Array<CreateUserRequestBody>) => {
-  userInMemory.clear();
-  usersInMemory.clear();
-  return await prismaClient.user.createMany({
-    data: users,
-    skipDuplicates: true,
-  });
-};
-
 export const updateUser: ({
   id,
   fields,
@@ -181,9 +170,14 @@ export const updateUser: ({
 }) => Promise<User & { role?: Role }> = async ({ fields, id }) => {
   userInMemory.clear();
   usersInMemory.clear();
+  const { name, password, roleId } = fields;
   return await prismaClient.user.update({
     where: { id },
-    data: fields,
+    data: {
+      ...(name && { name }),
+      ...(password && { password }),
+      ...(roleId && { roleId }),
+    },
   });
 };
 
@@ -211,7 +205,6 @@ export const listUsers: (params: ParamsUser) => Promise<
   });
 
   if (!usersInMemory.hasItem(reference)) {
-    console.log("CREAM IN DB");
     const [users, totalUsers] = await Promise.all([
       await prismaClient.user.findMany({
         skip: (page - 1) * perPage,
@@ -251,13 +244,46 @@ export const listUsers: (params: ParamsUser) => Promise<
 export const deleteUser = async ({ id }: { id: string }) => {
   userInMemory.clear();
   usersInMemory.clear();
-  await prismaClient.user.delete({ where: { id } });
-  return;
+  const hasClient = await prismaClient.client.findUnique({
+    where: {
+      userId: id,
+    },
+  });
+
+  if (hasClient) {
+    await prismaClient.address.update({
+      where: {
+        clientId: hasClient.id,
+      },
+      data: {
+        clientId: null,
+      },
+    });
+  }
+  const user = await prismaClient.user.delete({ where: { id } });
+
+  return user;
 };
 
 export const deleteManyUser = async ({ ids }: { ids: Array<string> }) => {
   userInMemory.clear();
   usersInMemory.clear();
+  const hasClients = await prismaClient.client.findMany({
+    where: {
+      OR: ids.map((id) => ({ id })),
+    },
+  });
+
+  if (hasClients && hasClients.length > 0)
+    await prismaClient.address.updateMany({
+      data: {
+        clientId: null,
+      },
+      where: {
+        OR: hasClients.map((client) => ({ clientId: client.id })),
+      },
+    });
+
   return await prismaClient.user.deleteMany({
     where: {
       id: {

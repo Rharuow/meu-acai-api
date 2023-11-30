@@ -15,13 +15,11 @@ export const createCreamController = async (req: Request, res: Response) => {
 
     return res.json(createCreamSerializer(cream));
   } catch (error) {
-    console.log(" create cream controller = ", error);
     // Check if the error is due to a unique constraint violation
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      console.error("Unique constraint violation:", error.message);
       const { clientVersion, ...errorSanitized } = error;
       // Handle the unique constraint violation error here
       return unprocessableEntity(res, {

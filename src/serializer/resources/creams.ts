@@ -1,5 +1,6 @@
 import { Cream } from "@prisma/client";
 import { list } from ".";
+import { Response } from "express";
 
 export type ListCreamsSerializer = {
   data: Array<Cream>;
@@ -14,12 +15,13 @@ type Params = {
   page: number;
 };
 
-export const listCreamsSerializer: (params: Params) => ListCreamsSerializer = ({
+export const listCreamsSerializer = ({
   creams,
   totalPages,
   page,
-}) => {
-  return list({ data: creams, page, totalPages });
+  res,
+}: Params & { res: Response }) => {
+  return res.json(list({ data: creams, page, totalPages }));
 };
 
 export const createCreamSerializer = (cream: Cream) => ({
