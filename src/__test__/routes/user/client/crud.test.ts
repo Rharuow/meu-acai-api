@@ -535,7 +535,7 @@ describe("CRUD TO CLIENT RESOURCE", () => {
   // DELETE
   test(
     "When an authenticated ADMIN accesses DELETE /api/v1/resources/users/clients/:id " +
-      "then it should return a 204 status and delete the first admin created",
+      "then it should return a 204 status and delete the first client created",
     async () => {
       const response = await request(app)
         .delete(userResourcePath + `/${userClient.id}`)
