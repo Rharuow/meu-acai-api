@@ -286,6 +286,23 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
       }
     );
   });
+
+  describe("CREATING MEMBER AS AN MEMBER", () => {
+    test(
+      `When an authenticated MEMBER accesses POST ${memberResourcePath} ` +
+        "without body data" +
+        "then it shouldn't create a new User and a new Member resource in the database and return 401",
+      async () => {
+        const response = await request(app)
+          .post(memberResourcePath)
+          .set("authorization", `Bearer ${accessTokenAsMember}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsMember}`)
+          .expect(401);
+
+        return expect(response.statusCode).toBe(401);
+      }
+    );
+  });
 });
 
 describe("TEST TO DELETE MEMBER RESOURCE", () => {
