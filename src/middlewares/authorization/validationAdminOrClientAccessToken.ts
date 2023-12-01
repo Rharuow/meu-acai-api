@@ -1,10 +1,9 @@
 import { unauthorized } from "@serializer/erros/401";
-import { prismaClient } from "@libs/prisma";
 import { Role, User } from "@prisma/client";
 import { getUser } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 import { VerifyErrors, verify } from "jsonwebtoken";
-import { getClient } from "@repositories/user/client";
+import { findClient } from "@repositories/user/client";
 
 export const validationAdminOrClientAccessToken = async (
   req: Request,
@@ -40,7 +39,7 @@ export const validationAdminOrClientAccessToken = async (
     }
 
     if (user.role.name === "CLIENT") {
-      const clientId = (await getClient({ id: user.clientId })).id;
+      const clientId = (await findClient({ userId: user.id })).id;
       req.body.clientId = clientId;
       return next();
     }

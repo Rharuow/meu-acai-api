@@ -12,11 +12,11 @@ import { memberRouter } from "./member";
 
 const userRouter = Router();
 
+userRouter.use("/users", validationAdminOrClientAccessToken, memberRouter);
+
 userRouter.use("/users", validationAdminAccessToken, adminRouter);
 
 userRouter.use("/users", validationAdminAccessToken, clientRouter);
-
-userRouter.use("/users", validationAdminOrClientAccessToken, memberRouter);
 
 userRouter.delete(
   "/users/deleteMany",

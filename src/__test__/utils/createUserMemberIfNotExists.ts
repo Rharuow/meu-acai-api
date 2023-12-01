@@ -9,14 +9,25 @@ export const createUserMemberIfNotExists = async (
     where: { userId: user.id },
   });
 
-  if (!hasClient)
-    return await prismaClient.member.create({
+  if (!hasClient) {
+    const member = await prismaClient.member.create({
       data: {
         userId: user.id,
         clientId: client.id,
         relationship: "Wife",
       },
     });
+
+    await prismaClient.user.update({
+      data: {
+        memberId: member.id,
+      },
+      where: {
+        id: user.id,
+      },
+    });
+    return member;
+  }
 
   return hasClient;
 };

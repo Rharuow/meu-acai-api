@@ -1,6 +1,8 @@
 import { createUserController } from "@controllers/user/create";
+import { deleteUserController } from "@controllers/user/delete";
 import { createMemberController } from "@controllers/user/member/create";
 import { addNextToBody } from "@middlewares/addNextToBody";
+import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationParams } from "@middlewares/paramsRouter";
 import { addRoleIdAtBody } from "@middlewares/resources/user/member/addRoleIdAtBody";
 import { Router } from "express";
@@ -64,6 +66,12 @@ memberRouter.post(
   addNextToBody,
   createUserController,
   createMemberController
+);
+
+memberRouter.delete(
+  "/members/:id",
+  validationAdminOrClientAccessToken,
+  deleteUserController
 );
 
 export { memberRouter };

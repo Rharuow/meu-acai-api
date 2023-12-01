@@ -9,13 +9,25 @@ export const createUserClientIfNotExists = async (
     where: { userId: user.id },
   });
 
-  if (!hasClient)
-    return await prismaClient.client.create({
+  if (!hasClient) {
+    const client = await prismaClient.client.create({
       data: {
         userId: user.id,
         addressId: address.id,
       },
     });
+
+    await prismaClient.user.update({
+      data: {
+        clientId: client.id,
+      },
+      where: {
+        id: user.id,
+      },
+    });
+
+    return client;
+  }
 
   return hasClient;
 };

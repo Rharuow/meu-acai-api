@@ -1,6 +1,10 @@
 import request from "supertest";
 import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
-import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
+import {
+  userAsAdmin,
+  userAsClient,
+  userAsMember,
+} from "@/__test__/utils/users";
 import { app } from "@/app";
 import { Client, Member, Role, User } from "@prisma/client";
 import { getUserByNameAndPassword } from "@repositories/user";
@@ -46,7 +50,7 @@ beforeAll(async () => {
 
   const responseSignInAsMember = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send(userAsMember)
     .set("Accept", "application/json")
     .expect(200);
 
@@ -78,7 +82,6 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
           .set("authorization", `Bearer ${accessTokenAsAdmin}`)
           .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
           .expect(200);
-
         userMemberAdmin = await getUserByNameAndPassword(
           {
             name: "Test Member Created For Admin",
@@ -86,7 +89,6 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
           },
           ["Role", "Member"]
         );
-
         expect(userMemberAdmin).toBeTruthy();
         expect(userMemberAdmin).toHaveProperty(
           "name",
@@ -106,7 +108,6 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
           encodeSha256(createMemberBody.password)
         );
         expect(userMemberAdmin.role).toHaveProperty("name", "MEMBER");
-
         return expect(response.statusCode).toBe(200);
       }
     );
@@ -115,7 +116,7 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
   describe("CREATING MEMBER AS AN CLIENT", () => {
     test(
       `When an authenticated CLIENT accesses POST ${memberResourcePath} ` +
-        'with name "Test Member Created", password "123", clientId "client id" ' +
+        'with name "Test Member Created For Client", password "123", clientId "client id" ' +
         "then it should create a new User and a new Member resource in the database",
       async () => {
         const response = await request(app)
@@ -132,7 +133,6 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
           },
           ["Role", "Member"]
         );
-
         expect(userMemberClient).toBeTruthy();
         expect(userMemberClient).toHaveProperty(
           "name",
@@ -152,7 +152,6 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
           encodeSha256(createMemberBody.password)
         );
         expect(userMemberClient.role).toHaveProperty("name", "MEMBER");
-
         return expect(response.statusCode).toBe(200);
       }
     );
@@ -168,9 +167,8 @@ describe("TEST TO DELETE MEMBER RESOURCE", () => {
         const response = await request(app)
           .delete(userResourcePath + `/${userMemberAdmin.id}`)
           .set("authorization", "Bearer " + accessTokenAsAdmin)
-          .set("refreshToken", refreshTokenAsAdmin)
+          .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
           .expect(204);
-
         return expect(response.statusCode).toBe(204);
       }
     );
@@ -178,13 +176,13 @@ describe("TEST TO DELETE MEMBER RESOURCE", () => {
 
   describe("DELETING MEMBER AS AN CLIENT", () => {
     test(
-      `When an authenticated CLIENT accesses DELETE ${userResourcePath}/:id ` +
+      `When an authenticated CLIENT accesses DELETE ${userResourcePath}/members/:id ` +
         "then it should return a 204 status and delete the first member created",
       async () => {
         const response = await request(app)
-          .delete(userResourcePath + `/${userMemberClient.id}`)
+          .delete(userResourcePath + `/members/${userMemberClient.id}`)
           .set("authorization", "Bearer " + accessTokenAsClient)
-          .set("refreshToken", refreshTokenAsClient)
+          .set("refreshToken", "Bearer " + refreshTokenAsClient)
           .expect(204);
 
         return expect(response.statusCode).toBe(204);
