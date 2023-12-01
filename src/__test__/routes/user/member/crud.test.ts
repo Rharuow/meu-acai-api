@@ -319,6 +319,30 @@ describe("TEST TO DELETE MEMBER RESOURCE", () => {
         return expect(response.statusCode).toBe(204);
       }
     );
+
+    test(
+      `When an authenticated ADMIN accesses DELETE ${userResourcePath}/:id with inalid id ` +
+        "then it should return a 422 status",
+      async () => {
+        const response = await request(app)
+          .delete(userResourcePath + `/some-id-invalid`)
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+          .expect(422);
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+
+    test(
+      `When accesses DELETE ${userResourcePath}/:id with without authentication ` +
+        "then it should return a 401 status",
+      async () => {
+        const response = await request(app)
+          .delete(userResourcePath + `/${userMemberAdmin.id}`)
+          .expect(401);
+        return expect(response.statusCode).toBe(401);
+      }
+    );
   });
 
   describe("DELETING MEMBER AS AN CLIENT", () => {
