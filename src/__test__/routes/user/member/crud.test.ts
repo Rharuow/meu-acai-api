@@ -224,6 +224,67 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
         return expect(response.statusCode).toBe(200);
       }
     );
+
+    test(
+      `When an authenticated CLIENT accesses POST ${memberResourcePath} ` +
+        "without body data" +
+        "then it shouldn't create a new User and a new Member resource in the database and return 422",
+      async () => {
+        const response = await request(app)
+          .post(memberResourcePath)
+          .set("authorization", `Bearer ${accessTokenAsClient}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
+          .expect(422);
+
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+
+    test(
+      `When an authenticated CLIENT accesses POST ${memberResourcePath} ` +
+        "with body missing password " +
+        "then it shouldn't create a new User and a new Member resource in the database and return 422",
+      async () => {
+        const response = await request(app)
+          .post(memberResourcePath)
+          .send(createMemberBodyMissingPassword)
+          .set("authorization", `Bearer ${accessTokenAsClient}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
+          .expect(422);
+
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+
+    test(
+      `When an authenticated CLIENT accesses POST ${memberResourcePath} ` +
+        "with body missing name " +
+        "then it shouldn't create a new User and a new Member resource in the database and return 422",
+      async () => {
+        const response = await request(app)
+          .post(memberResourcePath)
+          .send(createMemberBodyMissingName)
+          .set("authorization", `Bearer ${accessTokenAsClient}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
+          .expect(422);
+
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+
+    test(
+      `When accesses POST ${memberResourcePath} ` +
+        "without authentication " +
+        "then it shouldn't create a new User and a new Member resource in the database and return 401",
+      async () => {
+        const response = await request(app)
+          .post(memberResourcePath)
+          .send(createMemberBodyMissingName)
+          .expect(401);
+
+        return expect(response.statusCode).toBe(401);
+      }
+    );
   });
 });
 
