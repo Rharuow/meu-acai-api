@@ -17,6 +17,7 @@ let accessTokenAsMember: string;
 let refreshTokenAsMember: string;
 
 const memberResourcePath = "/api/v1/resources/users/members";
+const userResourcePath = "/api/v1/resources/users";
 
 let clientReferenceToMember: Client;
 
@@ -161,11 +162,11 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
 describe("TEST TO DELETE MEMBER RESOURCE", () => {
   describe("DELETING MEMBER AS AN ADMIN", () => {
     test(
-      `When an authenticated ADMIN accesses DELETE ${memberResourcePath}/:id ` +
+      `When an authenticated ADMIN accesses DELETE ${userResourcePath}/:id ` +
         "then it should return a 204 status and delete the first member created",
       async () => {
         const response = await request(app)
-          .delete(memberResourcePath + `/${userMemberAdmin.id}`)
+          .delete(userResourcePath + `/${userMemberAdmin.id}`)
           .set("authorization", "Bearer " + accessTokenAsAdmin)
           .set("refreshToken", refreshTokenAsAdmin)
           .expect(204);
@@ -177,11 +178,11 @@ describe("TEST TO DELETE MEMBER RESOURCE", () => {
 
   describe("DELETING MEMBER AS AN CLIENT", () => {
     test(
-      `When an authenticated CLIENT accesses DELETE ${memberResourcePath}/:id ` +
+      `When an authenticated CLIENT accesses DELETE ${userResourcePath}/:id ` +
         "then it should return a 204 status and delete the first member created",
       async () => {
         const response = await request(app)
-          .delete(memberResourcePath + `/${userMemberClient.id}`)
+          .delete(userResourcePath + `/${userMemberClient.id}`)
           .set("authorization", "Bearer " + accessTokenAsClient)
           .set("refreshToken", refreshTokenAsClient)
           .expect(204);

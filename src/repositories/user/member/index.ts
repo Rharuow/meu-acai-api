@@ -8,7 +8,13 @@ export const createMember = async (params: {
   relationship?: string;
 }) => {
   const member = await prismaClient.member.create({
-    data: params,
+    data: {
+      clientId: params.clientId,
+      userId: params.userId,
+      ...(params.email && { email: params.email }),
+      ...(params.phone && { phone: params.phone }),
+      ...(params.relationship && { relationship: params.relationship }),
+    },
   });
 
   return member;

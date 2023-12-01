@@ -73,13 +73,13 @@ model Member {
   id            String      @id @default(uuid())
   createdAt     DateTime    @default(now())
   deletedAt     DateTime?   
+  updatedAt     DateTime    @updatedAt
   email         String?
   phone         String?
-  updatedAt     DateTime    @updatedAt
+  relationship  String?
   userId        String      @unique
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  relationship  String?
-  clientId      String
+  clientId      String      @unique
   client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }
 

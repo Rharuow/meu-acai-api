@@ -7,12 +7,16 @@ import {
 } from "@controllers/user/delete";
 import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
 import { clientRouter } from "./client";
+import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
+import { memberRouter } from "./member";
 
 const userRouter = Router();
 
 userRouter.use("/users", validationAdminAccessToken, adminRouter);
 
 userRouter.use("/users", validationAdminAccessToken, clientRouter);
+
+userRouter.use("/users", validationAdminOrClientAccessToken, memberRouter);
 
 userRouter.delete(
   "/users/deleteMany",

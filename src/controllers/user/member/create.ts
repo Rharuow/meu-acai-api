@@ -11,10 +11,11 @@ export const createMemberController = async (
 ) => {
   try {
     const { user } = req.body;
-    const member = await createMember(req.body);
+    const member = await createMember({ ...req.body, userId: user.id });
 
     return createMemberSerializer({ res, user, member });
   } catch (error) {
+    console.error("Error creating member = ", error);
     // Check if the error is due to a unique constraint violation
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
