@@ -321,7 +321,7 @@ describe("TEST TO DELETE MEMBER RESOURCE", () => {
     );
 
     test(
-      `When an authenticated ADMIN accesses DELETE ${userResourcePath}/:id with inalid id ` +
+      `When an authenticated ADMIN accesses DELETE ${userResourcePath}/:id with invalid id ` +
         "then it should return a 422 status",
       async () => {
         const response = await request(app)
@@ -357,6 +357,19 @@ describe("TEST TO DELETE MEMBER RESOURCE", () => {
           .expect(204);
 
         return expect(response.statusCode).toBe(204);
+      }
+    );
+
+    test(
+      `When an authenticated CLIENT accesses DELETE ${userResourcePath}/:id with invalid id ` +
+        "then it should return a 422 status",
+      async () => {
+        const response = await request(app)
+          .delete(userResourcePath + `/members/some-id-invalid`)
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + refreshTokenAsClient)
+          .expect(422);
+        return expect(response.statusCode).toBe(422);
       }
     );
   });
