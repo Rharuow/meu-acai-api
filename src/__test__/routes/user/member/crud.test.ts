@@ -30,6 +30,14 @@ const createMemberBody = {
   password: "123",
 };
 
+const createMemberBodyMissingName = {
+  password: "123",
+};
+
+const createMemberBodyMissingPassword = {
+  name: "Test Member Created",
+};
+
 let userMemberAdmin: User & { role?: Role } & { client?: Member };
 let userMemberClient: User & { role?: Role } & { client?: Member };
 
@@ -109,6 +117,67 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
         );
         expect(userMemberAdmin.role).toHaveProperty("name", "MEMBER");
         return expect(response.statusCode).toBe(200);
+      }
+    );
+
+    test(
+      `When an authenticated ADMIN accesses POST ${memberResourcePath} ` +
+        "without body data" +
+        "then it shouldn't create a new User and a new Member resource in the database and return 422",
+      async () => {
+        const response = await request(app)
+          .post(memberResourcePath)
+          .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+          .expect(422);
+
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+
+    test(
+      `When an authenticated ADMIN accesses POST ${memberResourcePath} ` +
+        "with body missing password " +
+        "then it shouldn't create a new User and a new Member resource in the database and return 422",
+      async () => {
+        const response = await request(app)
+          .post(memberResourcePath)
+          .send(createMemberBodyMissingPassword)
+          .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+          .expect(422);
+
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+
+    test(
+      `When an authenticated ADMIN accesses POST ${memberResourcePath} ` +
+        "with body missing name " +
+        "then it shouldn't create a new User and a new Member resource in the database and return 422",
+      async () => {
+        const response = await request(app)
+          .post(memberResourcePath)
+          .send(createMemberBodyMissingName)
+          .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+          .expect(422);
+
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+
+    test(
+      `When accesses POST ${memberResourcePath} ` +
+        "without authentication " +
+        "then it shouldn't create a new User and a new Member resource in the database and return 401",
+      async () => {
+        const response = await request(app)
+          .post(memberResourcePath)
+          .send(createMemberBodyMissingName)
+          .expect(401);
+
+        return expect(response.statusCode).toBe(401);
       }
     );
   });

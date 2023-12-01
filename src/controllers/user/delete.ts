@@ -5,7 +5,6 @@ import { Request, Response } from "express";
 
 export const deleteUserController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  console.log("id = ", id);
 
   try {
     await deleteUser({ id });
