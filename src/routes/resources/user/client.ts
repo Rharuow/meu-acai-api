@@ -7,7 +7,7 @@ import {
   validationParams,
   validationQueryParams,
 } from "@middlewares/paramsRouter";
-import { NextFunction, Request, Router } from "express";
+import { Router } from "express";
 import { updateClientController } from "@controllers/user/client/update";
 import { addRoleIdAtBody } from "@middlewares/resources/user/client/addRoleIdAtBody";
 import { addIncludesClientAndRoleAtBody } from "@middlewares/resources/user/client/addIncludesClientAndRoleAtBody";
@@ -19,7 +19,7 @@ import {
   param,
   query,
 } from "express-validator";
-import { addNextToBody } from "@middlewares/resources/user/client/addNextToBody";
+import { addNextToBody } from "@middlewares/addNextToBody";
 import { updateBodyUser } from "@middlewares/resources/user/updateBody";
 
 export const validationCreateClientBodySchema: Schema = {

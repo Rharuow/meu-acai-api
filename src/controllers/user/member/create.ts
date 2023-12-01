@@ -1,23 +1,19 @@
-import { NextFunction, Request, Response } from "express";
-
+import { createMember } from "@repositories/user/member";
+import { createMemberSerializer } from "@serializer/resources/user/member";
 import { unprocessableEntity } from "@serializer/erros/422";
-import { createUser } from "@repositories/user";
-import { CreateUserRequestBody } from "@/types/user/createRequestbody";
+import { Request, Response } from "express";
 import { Prisma, User } from "@prisma/client";
+import { CreateMemberRequestBody } from "@/types/user/member/createRequestBody";
 
-export const createUserController = async (
-  req: Request<{}, {}, CreateUserRequestBody & { user: User }, {}>,
-  res: Response,
-  next: NextFunction
+export const createMemberController = async (
+  req: Request<{}, {}, CreateMemberRequestBody & { user: User }, {}>,
+  res: Response
 ) => {
-  const { name, password, roleId } = req.body as CreateUserRequestBody;
-
   try {
-    const user = await createUser({ name, password, roleId });
+    const { user } = req.body;
+    const member = await createMember(req.body);
 
-    req.body.user = user;
-
-    return next();
+    return createMemberSerializer({ res, user, member });
   } catch (error) {
     // Check if the error is due to a unique constraint violation
     if (
