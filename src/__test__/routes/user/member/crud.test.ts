@@ -311,7 +311,7 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
   });
 });
 
-describe("TEST TO UPDATE MEMBER RESOURCE", () => {
+describe("TEST TO UPDATE MEMBER RESOURCE AS ADMIN", () => {
   test(
     `When an authenticated ADMIN accesses PUT ${userResourcePath}/:userId/members/:id ` +
       'with name "Test Member Edited", ' +
@@ -332,12 +332,14 @@ describe("TEST TO UPDATE MEMBER RESOURCE", () => {
         ...updateMemberBody,
       };
 
+      console.log(response.body.data.user);
+
       expect(response.body.data.user.name).toBe(userMemberAdmin.name);
       expect(response.body.data.user.id).toBe(userMemberAdmin.id);
       expect(
-        response.body.data.user.client.id === response.body.data.user.clientId
+        response.body.data.user.member.id === response.body.data.user.memberId
       ).toBeTruthy();
-      expect(response.body.data.user.client.id).toBe(userMemberAdmin.member.id);
+      expect(response.body.data.user.member.id).toBe(userMemberAdmin.member.id);
       return expect(response.statusCode).toBe(200);
     }
   );

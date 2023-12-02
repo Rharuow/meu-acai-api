@@ -30,3 +30,7 @@ export const updateMember = async ({
     data: fields,
   });
 };
+
+export const getMember = async ({ id }: { id: string }) => {
+  return await prismaClient.member.findUnique({ where: { id } });
+};
