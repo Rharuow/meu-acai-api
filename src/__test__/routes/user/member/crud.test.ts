@@ -374,6 +374,30 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
   });
 });
 
+describe("TEST TO GET MEMBER RESOURCE", () => {
+  describe("GETTING MEMBER AS ADMIN", () => {
+    test(
+      `When an authenticated user as ADMIN access ${userResourcePath}/:userId/members/:id` +
+        "return 200 and the member resource",
+      async () => {
+        const response = await request(app)
+          .get(
+            userResourcePath +
+              `/${userMemberAdmin.id}/members/${userMemberAdmin.member.id}`
+          )
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + accessTokenAsAdmin)
+          .expect(200);
+
+        return expect(response.body.data).toHaveProperty(
+          "name",
+          userMemberAdmin.name
+        );
+      }
+    );
+  });
+});
+
 describe("TEST TO UPDATE MEMBER RESOURCE", () => {
   describe("UPDATING MEMBER RESOURCE AS ADMIN", () => {
     test(

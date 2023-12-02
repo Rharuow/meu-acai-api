@@ -1,5 +1,6 @@
 import { createUserController } from "@controllers/user/create";
 import { deleteUserController } from "@controllers/user/delete";
+import { getUserController } from "@controllers/user/get";
 import { createMemberController } from "@controllers/user/member/create";
 import { updateMemberController } from "@controllers/user/member/update";
 import { updateUserController } from "@controllers/user/update";
@@ -7,6 +8,7 @@ import { addNextToBody } from "@middlewares/addNextToBody";
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationAdminOrMemberAccessToken } from "@middlewares/authorization/validationAdminOrMemberAccessToken";
 import { validationParams } from "@middlewares/paramsRouter";
+import { addIncludesMemberAndRoleAtBody } from "@middlewares/resources/user/member/addIncludesMemberAndRoleAtBody";
 import { addRoleIdAtBody } from "@middlewares/resources/user/member/addRoleIdAtBody";
 import { updateBodyMember } from "@middlewares/resources/user/member/updateBodyUser";
 import { Router } from "express";
@@ -91,6 +93,12 @@ export const validationUpdateMemberBodySchema: Schema = {
 };
 
 const memberRouter = Router();
+
+memberRouter.get(
+  "/:userId/members/:id",
+  addIncludesMemberAndRoleAtBody,
+  getUserController
+);
 
 memberRouter.post(
   "/members",
