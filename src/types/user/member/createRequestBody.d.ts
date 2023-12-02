@@ -3,5 +3,5 @@ export type CreateMemberRequestBody = {
   clientId: string;
   email?: string;
   phone?: string;
-  relationshipt?: string;
+  relationship?: string;
 };

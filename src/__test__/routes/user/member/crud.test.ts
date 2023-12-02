@@ -38,8 +38,14 @@ const createMemberBodyMissingPassword = {
   name: "Test Member Created",
 };
 
-let userMemberAdmin: User & { role?: Role } & { client?: Member };
-let userMemberClient: User & { role?: Role } & { client?: Member };
+const updateMemberBody = {
+  name: "Test Member Edited",
+  email: "test.member@mail.com",
+  phone: "(84)999999999",
+};
+
+let userMemberAdmin: User & { role?: Role } & { member?: Member };
+let userMemberClient: User & { role?: Role } & { member?: Member };
 
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();
@@ -305,6 +311,38 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
   });
 });
 
+describe("TEST TO UPDATE MEMBER RESOURCE", () => {
+  test(
+    `When an authenticated ADMIN accesses PUT ${userResourcePath}/:userId/members/:id ` +
+      'with name "Test Member Edited", ' +
+      "then it should update the User with the new provided information",
+    async () => {
+      const response = await request(app)
+        .put(
+          userResourcePath +
+            `/${userMemberAdmin.id}/members/${userMemberAdmin.member.id}`
+        )
+        .send(updateMemberBody)
+        .set("authorization", "Bearer " + accessTokenAsAdmin)
+        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+        .expect(200);
+
+      userMemberAdmin = {
+        ...userMemberAdmin,
+        ...updateMemberBody,
+      };
+
+      expect(response.body.data.user.name).toBe(userMemberAdmin.name);
+      expect(response.body.data.user.id).toBe(userMemberAdmin.id);
+      expect(
+        response.body.data.user.client.id === response.body.data.user.clientId
+      ).toBeTruthy();
+      expect(response.body.data.user.client.id).toBe(userMemberAdmin.member.id);
+      return expect(response.statusCode).toBe(200);
+    }
+  );
+});
+
 describe("TEST TO DELETE MEMBER RESOURCE", () => {
   describe("DELETING MEMBER AS AN ADMIN", () => {
     test(
@@ -373,6 +411,7 @@ describe("TEST TO DELETE MEMBER RESOURCE", () => {
       }
     );
   });
+
   describe("DELETING MEMBER AS AN MEMBER", () => {
     test(
       `When an authenticated MEMBER accesses DELETE ${userResourcePath}/:id ` +

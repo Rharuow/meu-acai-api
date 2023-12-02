@@ -1,12 +1,8 @@
+import { CreateMemberRequestBody } from "@/types/user/member/createRequestBody";
+import { UpdateMemberRequestBody } from "@/types/user/member/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
 
-export const createMember = async (params: {
-  userId: string;
-  clientId: string;
-  email?: string;
-  phone?: string;
-  relationship?: string;
-}) => {
+export const createMember = async (params: CreateMemberRequestBody) => {
   const member = await prismaClient.member.create({
     data: {
       clientId: params.clientId,
@@ -18,4 +14,19 @@ export const createMember = async (params: {
   });
 
   return member;
+};
+
+export const updateMember = async ({
+  userId,
+  id,
+  fields,
+}: {
+  userId: string;
+  id: string;
+  fields: UpdateMemberRequestBody;
+}) => {
+  return await prismaClient.member.update({
+    where: { userId, id },
+    data: fields,
+  });
 };
