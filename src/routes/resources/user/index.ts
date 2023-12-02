@@ -12,7 +12,7 @@ import { memberRouter } from "./member";
 
 const userRouter = Router();
 
-userRouter.use("/users", validationAdminOrClientAccessToken, memberRouter);
+userRouter.use("/users", memberRouter);
 
 userRouter.use("/users", validationAdminAccessToken, adminRouter);
 

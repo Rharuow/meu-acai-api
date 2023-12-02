@@ -34,3 +34,31 @@ export const updateMember = async ({
 export const getMember = async ({ id }: { id: string }) => {
   return await prismaClient.member.findUnique({ where: { id } });
 };
+
+export const findMember = async (params: {
+  name?: string;
+  userId?: string;
+  id?: string;
+}) => {
+  if (params.hasOwnProperty("name")) {
+    const user = await prismaClient.user.findUnique({
+      where: {
+        name: params.name,
+      },
+      include: {
+        member: true,
+      },
+    });
+
+    return user.member;
+  }
+
+  const member = await prismaClient.member.findUnique({
+    where: {
+      ...(params.userId && { userId: params.userId }),
+      ...(params.id && { id: params.id }),
+    },
+  });
+
+  return member;
+};

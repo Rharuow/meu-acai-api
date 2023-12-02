@@ -255,7 +255,7 @@ describe("CRUD TO CLIENT RESOURCE", () => {
   test(
     "When an authenticated client accesses PUT /api/v1/resources/users/:userId/clients/:id " +
       "without body" +
-      "then it shouldn't update the User with the new provided information and return 422",
+      "then it shouldn't update the User with the new provided information and return 400",
     async () => {
       const response = await request(app)
         .put(

@@ -7,9 +7,16 @@ import {
 } from "@/__test__/utils/users";
 import { app } from "@/app";
 import { Client, Member, Role, User } from "@prisma/client";
-import { getUserByNameAndPassword } from "@repositories/user";
+import {
+  createUser,
+  deleteManyUser,
+  deleteUser,
+  getUserByNameAndPassword,
+} from "@repositories/user";
 import { encodeSha256 } from "@libs/crypto";
 import { prismaClient } from "@libs/prisma";
+import { createClient } from "@repositories/user/client";
+import { createAddress } from "@repositories/address";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -23,7 +30,8 @@ let refreshTokenAsMember: string;
 const memberResourcePath = "/api/v1/resources/users/members";
 const userResourcePath = "/api/v1/resources/users";
 
-let clientReferenceToMember: Client;
+let clientReferenceToMemberAsAdmin: Client;
+let clientReferenceToMemberAsClient: Client;
 
 const createMemberBody = {
   name: "Test Member Created",
@@ -49,7 +57,36 @@ let userMemberClient: User & { role?: Role } & { member?: Member };
 
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();
-  clientReferenceToMember = await prismaClient.client.findFirst();
+  const roleClientId = (
+    await prismaClient.role.findUnique({
+      where: {
+        name: "CLIENT",
+      },
+    })
+  ).id;
+
+  const userToMemberCreatedByAdmin = await createUser({
+    name: "Test client reference to member created by Admin",
+    password: "123",
+    roleId: roleClientId,
+  });
+
+  clientReferenceToMemberAsAdmin = await createClient({
+    address: { house: "10", square: "10" },
+    userId: userToMemberCreatedByAdmin.id,
+  });
+
+  const userToMemberCreatedByClient = await createUser({
+    name: "Test client reference to member created by Client",
+    password: "123",
+    roleId: roleClientId,
+  });
+
+  clientReferenceToMemberAsClient = await createClient({
+    address: { house: "11", square: "11" },
+    userId: userToMemberCreatedByClient.id,
+  });
+
   const responseSignInAsAdmin = await request(app)
     .post("/api/v1/signin")
     .send(userAsAdmin)
@@ -58,7 +95,10 @@ beforeAll(async () => {
 
   const responseSignInAsClient = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send({
+      name: "Test client reference to member created by Client",
+      password: "123",
+    })
     .set("Accept", "application/json")
     .expect(200);
 
@@ -78,6 +118,29 @@ beforeAll(async () => {
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
 });
 
+afterAll(async () => {
+  await prismaClient.user.deleteMany({
+    where: {
+      id: {
+        in: [
+          clientReferenceToMemberAsAdmin.userId,
+          clientReferenceToMemberAsClient.userId,
+        ],
+      },
+    },
+  });
+  await prismaClient.address.deleteMany({
+    where: {
+      house: {
+        in: ["10", "11"],
+      },
+      square: {
+        in: ["10", "11"],
+      },
+    },
+  });
+});
+
 describe("TEST TO CREATE MEMBER RESOURCE", () => {
   // CREATE
   describe("CREATING MEMBER AS AN ADMIN", () => {
@@ -91,7 +154,7 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
           .send({
             ...createMemberBody,
             name: "Test Member Created For Admin",
-            clientId: clientReferenceToMember.id,
+            clientId: clientReferenceToMemberAsAdmin.id,
           })
           .set("authorization", `Bearer ${accessTokenAsAdmin}`)
           .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
@@ -311,38 +374,135 @@ describe("TEST TO CREATE MEMBER RESOURCE", () => {
   });
 });
 
-describe("TEST TO UPDATE MEMBER RESOURCE AS ADMIN", () => {
-  test(
-    `When an authenticated ADMIN accesses PUT ${userResourcePath}/:userId/members/:id ` +
-      'with name "Test Member Edited", ' +
-      "then it should update the User with the new provided information",
-    async () => {
-      const response = await request(app)
-        .put(
-          userResourcePath +
-            `/${userMemberAdmin.id}/members/${userMemberAdmin.member.id}`
-        )
-        .send(updateMemberBody)
-        .set("authorization", "Bearer " + accessTokenAsAdmin)
-        .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-        .expect(200);
+describe("TEST TO UPDATE MEMBER RESOURCE", () => {
+  describe("UPDATING MEMBER RESOURCE AS ADMIN", () => {
+    test(
+      `When an authenticated ADMIN accesses PUT ${userResourcePath}/:userId/members/:id ` +
+        'with name "Test Member Edited", ' +
+        "then it should update the User with the new provided information",
+      async () => {
+        const response = await request(app)
+          .put(
+            userResourcePath +
+              `/${userMemberAdmin.id}/members/${userMemberAdmin.member.id}`
+          )
+          .send(updateMemberBody)
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+          .expect(200);
 
-      userMemberAdmin = {
-        ...userMemberAdmin,
-        ...updateMemberBody,
-      };
+        userMemberAdmin = {
+          ...userMemberAdmin,
+          ...updateMemberBody,
+        };
 
-      console.log(response.body.data.user);
+        expect(response.body.data.user.name).toBe(userMemberAdmin.name);
+        expect(response.body.data.user.id).toBe(userMemberAdmin.id);
+        expect(
+          response.body.data.user.member.id === response.body.data.user.memberId
+        ).toBeTruthy();
+        expect(response.body.data.user.member.id).toBe(
+          userMemberAdmin.member.id
+        );
+        return expect(response.statusCode).toBe(200);
+      }
+    );
 
-      expect(response.body.data.user.name).toBe(userMemberAdmin.name);
-      expect(response.body.data.user.id).toBe(userMemberAdmin.id);
-      expect(
-        response.body.data.user.member.id === response.body.data.user.memberId
-      ).toBeTruthy();
-      expect(response.body.data.user.member.id).toBe(userMemberAdmin.member.id);
-      return expect(response.statusCode).toBe(200);
-    }
-  );
+    test(
+      `When an authenticated ADMIN accesses PUT ${userResourcePath}/:userId/members/:id ` +
+        "without body" +
+        "then it shouldn't update the User with the new provided information and return 400",
+      async () => {
+        const response = await request(app)
+          .put(
+            userResourcePath +
+              `/${userMemberAdmin.id}/members/${userMemberAdmin.member.id}`
+          )
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+          .expect(400);
+
+        return expect(response.statusCode).toBe(400);
+      }
+    );
+
+    test(
+      `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/members/:id ` +
+        "with valid body" +
+        "then it shouldn't update the User with the new provided information and return 401",
+      async () => {
+        const response = await request(app)
+          .put(
+            userResourcePath +
+              `/${userMemberAdmin.id}/members/${userMemberAdmin.member.id}`
+          )
+          .send(updateMemberBody)
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + refreshTokenAsClient)
+          .expect(401);
+
+        return expect(response.statusCode).toBe(401);
+      }
+    );
+
+    test(
+      `When an authenticated ADMIN accesses PUT ${userResourcePath}/:userId/members/:id ` +
+        "with valid body and invalid memberId" +
+        "then it shouldn't update the User with the new provided information and return 422",
+      async () => {
+        const response = await request(app)
+          .put(
+            userResourcePath +
+              `/${userMemberAdmin.id}/members/invalid-member-id`
+          )
+          .send(updateMemberBody)
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+          .expect(422);
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+
+    test(
+      `When an authenticated ADMIN accesses PUT ${userResourcePath}/:userId/members/:id ` +
+        "with valid body and invalid userId" +
+        "then it shouldn't update the User with the new provided information and return 422",
+      async () => {
+        const response = await request(app)
+          .put(
+            userResourcePath +
+              `/invalid-user-id/members/${userMemberAdmin.memberId}`
+          )
+          .send(updateMemberBody)
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+          .expect(422);
+
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+  });
+
+  describe("UPDATING MEMBER RESOURCE AS CLIENT", () => {
+    test(
+      `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/members/:id ` +
+        'with name "Test Member Edited", ' +
+        "should return 401",
+      async () => {
+        const response = await request(app)
+          .put(
+            userResourcePath +
+              `/${userMemberAdmin.id}/members/${userMemberAdmin.member.id}`
+          )
+          .send(updateMemberBody)
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + refreshTokenAsClient)
+          .expect(401);
+
+        return expect(response.statusCode).toBe(401);
+      }
+    );
+  });
 });
 
 describe("TEST TO DELETE MEMBER RESOURCE", () => {

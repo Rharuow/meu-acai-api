@@ -11,7 +11,11 @@ export const createMemberController = async (
 ) => {
   try {
     const { user } = req.body;
-    const member = await createMember({ ...req.body, userId: user.id });
+    const member = await createMember({
+      ...req.body,
+      userId: user.id,
+      clientId: req.body.clientId,
+    });
 
     return createMemberSerializer({ res, user, member });
   } catch (error) {

@@ -5,6 +5,7 @@ import { updateMemberController } from "@controllers/user/member/update";
 import { updateUserController } from "@controllers/user/update";
 import { addNextToBody } from "@middlewares/addNextToBody";
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
+import { validationAdminOrMemberAccessToken } from "@middlewares/authorization/validationAdminOrMemberAccessToken";
 import { validationParams } from "@middlewares/paramsRouter";
 import { addRoleIdAtBody } from "@middlewares/resources/user/member/addRoleIdAtBody";
 import { updateBodyMember } from "@middlewares/resources/user/member/updateBodyUser";
@@ -94,6 +95,7 @@ const memberRouter = Router();
 memberRouter.post(
   "/members",
   addRoleIdAtBody,
+  validationAdminOrClientAccessToken,
   checkExact(
     [
       checkSchema(validationCreateMemberBodySchema, ["body"]),
@@ -112,6 +114,7 @@ memberRouter.post(
 
 memberRouter.put(
   "/:userId/members/:id",
+  validationAdminOrMemberAccessToken,
   checkExact(
     [
       checkSchema(validationUpdateMemberBodySchema, ["body"]),
