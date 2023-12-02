@@ -373,4 +373,31 @@ describe("TEST TO DELETE MEMBER RESOURCE", () => {
       }
     );
   });
+  describe("DELETING MEMBER AS AN MEMBER", () => {
+    test(
+      `When an authenticated MEMBER accesses DELETE ${userResourcePath}/:id ` +
+        "then it should return a 401 status",
+      async () => {
+        const response = await request(app)
+          .delete(userResourcePath + `/${userMemberClient.id}`)
+          .set("authorization", "Bearer " + accessTokenAsMember)
+          .set("refreshToken", "Bearer " + refreshTokenAsMember)
+          .expect(401);
+        return expect(response.statusCode).toBe(401);
+      }
+    );
+
+    test(
+      `When an authenticated MEMBER accesses DELETE ${userResourcePath}/members/:id ` +
+        "then it should return a 401 status",
+      async () => {
+        const response = await request(app)
+          .delete(userResourcePath + `/members/${userMemberClient.id}`)
+          .set("authorization", "Bearer " + accessTokenAsMember)
+          .set("refreshToken", "Bearer " + refreshTokenAsMember)
+          .expect(401);
+        return expect(response.statusCode).toBe(401);
+      }
+    );
+  });
 });

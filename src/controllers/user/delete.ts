@@ -11,7 +11,6 @@ export const deleteUserController = async (req: Request, res: Response) => {
 
     return res.status(204).send("cream is deleted");
   } catch (error) {
-    console.log("error: " + error);
     return unprocessableEntity(res);
   }
 };
