@@ -130,7 +130,7 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Test for failed cases in UPDATE a Client
             - [x] Test to GET Client
             - [x] Test for failed cases in GET a Client
-            - [ ] Test to LIST Client
+            - [x] Test to LIST Client
             - [ ] Test for failed cases in LIST a Client
             - [x] Test to DELETE Client
             - [x] Test for failed cases in DELETE a Client
@@ -168,7 +168,7 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Router to update ADMIN
             - [x] Router to get ADMIN
             - [x] Router to list with pagination and filters ADMIN
-            - [x] Router to delete ADMIN
+            - [x] Router to delete many ADMIN
         - **CLIENT**
           - **IMPROVEMENTS:**
             - [x] Client Model in Schema
@@ -177,6 +177,7 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Router to get Client
             - [x] Router to list with pagination and filters Client
             - [x] Router to delete Client
+            - [x] Router to delete many Client
         - **MEMBER**
           - **IMPROVEMENTS:**
             - [x] Member Model in Schema
@@ -184,7 +185,7 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Router to update Member
             - [x] Router to get Member
             - [x] Router to list with pagination and filters Member
-            - [x] Router to delete Member
+            - [ ] Router to delete many Member
       - **CREAM:**
         - **IMPROVEMENTS:**
           - [x] Cream Model in Schema

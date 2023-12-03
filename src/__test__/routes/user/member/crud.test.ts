@@ -17,6 +17,7 @@ import { encodeSha256 } from "@libs/crypto";
 import { prismaClient } from "@libs/prisma";
 import { createClient } from "@repositories/user/client";
 import { createAddress } from "@repositories/address";
+import { isBooleanAttribute } from "@/__test__/utils/isBooleanAttribute";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -519,7 +520,7 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
     test(
       `When an authenticated ADMIN accesses the GET endpoint ${memberResourcePath} ` +
         " without any query parameters, " +
-        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where the first member is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'perPage' attribute with a value of 10, and the 'nextPage' attribute with a boolean value.",
+        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where the first member is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
       async () => {
         const response = await request(app)
           .get(memberResourcePath)
@@ -527,7 +528,19 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
           .set("refreshToken", "Bearer " + accessTokenAsAdmin)
           .expect(200);
 
-        return expect(response.statusCode).toBe(200);
+        console.log(response.body);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("data");
+        expect(response.body.data).toHaveProperty("length");
+        expect(response.body.data.length).toBeLessThanOrEqual(10);
+        expect(response.body).toHaveProperty("page", 1);
+        expect(response.body).toHaveProperty("totalPages");
+        expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
+        expect(response.body).toHaveProperty("hasNextPage");
+        return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
+          true
+        );
       }
     );
   });
