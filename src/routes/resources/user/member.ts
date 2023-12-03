@@ -108,8 +108,8 @@ memberRouter.get(
 
 memberRouter.get(
   "/members",
-  validationUserAccessToken,
   validationQueryParams,
+  validationUserAccessToken,
   addIncludesMemberAtQuery,
   listUserController
 );

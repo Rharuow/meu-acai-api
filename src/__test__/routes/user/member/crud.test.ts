@@ -56,6 +56,8 @@ const updateMemberBody = {
 let userMemberAdmin: User & { role?: Role } & { member?: Member };
 let userMemberClient: User & { role?: Role } & { member?: Member };
 
+let clientAuthenticated: User & { role?: Role } & { client?: Client };
+
 beforeAll(async () => {
   await createAllKindOfUserAndRoles();
   const roleClientId = (
@@ -102,6 +104,8 @@ beforeAll(async () => {
     })
     .set("Accept", "application/json")
     .expect(200);
+
+  clientAuthenticated = responseSignInAsClient.body.user;
 
   const responseSignInAsMember = await request(app)
     .post("/api/v1/signin")
@@ -544,7 +548,7 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
 
     test(
       `When an authenticated ADMIN accesses the GET endpoint ${memberResourcePath}?page=2&perPage=5` +
-        " without any query parameters, " +
+        " with query parameters, page=2 and perPage=5 " +
         "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 5 members, where the first member is included. Additionally, the response should include the 'page' attribute with a value of 2, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
       async () => {
         const response = await request(app)
@@ -568,9 +572,9 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
     );
 
     test(
-      `When an authenticated ADMIN accesses the GET endpoint ${memberResourcePath}?page=1&perPage=10` +
-        " without any query parameters, " +
-        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where the first member is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
+      `When an authenticated ADMIN accesses the GET endpoint ${memberResourcePath}?page=1&perPage=10&filter=name:like:Test Member Created For Admin` +
+        " with query parameters, " +
+        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where the member with name 'Test Member Created For Admin' is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
       async () => {
         const response = await request(app)
           .get(
@@ -609,6 +613,115 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
         const response = await request(app).get(memberResourcePath).expect(401);
 
         return expect(response.statusCode).toBe(401);
+      }
+    );
+  });
+
+  describe("LISTING MEMBER AS CLIENT", () => {
+    test(
+      `When an authenticated CLIENT accesses the GET endpoint ${memberResourcePath} ` +
+        " without any query parameters, " +
+        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where just yourself members is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
+      async () => {
+        const response = await request(app)
+          .get(
+            memberResourcePath + "?filter=name:Test Member Created For Admin"
+          )
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + accessTokenAsClient)
+          .expect(200);
+
+        const usersWithClientAndMember = await prismaClient.user.findUnique({
+          where: {
+            id: clientAuthenticated.id,
+          },
+          include: {
+            client: {
+              include: {
+                members: true,
+              },
+            },
+          },
+        });
+
+        // console.log("DEBUG LOGGED CLIENT = ", clientAuthenticated);
+        // console.log(
+        //   "DEBUG REFERENCE CLIENT = ",
+        //   usersWithClientAndMember.client
+        // );
+
+        console.log("DEBUG DATA = ", response.body.data);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("data");
+        expect(response.body.data).toHaveProperty("length");
+        expect(response.body.data.length).toBeLessThanOrEqual(10);
+        expect(response.body).toHaveProperty("page", 1);
+        expect(response.body).toHaveProperty("totalPages");
+        expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
+        expect(response.body).toHaveProperty("hasNextPage");
+        return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
+          true
+        );
+      }
+    );
+
+    test(
+      `When an authenticated CLIENT accesses the GET endpoint ${memberResourcePath}?page=2&perPage=5` +
+        " with query parameters, page=2 and perPage=5 " +
+        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 5 members, where the first member is included. Additionally, the response should include the 'page' attribute with a value of 2, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
+      async () => {
+        const response = await request(app)
+          .get(memberResourcePath + "?page=2&perPage=5")
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + accessTokenAsAdmin)
+          .expect(200);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("data");
+        expect(response.body.data).toHaveProperty("length");
+        expect(response.body.data.length).toBeLessThanOrEqual(5);
+        expect(response.body).toHaveProperty("page", 2);
+        expect(response.body).toHaveProperty("totalPages");
+        expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
+        expect(response.body).toHaveProperty("hasNextPage");
+        return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
+          true
+        );
+      }
+    );
+
+    test(
+      `When an authenticated CLIENT accesses the GET endpoint ${memberResourcePath}?page=1&perPage=10&filter=name:like:Test Member Created For Admin` +
+        " with query parameters, " +
+        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where the member with name 'Test Member Created For Admin' is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
+      async () => {
+        const response = await request(app)
+          .get(
+            memberResourcePath +
+              "?page=1&perPage=10&filter=name:like:Test Member Created For Admin"
+          )
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + accessTokenAsAdmin)
+          .expect(200);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("data");
+        expect(response.body.data).toHaveProperty("length");
+        expect(response.body.data.length).toBeLessThanOrEqual(10);
+        expect(response.body).toHaveProperty("page", 1);
+        expect(response.body).toHaveProperty("totalPages");
+        expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
+        expect(response.body).toHaveProperty("hasNextPage");
+        expect(
+          response.body.data.some(
+            (member: User & { member: Member }) =>
+              member.name === "Test Member Created For Admin"
+          )
+        ).toBeTruthy();
+        return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
+          true
+        );
       }
     );
   });

@@ -1,11 +1,11 @@
 import { unauthorized } from "@serializer/erros/401";
 import { Role, User } from "@prisma/client";
-import { getUser, getUserByNameAndPassword } from "@repositories/user";
+import { ParamsUser, getUser } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 import { VerifyErrors, verify } from "jsonwebtoken";
 
 export const validationUserAccessToken = async (
-  req: Request,
+  req: Request<{}, {}, {}, qs.ParsedQs & ParamsUser>,
   res: Response,
   next: NextFunction
 ) => {
@@ -34,6 +34,23 @@ export const validationUserAccessToken = async (
     });
 
     if (!user) return unauthorized(res);
+
+    // if (user.role.name === "CLIENT") {
+    //   req.query.includeNested = {
+    //     role: true,
+    //     client: {
+    //       include: {
+    //         members: true,
+    //       },
+    //     },
+    //     member: true,
+    //   };
+    //   req.query.filter = `${
+    //     req.query.filter ? req.query.filter + `,id:${user.id}` : `id:${user.id}`
+    //   }`;
+
+    //   console.log(req.query);
+    // }
 
     return next();
   } catch (error) {
