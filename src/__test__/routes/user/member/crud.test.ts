@@ -514,6 +514,25 @@ describe("TEST TO GET MEMBER RESOURCE", () => {
   });
 });
 
+describe("TEST TO LIST MEMBERS RESOURCE", () => {
+  describe("LISTING MEMBER AS ADMIN", () => {
+    test(
+      `When an authenticated ADMIN accesses the GET endpoint ${memberResourcePath} ` +
+        " without any query parameters, " +
+        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where the first member is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'perPage' attribute with a value of 10, and the 'nextPage' attribute with a boolean value.",
+      async () => {
+        const response = await request(app)
+          .get(memberResourcePath)
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + accessTokenAsAdmin)
+          .expect(200);
+
+        return expect(response.statusCode).toBe(200);
+      }
+    );
+  });
+});
+
 describe("TEST TO UPDATE MEMBER RESOURCE", () => {
   describe("UPDATING MEMBER RESOURCE AS ADMIN", () => {
     test(
