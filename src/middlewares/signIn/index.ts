@@ -1,7 +1,7 @@
 import { getUserByNameAndPassword } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 
-export const validationUserAccessToken = async (
+export const validationUser = async (
   req: Request,
   res: Response,
   next: NextFunction

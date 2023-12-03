@@ -8,6 +8,7 @@ import { updateUserController } from "@controllers/user/update";
 import { addNextToBody } from "@middlewares/addNextToBody";
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationAdminOrMemberAccessToken } from "@middlewares/authorization/validationAdminOrMemberAccessToken";
+import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
 import {
   validationParams,
   validationQueryParams,
@@ -107,6 +108,7 @@ memberRouter.get(
 
 memberRouter.get(
   "/members",
+  validationUserAccessToken,
   validationQueryParams,
   addIncludesMemberAtQuery,
   listUserController

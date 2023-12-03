@@ -528,8 +528,6 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
           .set("refreshToken", "Bearer " + accessTokenAsAdmin)
           .expect(200);
 
-        console.log(response.body);
-
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty("data");
         expect(response.body.data).toHaveProperty("length");
@@ -541,6 +539,16 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
         return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
           true
         );
+      }
+    );
+    test(
+      `When acess the GET endpoint ${memberResourcePath} ` +
+        "without authentication " +
+        "the expected behavior is to return a status code of 401.",
+      async () => {
+        const response = await request(app).get(memberResourcePath).expect(401);
+
+        return expect(response.statusCode).toBe(401);
       }
     );
   });
