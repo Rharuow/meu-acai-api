@@ -1,14 +1,19 @@
 import { createUserController } from "@controllers/user/create";
 import { deleteUserController } from "@controllers/user/delete";
 import { getUserController } from "@controllers/user/get";
+import { listUserController } from "@controllers/user/list";
 import { createMemberController } from "@controllers/user/member/create";
 import { updateMemberController } from "@controllers/user/member/update";
 import { updateUserController } from "@controllers/user/update";
 import { addNextToBody } from "@middlewares/addNextToBody";
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationAdminOrMemberAccessToken } from "@middlewares/authorization/validationAdminOrMemberAccessToken";
-import { validationParams } from "@middlewares/paramsRouter";
+import {
+  validationParams,
+  validationQueryParams,
+} from "@middlewares/paramsRouter";
 import { addIncludesMemberAndRoleAtBody } from "@middlewares/resources/user/member/addIncludesMemberAndRoleAtBody";
+import { addIncludesMemberAtQuery } from "@middlewares/resources/user/member/addIncludesMemberAtQuery";
 import { addRoleIdAtBody } from "@middlewares/resources/user/member/addRoleIdAtBody";
 import { updateBodyMember } from "@middlewares/resources/user/member/updateBodyUser";
 import { Router } from "express";
@@ -98,6 +103,13 @@ memberRouter.get(
   "/:userId/members/:id",
   addIncludesMemberAndRoleAtBody,
   getUserController
+);
+
+memberRouter.get(
+  "/members",
+  validationQueryParams,
+  addIncludesMemberAtQuery,
+  listUserController
 );
 
 memberRouter.post(
