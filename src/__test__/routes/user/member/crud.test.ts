@@ -380,6 +380,7 @@ describe("TEST TO GET MEMBER RESOURCE", () => {
       `When an authenticated user as ADMIN access ${userResourcePath}/:userId/members/:id` +
         "return 200 and the member resource",
       async () => {
+        console.log(userMemberAdmin);
         const response = await request(app)
           .get(
             userResourcePath +
@@ -389,9 +390,33 @@ describe("TEST TO GET MEMBER RESOURCE", () => {
           .set("refreshToken", "Bearer " + accessTokenAsAdmin)
           .expect(200);
 
-        return expect(response.body.data).toHaveProperty(
+        expect(response.body).toHaveProperty("data");
+        expect(response.body.data).toHaveProperty("user");
+        expect(response.body.data.user).toHaveProperty(
+          "id",
+          userMemberAdmin.id
+        );
+        expect(response.body.data.user).toHaveProperty("role");
+        expect(response.body.data.user.role).toHaveProperty(
+          "name",
+          userMemberAdmin.role.name
+        );
+        expect(response.body.data.user).toHaveProperty("member");
+        expect(response.body.data.user.member).toHaveProperty(
+          "id",
+          userMemberAdmin.member.id
+        );
+        expect(response.body.data.user.member).toHaveProperty(
+          "userId",
+          userMemberAdmin.member.userId
+        );
+        expect(response.body.data.user).toHaveProperty(
           "name",
           userMemberAdmin.name
+        );
+        return expect(response.body.data.user).toHaveProperty(
+          "id",
+          userMemberAdmin.id
         );
       }
     );
