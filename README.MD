@@ -2,6 +2,50 @@
 
 Meu Açai API is a robust RESTful backend designed to power two distinct front-end applications: a customer app and an admin app, both centered around the delightful world of "Meu Açai." This project not only serves the purpose of providing data to the front-end interfaces but also showcases the developer's expertise in backend development using NodeJS and Express.
 
+## Clone, Install And Run
+
+To get started with the Meu Açai API, follow these steps:
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/Rharuow/meu-acai-api.git
+
+   ```
+
+1. **Navigate to the project directory:**
+
+   ```bash
+   cd meu-acai-api
+
+   ```
+
+1. **Install the project dependencies:**
+
+   ```bash
+   npm install
+
+   ```
+
+1. **You're now ready to run the project! Use the appropriate command to start the serve:**
+
+   ```bash
+    # For development
+    npm run dev
+
+    # For production
+
+    npm run start
+
+    # For test
+
+    npm run test
+
+    # For build
+
+    npm run build
+   ```
+
 ## Features
 
 - **Seamless Integration:**
