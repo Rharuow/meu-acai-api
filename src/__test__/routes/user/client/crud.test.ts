@@ -224,7 +224,7 @@ describe("CRUD TO CLIENT RESOURCE", () => {
 
   // UPDATE
   test(
-    "When an authenticated admin accesses PUT /api/v1/resources/users/:userId/clients/:id " +
+    "When an authenticated ADMIN accesses PUT /api/v1/resources/users/:userId/clients/:id " +
       'with name "Test Client Edited", ' +
       "then it should update the User with the new provided information",
     async () => {
@@ -253,7 +253,7 @@ describe("CRUD TO CLIENT RESOURCE", () => {
   );
 
   test(
-    "When an authenticated client accesses PUT /api/v1/resources/users/:userId/clients/:id " +
+    "When an authenticated CLIENT accesses PUT /api/v1/resources/users/:userId/clients/:id " +
       "without body" +
       "then it shouldn't update the User with the new provided information and return 400",
     async () => {
@@ -269,6 +269,7 @@ describe("CRUD TO CLIENT RESOURCE", () => {
     }
   );
 
+  // TO-DO: REFACTOR
   test(
     "When an authenticated CLIENT accesses PUT /api/v1/resources/users/:userId/clients/:id " +
       'with name "Test Client Edited", ' +
