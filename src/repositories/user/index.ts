@@ -190,9 +190,11 @@ export const listUsers: (params: ParamsUser) => Promise<
     >,
     number
   ]
-> = async ({ page, perPage, orderBy, filter, includes }) => {
+> = async ({ page, perPage, orderBy, filter, includes, customFilter }) => {
   const [fieldOrderBy, order] = orderBy.split(":");
-  const where = filter && createListQuery({ filterFields: filter.split(",") });
+  const where = customFilter
+    ? customFilter
+    : filter && createListQuery({ filterFields: filter.split(",") });
   // create a string reference to save in memory the list of admins
   const reference = createListReferenceMemoryCacheQuery({
     referenceString: (includes && includes.toLowerCase()) || "users",
@@ -201,6 +203,7 @@ export const listUsers: (params: ParamsUser) => Promise<
       perPage,
       orderBy,
       filter,
+      ...(customFilter && { query: JSON.stringify(customFilter) }),
     },
   });
 

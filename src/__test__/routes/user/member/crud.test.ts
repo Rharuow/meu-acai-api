@@ -55,6 +55,9 @@ const updateMemberBody = {
 
 let userMemberAdmin: User & { role?: Role } & { member?: Member };
 let userMemberClient: User & { role?: Role } & { member?: Member };
+let usersWithClientAndMember: User & {
+  client: Client & { members: Array<Member> };
+};
 
 let clientAuthenticated: User & { role?: Role } & { client?: Client };
 
@@ -621,17 +624,15 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
     test(
       `When an authenticated CLIENT accesses the GET endpoint ${memberResourcePath} ` +
         " without any query parameters, " +
-        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where just yourself members is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
+        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where only its own member is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
       async () => {
         const response = await request(app)
-          .get(
-            memberResourcePath + "?filter=name:Test Member Created For Admin"
-          )
+          .get(memberResourcePath)
           .set("authorization", "Bearer " + accessTokenAsClient)
           .set("refreshToken", "Bearer " + accessTokenAsClient)
           .expect(200);
 
-        const usersWithClientAndMember = await prismaClient.user.findUnique({
+        usersWithClientAndMember = await prismaClient.user.findUnique({
           where: {
             id: clientAuthenticated.id,
           },
@@ -644,14 +645,6 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
           },
         });
 
-        // console.log("DEBUG LOGGED CLIENT = ", clientAuthenticated);
-        // console.log(
-        //   "DEBUG REFERENCE CLIENT = ",
-        //   usersWithClientAndMember.client
-        // );
-
-        console.log("DEBUG DATA = ", response.body.data);
-
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty("data");
         expect(response.body.data).toHaveProperty("length");
@@ -660,6 +653,12 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
         expect(response.body).toHaveProperty("totalPages");
         expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
         expect(response.body).toHaveProperty("hasNextPage");
+        expect(
+          response.body.data.every(
+            (user: User & { member: Member }) =>
+              user.member.clientId === usersWithClientAndMember.clientId
+          )
+        ).toBeTruthy();
         return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
           true
         );
@@ -669,12 +668,12 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
     test(
       `When an authenticated CLIENT accesses the GET endpoint ${memberResourcePath}?page=2&perPage=5` +
         " with query parameters, page=2 and perPage=5 " +
-        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 5 members, where the first member is included. Additionally, the response should include the 'page' attribute with a value of 2, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
+        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 5 members, where only its own member is included. Additionally, the response should include the 'page' attribute with a value of 2, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
       async () => {
         const response = await request(app)
           .get(memberResourcePath + "?page=2&perPage=5")
-          .set("authorization", "Bearer " + accessTokenAsAdmin)
-          .set("refreshToken", "Bearer " + accessTokenAsAdmin)
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + accessTokenAsClient)
           .expect(200);
 
         expect(response.statusCode).toBe(200);
@@ -685,6 +684,13 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
         expect(response.body).toHaveProperty("totalPages");
         expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
         expect(response.body).toHaveProperty("hasNextPage");
+
+        expect(
+          response.body.data.every(
+            (user: User & { member: Member }) =>
+              user.member.clientId === usersWithClientAndMember.clientId
+          )
+        ).toBeTruthy();
         return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
           true
         );
@@ -692,17 +698,17 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
     );
 
     test(
-      `When an authenticated CLIENT accesses the GET endpoint ${memberResourcePath}?page=1&perPage=10&filter=name:like:Test Member Created For Admin` +
+      `When an authenticated CLIENT accesses the GET endpoint ${memberResourcePath}?page=1&perPage=10&filter=name:like:Test Member Created For Client` +
         " with query parameters, " +
-        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where the member with name 'Test Member Created For Admin' is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
+        "the expected behavior is to return a status code of 200. The response body should contain a 'data' object with an array of up to 10 members, where only its own member with name 'Test Member Created For Client' is included. Additionally, the response should include the 'page' attribute with a value of 1, the 'totalPages' attribute with a value biggest than 1, and the 'hasNextPage' attribute with a boolean value.",
       async () => {
         const response = await request(app)
           .get(
             memberResourcePath +
-              "?page=1&perPage=10&filter=name:like:Test Member Created For Admin"
+              "?page=1&perPage=10&filter=name:like:Test Member Created For Client"
           )
-          .set("authorization", "Bearer " + accessTokenAsAdmin)
-          .set("refreshToken", "Bearer " + accessTokenAsAdmin)
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + accessTokenAsClient)
           .expect(200);
 
         expect(response.statusCode).toBe(200);
@@ -716,7 +722,7 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
         expect(
           response.body.data.some(
             (member: User & { member: Member }) =>
-              member.name === "Test Member Created For Admin"
+              member.name === "Test Member Created For Client"
           )
         ).toBeTruthy();
         return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(

@@ -1,8 +1,11 @@
+import { ROLE } from "@prisma/client";
+
 export type Params = {
   page: number;
   perPage: number;
   orderBy: string;
   filter?: string;
+  customFilter?: {};
 };
 
 type WhereType = {
@@ -40,7 +43,7 @@ export const createReferenceMemoryCacheQuery = ({
   referenceString,
 }: {
   referenceString: string;
-  params: Params;
+  params: Params & { query?: string };
 }) => {
   referenceString = referenceString.concat(
     "-",
@@ -50,7 +53,9 @@ export const createReferenceMemoryCacheQuery = ({
     "-",
     String(params.orderBy),
     "-",
-    String(params.filter)
+    String(params.filter),
+    "-",
+    String(params.query)
   );
 
   return referenceString;

@@ -3,6 +3,7 @@ import { Role, User } from "@prisma/client";
 import { ParamsUser, getUser } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 import { VerifyErrors, verify } from "jsonwebtoken";
+import { prismaClient } from "@libs/prisma";
 
 export const validationUserAccessToken = async (
   req: Request<{}, {}, {}, qs.ParsedQs & ParamsUser>,
@@ -35,22 +36,26 @@ export const validationUserAccessToken = async (
 
     if (!user) return unauthorized(res);
 
-    // if (user.role.name === "CLIENT") {
-    //   req.query.includeNested = {
-    //     role: true,
-    //     client: {
-    //       include: {
-    //         members: true,
-    //       },
-    //     },
-    //     member: true,
-    //   };
-    //   req.query.filter = `${
-    //     req.query.filter ? req.query.filter + `,id:${user.id}` : `id:${user.id}`
-    //   }`;
+    if (user.role.name === "CLIENT") {
+      const userWithMember = await prismaClient.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          client: {
+            include: {
+              members: true,
+            },
+          },
+        },
+      });
 
-    //   console.log(req.query);
-    // }
+      req.query.customFilter = {
+        id: {
+          in: userWithMember.client.members.map((member) => member.userId),
+        },
+      };
+    }
 
     return next();
   } catch (error) {
