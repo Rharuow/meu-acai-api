@@ -131,7 +131,7 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Test to GET Client
             - [x] Test for failed cases in GET a Client
             - [x] Test to LIST Client
-            - [ ] Test for failed cases in LIST a Client
+            - [x] Test for failed cases in LIST a Client
             - [x] Test to DELETE Client
             - [x] Test for failed cases in DELETE a Client
             - [x] Test for DELETE MANY Client
