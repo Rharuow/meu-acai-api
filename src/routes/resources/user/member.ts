@@ -1,17 +1,23 @@
-import { createClientController } from "@controllers/user/client/create";
 import { createUserController } from "@controllers/user/create";
+import { deleteUserController } from "@controllers/user/delete";
 import { getUserController } from "@controllers/user/get";
 import { listUserController } from "@controllers/user/list";
+import { createMemberController } from "@controllers/user/member/create";
+import { updateMemberController } from "@controllers/user/member/update";
 import { updateUserController } from "@controllers/user/update";
+import { addNextToBody } from "@middlewares/addNextToBody";
+import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
+import { validationAdminOrMemberAccessToken } from "@middlewares/authorization/validationAdminOrMemberAccessToken";
+import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
 import {
   validationParams,
   validationQueryParams,
 } from "@middlewares/paramsRouter";
+import { addIncludesMemberAndRoleAtBody } from "@middlewares/resources/user/member/addIncludesMemberAndRoleAtBody";
+import { addIncludesMemberAtQuery } from "@middlewares/resources/user/member/addIncludesMemberAtQuery";
+import { addRoleIdAtBody } from "@middlewares/resources/user/member/addRoleIdAtBody";
+import { updateBodyMember } from "@middlewares/resources/user/member/updateBodyUser";
 import { Router } from "express";
-import { updateClientController } from "@controllers/user/client/update";
-import { addRoleIdAtBody } from "@middlewares/resources/user/client/addRoleIdAtBody";
-import { addIncludesClientAndRoleAtBody } from "@middlewares/resources/user/client/addIncludesClientAndRoleAtBody";
-import { addIncludesClientAtQuery } from "@middlewares/resources/user/client/addIncludesClientAtQuery";
 import {
   Schema,
   checkExact,
@@ -19,10 +25,8 @@ import {
   param,
   query,
 } from "express-validator";
-import { addNextToBody } from "@middlewares/addNextToBody";
-import { updateBodyUser } from "@middlewares/resources/user/updateBody";
 
-export const validationCreateClientBodySchema: Schema = {
+export const validationCreateMemberBodySchema: Schema = {
   name: {
     notEmpty: true,
     isString: true,
@@ -32,6 +36,11 @@ export const validationCreateClientBodySchema: Schema = {
     notEmpty: true,
     isString: true,
     errorMessage: "password must be a string and not empty",
+  },
+  clientId: {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "clientId must be a string and not empty",
   },
   roleId: {
     notEmpty: true,
@@ -48,28 +57,9 @@ export const validationCreateClientBodySchema: Schema = {
     isString: true,
     errorMessage: "Phone must be a string",
   },
-  address: {
-    custom: {
-      options: (address) => {
-        if (!address || typeof address !== "object") {
-          throw new Error("Address must be an object");
-        }
-
-        if (!address.house || typeof address.house !== "string") {
-          throw new Error("House must be a string and not empty");
-        }
-
-        if (!address.square || typeof address.square !== "string") {
-          throw new Error("Square must be a string and not empty");
-        }
-
-        return true;
-      },
-    },
-  },
 };
 
-export const validationUpdateClientBodySchema: Schema = {
+export const validationUpdateMemberBodySchema: Schema = {
   name: {
     notEmpty: false,
     optional: true,
@@ -100,16 +90,37 @@ export const validationUpdateClientBodySchema: Schema = {
     isString: true,
     errorMessage: "Phone must be a string",
   },
+  relationship: {
+    notEmpty: false,
+    optional: true,
+    isString: true,
+    errorMessage: "Relationship must be a string",
+  },
 };
 
-const clientRouter = Router();
+const memberRouter = Router();
 
-clientRouter.post(
-  "/clients",
+memberRouter.get(
+  "/:userId/members/:id",
+  addIncludesMemberAndRoleAtBody,
+  getUserController
+);
+
+memberRouter.get(
+  "/members",
+  validationQueryParams,
+  validationUserAccessToken,
+  addIncludesMemberAtQuery,
+  listUserController
+);
+
+memberRouter.post(
+  "/members",
   addRoleIdAtBody,
+  validationAdminOrClientAccessToken,
   checkExact(
     [
-      checkSchema(validationCreateClientBodySchema, ["body"]),
+      checkSchema(validationCreateMemberBodySchema, ["body"]),
       query([], "Query parameters unpermitted"), // check if has any query parameters
       param([], "Query parameters unpermitted"), // check if has any router parameters
     ],
@@ -120,14 +131,15 @@ clientRouter.post(
   validationParams,
   addNextToBody,
   createUserController,
-  createClientController
+  createMemberController
 );
 
-clientRouter.put(
-  "/:userId/clients/:id",
+memberRouter.put(
+  "/:userId/members/:id",
+  validationAdminOrMemberAccessToken,
   checkExact(
     [
-      checkSchema(validationUpdateClientBodySchema, ["body"]),
+      checkSchema(validationUpdateMemberBodySchema, ["body"]),
       query([], "Query parameters unpermitted"), // check if has any query parameters
       param(["userId", "id"], 'The "id" and "userId" parameter is required'), // check if 'id' is present in the route parameters
     ],
@@ -136,22 +148,15 @@ clientRouter.put(
     }
   ),
   validationParams,
-  updateBodyUser,
+  updateBodyMember,
   updateUserController,
-  updateClientController
+  updateMemberController
 );
 
-clientRouter.get(
-  "/:userId/clients/:id",
-  addIncludesClientAndRoleAtBody,
-  getUserController
+memberRouter.delete(
+  "/members/:id",
+  validationAdminOrClientAccessToken,
+  deleteUserController
 );
 
-clientRouter.get(
-  "/clients",
-  validationQueryParams,
-  addIncludesClientAtQuery,
-  listUserController
-);
-
-export { clientRouter };
+export { memberRouter };

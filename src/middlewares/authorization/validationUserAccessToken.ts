@@ -1,11 +1,12 @@
 import { unauthorized } from "@serializer/erros/401";
 import { Role, User } from "@prisma/client";
-import { getUser, getUserByNameAndPassword } from "@repositories/user";
+import { ParamsUser, getUser } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 import { VerifyErrors, verify } from "jsonwebtoken";
+import { prismaClient } from "@libs/prisma";
 
 export const validationUserAccessToken = async (
-  req: Request,
+  req: Request<{}, {}, {}, qs.ParsedQs & ParamsUser>,
   res: Response,
   next: NextFunction
 ) => {
@@ -34,6 +35,53 @@ export const validationUserAccessToken = async (
     });
 
     if (!user) return unauthorized(res);
+
+    if (user.role.name === "MEMBER") {
+      const userWithMember = await prismaClient.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          client: {
+            include: {
+              members: true,
+            },
+          },
+        },
+      });
+
+      req.query.customFilter = {
+        id: {
+          in: userWithMember.client.members.map((member) => member.userId),
+        },
+        AND: {
+          id: {
+            not: user.id,
+          },
+        },
+      };
+    }
+
+    if (user.role.name === "CLIENT") {
+      const userWithMember = await prismaClient.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          client: {
+            include: {
+              members: true,
+            },
+          },
+        },
+      });
+
+      req.query.customFilter = {
+        id: {
+          in: userWithMember.client.members.map((member) => member.userId),
+        },
+      };
+    }
 
     return next();
   } catch (error) {

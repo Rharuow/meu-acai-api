@@ -9,7 +9,8 @@ export const listUserController = async (
   req: Request<{}, {}, {}, qs.ParsedQs & QueryParms>,
   res: Response
 ) => {
-  const { page, perPage, orderBy, filter, includes } = req.query as ParamsUser;
+  const { page, perPage, orderBy, filter, includes, customFilter } =
+    req.query as ParamsUser;
 
   try {
     const [users, totalUsers] = await listUsers({
@@ -17,6 +18,7 @@ export const listUserController = async (
       perPage,
       orderBy,
       filter,
+      ...(customFilter && { customFilter }),
       ...(includes && { includes }),
     });
 

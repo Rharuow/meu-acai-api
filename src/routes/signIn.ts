@@ -8,7 +8,7 @@ import {
   param,
   query,
 } from "express-validator";
-import { validationUserAccessToken } from "@middlewares/signIn";
+import { validationUser } from "@middlewares/signIn";
 import { validationParams } from "@middlewares/paramsRouter";
 
 export const validationBodySignInSchema: Schema = {
@@ -42,7 +42,7 @@ signInRouter.use(
   // Middleware to make validation of the previous step has some error
   validationParams,
   // Middleware to validation user in jwt request
-  validationUserAccessToken
+  validationUser
 );
 
 signInRouter.post("/signin", signInController);

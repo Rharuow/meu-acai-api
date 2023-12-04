@@ -6,12 +6,21 @@ export const createUserAdminIfNotExists = async (user: User) => {
     where: { userId: user.id },
   });
 
-  if (!hasAdmin)
-    return await prismaClient.admin.create({
+  if (!hasAdmin) {
+    const admin = await prismaClient.admin.create({
       data: {
         userId: user.id,
       },
     });
+    await prismaClient.user.update({
+      data: {
+        adminId: admin.id,
+      },
+      where: {
+        id: user.id,
+      },
+    });
+  }
 
   return hasAdmin;
 };

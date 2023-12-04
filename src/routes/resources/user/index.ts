@@ -7,8 +7,12 @@ import {
 } from "@controllers/user/delete";
 import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
 import { clientRouter } from "./client";
+import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
+import { memberRouter } from "./member";
 
 const userRouter = Router();
+
+userRouter.use("/users", memberRouter);
 
 userRouter.use("/users", validationAdminAccessToken, adminRouter);
 
