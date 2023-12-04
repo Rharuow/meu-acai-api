@@ -731,6 +731,23 @@ describe("TEST TO LIST MEMBERS RESOURCE", () => {
       }
     );
   });
+
+  describe("LISTING MEMBER AS MEMBER", () => {
+    test(
+      `When an authenticated MEMBER accesses the GET endpoint ${memberResourcePath} ` +
+        " without any query parameters, " +
+        "the expected behavior is to return a status code of 401.",
+      async () => {
+        const response = await request(app)
+          .get(memberResourcePath)
+          .set("authorization", "Bearer " + accessTokenAsMember)
+          .set("refreshToken", "Bearer " + accessTokenAsMember)
+          .expect(401);
+
+        return expect(response.statusCode).toBe(401);
+      }
+    );
+  });
 });
 
 describe("TEST TO UPDATE MEMBER RESOURCE", () => {
