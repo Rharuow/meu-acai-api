@@ -81,7 +81,7 @@ To get started with the Meu Açai API, follow these steps:
         - **ADMIN**
 
           - **REFACTOR:**
-            - [ ] In the test description, utilize variables for routers and parameters.
+            - [x] In the test description, use variables for routers and parameters.
             - [x] Separate the CRUD routes into different descriptions.
           - **IMPROVEMENTS:**
             - [x] Test to CREATE Admin

@@ -27,6 +27,10 @@ const createAdminBody = {
   password: "123",
 };
 
+const updateAdminBody = {
+  name: "Test Admin Updated",
+};
+
 const createAdminBodyMissingPassword = {
   name: "Test Admin Missing Parameters",
 };
@@ -77,8 +81,8 @@ beforeAll(async () => {
 describe("TEST TO CREATE ADMIN RESOURCE", () => {
   describe("CREATING ADMIN AS AN ADMIN", () => {
     test(
-      "When an authenticated ADMIN accesses POST /api/v1/resources/users/admins " +
-        'with name "Test Admin Created" and password "123", ' +
+      `When an authenticated ADMIN accesses POST ${adminResourcePath} ` +
+        `with name ${createAdminBody.name} and password ${createAdminBody.password}, ` +
         "then it should create a new User and a new Admin resource in the database",
       async () => {
         const response = await request(app)
@@ -116,7 +120,7 @@ describe("TEST TO CREATE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an authenticated ADMIN accesses POST /api/v1/resources/users/admins " +
+      `When an authenticated ADMIN accesses POST ${adminResourcePath} ` +
         "without body data" +
         "then it shouldn't create a new User and a new Admin resource in the database and return 422",
       async () => {
@@ -131,7 +135,7 @@ describe("TEST TO CREATE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an authenticated ADMIN accesses POST /api/v1/resources/users/admins " +
+      `When an authenticated ADMIN accesses POST ${adminResourcePath} ` +
         "with body missing password " +
         "then it shouldn't create a new User and a new Admin resource in the database and return 422",
       async () => {
@@ -147,7 +151,7 @@ describe("TEST TO CREATE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an authenticated ADMIN accesses POST /api/v1/resources/users/admins " +
+      `When an authenticated ADMIN accesses POST ${adminResourcePath} ` +
         "with body missing name " +
         "then it shouldn't create a new User and a new Admin resource in the database and return 422",
       async () => {
@@ -163,8 +167,8 @@ describe("TEST TO CREATE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When accesses POST /api/v1/resources/users/admins WITHOUT authentication" +
-        'with name "Test Admin Created" and password "123", ' +
+      `When accesses POST ${adminResourcePath} WITHOUT authentication` +
+        `with name ${createAdminBody.name} and password ${createAdminBody.password}, ` +
         "then it shouldn't create a new User and a new Admin resource in the database and return 401",
       async () => {
         const response = await request(app)
@@ -179,8 +183,8 @@ describe("TEST TO CREATE ADMIN RESOURCE", () => {
 
   describe("CREATING ADMIN AS AN CLIENT", () => {
     test(
-      "When an authenticated CLIENT accesses POST /api/v1/resources/users/admins" +
-        'with name "Test Admin Created" and password "123", ' +
+      `When an authenticated CLIENT accesses POST ${adminResourcePath}` +
+        `with name ${createAdminBody.name} and password ${createAdminBody.password}, ` +
         "then it shouldn't create a new User and a new Admin resource in the database and return 401",
       async () => {
         const response = await request(app)
@@ -196,8 +200,8 @@ describe("TEST TO CREATE ADMIN RESOURCE", () => {
   });
   describe("CREATING ADMIN AS AN MEMBER", () => {
     test(
-      "When an authenticated MEMBER accesses POST /api/v1/resources/users/admins" +
-        'with name "Test Admin Created" and password "123", ' +
+      `When an authenticated MEMBER accesses POST ${adminResourcePath}` +
+        `with name ${createAdminBody.name} and password ${createAdminBody.password}, ` +
         "then it shouldn't create a new User and a new Admin resource in the database and return 401",
       async () => {
         const response = await request(app)
@@ -216,22 +220,22 @@ describe("TEST TO CREATE ADMIN RESOURCE", () => {
 describe("TEST TO UPDATE ADMIN RESOURCE", () => {
   describe("UPDATING ADMIN AS AN ADMIN", () => {
     test(
-      "When an authenticated admin accesses PUT /api/v1/resources/users/:userId/admins/:id " +
-        'with name "Test Admin Edited", ' +
+      `When an authenticated admin accesses PUT ${userResourcePath}/:userId/admins/:id ` +
+        `with name ${updateAdminBody.name}, ` +
         "then it should update the User with the new provided information",
       async () => {
         const response = await request(app)
           .put(
             userResourcePath + `/${userAdmin.id}/admins/${userAdmin.admin.id}`
           )
-          .send({ name: "Test Admin Edited" })
+          .send(updateAdminBody)
           .set("authorization", "Bearer " + accessTokenAsAdmin)
           .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
           .expect(200);
 
         userAdmin = {
           ...userAdmin,
-          name: "Test Admin Edited",
+          name: updateAdminBody.name,
         };
 
         expect(response.body.data.user.name).toBe(userAdmin.name);
@@ -245,7 +249,7 @@ describe("TEST TO UPDATE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an authenticated admin accesses PUT /api/v1/resources/users/:userId/admins/:id " +
+      `When an authenticated admin accesses PUT ${userResourcePath}/:userId/admins/:id ` +
         "without body" +
         "then it shouldn't update the User with the new provided information and return 422",
       async () => {
@@ -262,7 +266,7 @@ describe("TEST TO UPDATE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an authenticated ADMIN accesses PUT /api/v1/resources/users/:userId/admins/:id " +
+      `When an authenticated ADMIN accesses PUT ${userResourcePath}/:userId/admins/:id ` +
         "with invalid params, " +
         "then it shouldn't update the User with the new provided information and return 401",
       async () => {
@@ -278,16 +282,17 @@ describe("TEST TO UPDATE ADMIN RESOURCE", () => {
         return expect(response.statusCode).toBe(422);
       }
     );
+
     test(
-      "When accesses PUT /api/v1/resources/users/:userId/admins/:id without authentication" +
-        'with name "Test Admin Edited", ' +
+      `When accesses PUT ${userResourcePath}/:userId/admins/:id without authentication` +
+        `with name ${updateAdminBody.name}, ` +
         "then it shouldn't update the User with the new provided information and return 401",
       async () => {
         const response = await request(app)
           .put(
             userResourcePath + `/${userAdmin.id}/admins/${userAdmin.admin.id}`
           )
-          .send({ user: { name: "Test Admin Edited" } })
+          .send(updateAdminBody)
           .expect(401);
 
         return expect(response.statusCode).toBe(401);
@@ -297,15 +302,15 @@ describe("TEST TO UPDATE ADMIN RESOURCE", () => {
 
   describe("UPDATING ADMIN AS AN CLIENT", () => {
     test(
-      "When an authenticated CLIENT accesses PUT /api/v1/resources/users/:userId/admins/:id " +
-        'with name "Test Admin Edited", ' +
+      `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/admins/:id ` +
+        `with name ${updateAdminBody.name}, ` +
         "then it shouldn't update the User with the new provided information and return 401",
       async () => {
         const response = await request(app)
           .put(
             userResourcePath + `/${userAdmin.id}/admins/${userAdmin.admin.id}`
           )
-          .send({ name: "Test Admin Edited" })
+          .send(updateAdminBody)
           .set("authorization", "Bearer " + accessTokenAsClient)
           .set("refreshToken", "Bearer " + refreshTokenAsClient)
           .expect(401);
@@ -317,15 +322,15 @@ describe("TEST TO UPDATE ADMIN RESOURCE", () => {
 
   describe("UPDATING ADMIN AS AN MEMBER", () => {
     test(
-      "When an authenticated MEMBER accesses PUT /api/v1/resources/users/:userId/admins/:id " +
-        'with name "Test Admin Edited", ' +
+      `When an authenticated MEMBER accesses PUT ${userResourcePath}/:userId/admins/:id ` +
+        `with name ${updateAdminBody.name}, ` +
         "then it shouldn't update the User with the new provided information and return 401",
       async () => {
         const response = await request(app)
           .put(
             userResourcePath + `/${userAdmin.id}/admins/${userAdmin.admin.id}`
           )
-          .send({ name: "Test Admin Edited" })
+          .send(updateAdminBody)
           .set("authorization", "Bearer " + accessTokenAsMember)
           .set("refreshToken", "Bearer " + refreshTokenAsMember)
           .expect(401);
@@ -339,7 +344,7 @@ describe("TEST TO UPDATE ADMIN RESOURCE", () => {
 describe("TEST TO GET ADMIN RESOURCE", () => {
   describe("GETTING ADMIN AS AN ADMIN", () => {
     test(
-      "When an authenticated admin accesses GET /api/v1/resources/users/admins/:id " +
+      `When an authenticated ADMIN accesses GET ${adminResourcePath}/:id ` +
         "with the ID of the first admin, " +
         "then it should return the first admin and associated user created",
       async () => {
@@ -359,7 +364,7 @@ describe("TEST TO GET ADMIN RESOURCE", () => {
     );
 
     test(
-      "When accesses GET /api/v1/resources/users/admins/:id without authentication" +
+      `When accesses GET ${adminResourcePath}/:id without authentication` +
         "with the ID of the first admin, " +
         "then it should return 401 status code",
       async () => {
@@ -376,7 +381,7 @@ describe("TEST TO GET ADMIN RESOURCE", () => {
 
   describe("GETTING ADMIN AS A CLIENT", () => {
     test(
-      "When an authenticated CLIENT accesses GET /api/v1/resources/users/admins/:id " +
+      `When an authenticated CLIENT accesses GET ${adminResourcePath}/:id ` +
         "with the ID of the first admin, " +
         "then it should return 401 status code",
       async () => {
@@ -395,7 +400,7 @@ describe("TEST TO GET ADMIN RESOURCE", () => {
 
   describe("GETTING ADMIN AS A MEMBER", () => {
     test(
-      "When an authenticated MEMBER accesses GET /api/v1/resources/users/admins/:id " +
+      `When an authenticated MEMBER accesses GET ${adminResourcePath}/:id ` +
         "with the ID of the first admin, " +
         "then it should return 401 status code",
       async () => {
@@ -416,7 +421,7 @@ describe("TEST TO GET ADMIN RESOURCE", () => {
 describe("TEST TO LIST ADMIN RESOURCE", () => {
   describe("LISTING ADMIN AS AN ADMIN", () => {
     test(
-      "When an authenticated admin accesses GET /api/v1/resources/users/admins " +
+      `When an authenticated admin accesses GET ${adminResourcePath} ` +
         "then it should return an array containing the first admin created and the default admin created",
       async () => {
         const roleId = (
@@ -439,7 +444,7 @@ describe("TEST TO LIST ADMIN RESOURCE", () => {
         });
 
         const response = await request(app)
-          .get("/api/v1/resources/users/admins")
+          .get(adminResourcePath)
           .set("authorization", "Bearer " + accessTokenAsAdmin)
           .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
           .expect(200);
@@ -452,12 +457,10 @@ describe("TEST TO LIST ADMIN RESOURCE", () => {
     );
 
     test(
-      "When accesses GET /api/v1/resources/users/admins without authentication " +
+      `When accesses GET ${adminResourcePath} without authentication ` +
         "then it should return 401 status code",
       async () => {
-        const response = await request(app)
-          .get("/api/v1/resources/users/admins")
-          .expect(401);
+        const response = await request(app).get(adminResourcePath).expect(401);
 
         return expect(response.statusCode).toBe(401);
       }
@@ -466,11 +469,11 @@ describe("TEST TO LIST ADMIN RESOURCE", () => {
 
   describe("LISTING ADMIN AS A CLIENT", () => {
     test(
-      "When an authenticated CLIENT accesses GET /api/v1/resources/users/admins " +
+      `When an authenticated CLIENT accesses GET ${adminResourcePath} ` +
         "then it should return 401 status code",
       async () => {
         const response = await request(app)
-          .get("/api/v1/resources/users/admins")
+          .get(adminResourcePath)
           .set("authorization", "Bearer " + accessTokenAsClient)
           .set("refreshToken", "Bearer " + refreshTokenAsClient)
           .expect(401);
@@ -482,11 +485,11 @@ describe("TEST TO LIST ADMIN RESOURCE", () => {
 
   describe("LISTING ADMIN AS A MEMBER", () => {
     test(
-      "When an authenticated MEMBER accesses GET /api/v1/resources/users/admins " +
+      `When an authenticated MEMBER accesses GET ${adminResourcePath} ` +
         "then it should return 401 status code",
       async () => {
         const response = await request(app)
-          .get("/api/v1/resources/users/admins")
+          .get(adminResourcePath)
           .set("authorization", "Bearer " + accessTokenAsMember)
           .set("refreshToken", "Bearer " + refreshTokenAsMember)
           .expect(401);
@@ -500,7 +503,7 @@ describe("TEST TO LIST ADMIN RESOURCE", () => {
 describe("TEST TO DELETE ADMIN RESOURCE", () => {
   describe("DELETING MANY ADMIN AS AN ADMIN", () => {
     test(
-      "When an autenticated ADMIN accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
+      `When an autenticated ADMIN accesses DELETE ${userResourcePath}/deleteMany?ids=id1&id2` +
         "then it should return a 204 status and delete all the ids sent in query parameters",
       async () => {
         admins = await prismaClient.user.findMany({
@@ -526,7 +529,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an autenticated ADMIN accesses DELETE /api/v1/resources/users/deleteMany without ids query params" +
+      `When an autenticated ADMIN accesses DELETE ${userResourcePath}/deleteMany without ids query params` +
         "then it should return a 400 status code",
       async () => {
         const response = await request(app)
@@ -540,7 +543,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2 without authentication " +
+      `When accesses DELETE ${userResourcePath}/deleteMany?ids=id1&id2 without authentication ` +
         "then it should return a 401 status code",
       async () => {
         const response = await request(app)
@@ -558,7 +561,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
 
   describe("DELETING ADMIN AS A CLIENT", () => {
     test(
-      "When an autenticated CLIENT accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
+      `When an autenticated CLIENT accesses DELETE ${userResourcePath}/deleteMany?ids=id1&id2` +
         "then it should return a 401 status code",
       async () => {
         const response = await request(app)
@@ -576,7 +579,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an authenticated CLIENT accesses DELETE /api/v1/resources/users/admins/:id " +
+      `When an authenticated CLIENT accesses DELETE ${userResourcePath}/:id ` +
         "then it should return a 401 status",
       async () => {
         const response = await request(app)
@@ -592,7 +595,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
 
   describe("DELETING ADMIN AS A MEMBER", () => {
     test(
-      "When an autenticated MEMBER accesses DELETE /api/v1/resources/users/deleteMany?ids=id1&id2" +
+      `When an autenticated MEMBER accesses DELETE ${userResourcePath}/deleteMany?ids=id1&id2` +
         "then it should return a 401 status code",
       async () => {
         const response = await request(app)
@@ -610,7 +613,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an authenticated MEMBER accesses DELETE /api/v1/resources/users/admins/:id " +
+      `When an authenticated MEMBER accesses DELETE ${userResourcePath}/:id ` +
         "then it should return a 401 status",
       async () => {
         const response = await request(app)
@@ -626,7 +629,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
 
   describe("DELETING ADMIN AS AN ADMIN", () => {
     test(
-      "When an authenticated ADMIN accesses DELETE /api/v1/resources/users/admins/:id " +
+      `When an authenticated ADMIN accesses DELETE ${userResourcePath}/:id ` +
         "then it should return a 204 status and delete the first admin created",
       async () => {
         const response = await request(app)
@@ -640,7 +643,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an authenticated ADMIN accesses DELETE /api/v1/resources/users/admins/:id with id invalid" +
+      `When an authenticated ADMIN accesses DELETE ${userResourcePath}/:id with id invalid` +
         "then it should return a 422 status",
       async () => {
         const response = await request(app)
@@ -654,7 +657,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When accesses DELETE /api/v1/resources/users/admins/:id without authentication " +
+      `When accesses DELETE ${userResourcePath}/:id without authentication ` +
         "then it should return a 401 status",
       async () => {
         const response = await request(app)
@@ -666,7 +669,7 @@ describe("TEST TO DELETE ADMIN RESOURCE", () => {
     );
 
     test(
-      "When an authenticated ADMIN accesses DELETE /api/v1/resources/users/admins " +
+      `When an authenticated ADMIN accesses DELETE ${userResourcePath} ` +
         "then it should return a 404 status",
       async () => {
         const response = await request(app)
