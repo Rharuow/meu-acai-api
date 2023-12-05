@@ -102,7 +102,7 @@ To get started with the Meu Açai API, follow these steps:
           - **REFACTOR:**
             - [x] In the test description, utilize variables for routers and parameters.
             - [x] Separate the CRUD routes into different descriptions.
-            - [ ] A client should update their data.
+            - [ ] The client can update their own data.
           - **IMPROVEMENTS:**
             - [x] Test to CREATE Client
             - [x] Test for failed cases in CREATE a Client

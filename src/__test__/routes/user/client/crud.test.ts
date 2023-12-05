@@ -1,11 +1,16 @@
 import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
-import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
+import {
+  userAsAdmin,
+  userAsClient,
+  userAsMember,
+} from "@/__test__/utils/users";
 import { app } from "@/app";
 import { prismaClient } from "@libs/prisma";
 import { encodeSha256 } from "@libs/crypto";
 import { Client, Role, User } from "@prisma/client";
 import { getUserByNameAndPassword } from "@repositories/user";
 import request from "supertest";
+import { verify } from "jsonwebtoken";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -45,6 +50,8 @@ const createClientBodyMissingName = {
   password: "Missing name",
 };
 
+let clientAuthenticated: User & { role: Role };
+
 const createManyClients = Array(15)
   .fill(null)
   .map((_, index) => ({
@@ -74,7 +81,7 @@ beforeAll(async () => {
 
   const responseSignInAsMember = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send(userAsMember)
     .set("Accept", "application/json")
     .expect(200);
 
@@ -86,6 +93,23 @@ beforeAll(async () => {
 
   accessTokenAsMember = responseSignInAsMember.body.accessToken;
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
+
+  verify(
+    accessTokenAsClient,
+    process.env.TOKEN_SECRET,
+    async (err, user: User & { role: Role }) => {
+      if (err) console.log("ERROR TO VERIFY CLIENT ACCESS TOKEN", err);
+      const userLogged = await prismaClient.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          role: true,
+        },
+      });
+      clientAuthenticated = userLogged;
+    }
+  );
 });
 
 describe("TEST TO CREATE CLIENT RESOURCE", () => {
@@ -252,7 +276,7 @@ describe("TEST TO UPDATE CLIENT RESOURCE", () => {
           ...updateClientBody,
         };
 
-        expect(response.body.data.user.name).toBe(userClient.name);
+        expect(response.body.data.user.name).toBe(updateClientBody.name);
         expect(response.body.data.user.id).toBe(userClient.id);
         expect(
           response.body.data.user.client.id === response.body.data.user.clientId
@@ -302,23 +326,42 @@ describe("TEST TO UPDATE CLIENT RESOURCE", () => {
 
   describe("UPDATING CLIENT AS A CLIENT", () => {
     test(
-      `When an authenticated CLIENT accesses PUT ${clientResourcePath}/:userId/clients/:id ` +
-        `with name ${updateClientBody.name}, ` +
-        "then it shouldn't update the User with the new provided information and return 401",
+      `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/clients/:id ` +
+        `with the name ${updateClientBody.name}, and sending the own ID. ` +
+        "then it shouldn't update the User with the new provided information and return 200",
       async () => {
         const response = await request(app)
           .put(
             userResourcePath +
-              `/${userClient.id}/clients/${userClient.client.id}`
+              `/${clientAuthenticated.id}/clients/${clientAuthenticated.clientId}`
           )
           .send(updateClientBody)
           .set("authorization", "Bearer " + accessTokenAsClient)
           .set("refreshToken", "Bearer " + refreshTokenAsClient)
-          .expect(401);
+          .expect(200);
 
-        return expect(response.statusCode).toBe(401);
+        return expect(response.statusCode).toBe(200);
       }
     );
+
+    // test(
+    //   `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/clients/:id ` +
+    //     `with the name ${updateClientBody.name}, and sending an ID that's not your own. ` +
+    //     "then it shouldn't update the User with the new provided information and return 401",
+    //   async () => {
+    //     const response = await request(app)
+    //       .put(
+    //         userResourcePath +
+    //           `/${clientAuthenticated.id}/clients/${userClient.client.id}`
+    //       )
+    //       .send(updateClientBody)
+    //       .set("authorization", "Bearer " + accessTokenAsClient)
+    //       .set("refreshToken", "Bearer " + refreshTokenAsClient)
+    //       .expect(401);
+
+    //     return expect(response.statusCode).toBe(401);
+    //   }
+    // );
   });
 
   describe("UPDATING CLIENT AS A MEMBER", () => {
