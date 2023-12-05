@@ -24,6 +24,7 @@ import { updateBodyUser } from "@middlewares/resources/user/updateBody";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationUserOwnId } from "@middlewares/authorization/validationUserOwnId";
+import { updateBodyClient } from "@middlewares/resources/user/client/updateBody";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {
@@ -149,6 +150,7 @@ clientRouter.put(
   ),
   validationParams,
   updateBodyUser,
+  updateBodyClient,
   updateUserController,
   updateClientController
 );

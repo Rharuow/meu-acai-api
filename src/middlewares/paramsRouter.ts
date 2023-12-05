@@ -10,12 +10,6 @@ export const validationParams = (
 ) => {
   const errors = validationResult(req);
 
-  req.method === "PUT" &&
-    req.params.userId &&
-    errors &&
-    errors.array().forEach((err) => {
-      console.log(err);
-    });
   // If errors return 422, client didn't provide required or unpermitted values at query parameters
   if (!errors.isEmpty()) {
     return unprocessableEntity(res, errors);

@@ -15,6 +15,7 @@ export const updateClientController = async (req: Request, res: Response) => {
 
     return updateClientSerializer({ res, user, client });
   } catch (error) {
+    console.log("Error updating client = ", error);
     return unprocessableEntity(res, {
       message: "Error updating client = " + error.message,
     });

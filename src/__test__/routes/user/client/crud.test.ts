@@ -36,7 +36,7 @@ const createClientBody = {
   },
 };
 
-const updateClientBody = {
+let updateClientBody = {
   name: "Test Client Edited",
   email: "test.client@mail.com",
   phone: "(84)999999999",
@@ -335,7 +335,10 @@ describe("TEST TO UPDATE CLIENT RESOURCE", () => {
             userResourcePath +
               `/${clientAuthenticated.id}/clients/${clientAuthenticated.clientId}`
           )
-          .send(updateClientBody)
+          .send({
+            email: "testclienteditedbyclient@mail.com",
+            phone: "(00)0000000000",
+          })
           .set("authorization", "Bearer " + accessTokenAsClient)
           .set("refreshToken", "Bearer " + refreshTokenAsClient)
           .expect(200);
