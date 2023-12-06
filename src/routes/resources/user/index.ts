@@ -14,9 +14,9 @@ const userRouter = Router();
 
 userRouter.use("/users", memberRouter);
 
-userRouter.use("/users", validationAdminAccessToken, adminRouter);
+userRouter.use("/users", clientRouter);
 
-userRouter.use("/users", validationAdminAccessToken, clientRouter);
+userRouter.use("/users", validationAdminAccessToken, adminRouter);
 
 userRouter.delete(
   "/users/deleteMany",

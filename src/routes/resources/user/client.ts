@@ -21,6 +21,10 @@ import {
 } from "express-validator";
 import { addNextToBody } from "@middlewares/addNextToBody";
 import { updateBodyUser } from "@middlewares/resources/user/updateBody";
+import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
+import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
+import { validationUserOwnId } from "@middlewares/authorization/validationUserOwnId";
+import { updateBodyClient } from "@middlewares/resources/user/client/updateBody";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {
@@ -100,12 +104,19 @@ export const validationUpdateClientBodySchema: Schema = {
     isString: true,
     errorMessage: "Phone must be a string",
   },
+  clientId: {
+    notEmpty: false,
+    optional: true,
+    isString: true,
+    errorMessage: "clientId must be a string",
+  },
 };
 
 const clientRouter = Router();
 
 clientRouter.post(
   "/clients",
+  validationAdminAccessToken,
   addRoleIdAtBody,
   checkExact(
     [
@@ -125,6 +136,8 @@ clientRouter.post(
 
 clientRouter.put(
   "/:userId/clients/:id",
+  validationAdminOrClientAccessToken,
+  validationUserOwnId,
   checkExact(
     [
       checkSchema(validationUpdateClientBodySchema, ["body"]),
@@ -137,18 +150,22 @@ clientRouter.put(
   ),
   validationParams,
   updateBodyUser,
+  updateBodyClient,
   updateUserController,
   updateClientController
 );
 
 clientRouter.get(
   "/:userId/clients/:id",
+  validationAdminOrClientAccessToken,
+  validationUserOwnId,
   addIncludesClientAndRoleAtBody,
   getUserController
 );
 
 clientRouter.get(
   "/clients",
+  validationAdminAccessToken,
   validationQueryParams,
   addIncludesClientAtQuery,
   listUserController
