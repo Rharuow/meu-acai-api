@@ -325,6 +325,10 @@ describe("TEST TO UPDATE CLIENT RESOURCE", () => {
   });
 
   describe("UPDATING CLIENT AS A CLIENT", () => {
+    const updatedFields = {
+      email: "testclienteditedbyclient@mail.com",
+      phone: "(00)0000000000",
+    };
     test(
       `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/clients/:id ` +
         `with the name ${updateClientBody.name}, and sending the own ID. ` +
@@ -335,10 +339,7 @@ describe("TEST TO UPDATE CLIENT RESOURCE", () => {
             userResourcePath +
               `/${clientAuthenticated.id}/clients/${clientAuthenticated.clientId}`
           )
-          .send({
-            email: "testclienteditedbyclient@mail.com",
-            phone: "(00)0000000000",
-          })
+          .send(updatedFields)
           .set("authorization", "Bearer " + accessTokenAsClient)
           .set("refreshToken", "Bearer " + refreshTokenAsClient)
           .expect(200);
@@ -347,24 +348,59 @@ describe("TEST TO UPDATE CLIENT RESOURCE", () => {
       }
     );
 
-    // test(
-    //   `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/clients/:id ` +
-    //     `with the name ${updateClientBody.name}, and sending an ID that's not your own. ` +
-    //     "then it shouldn't update the User with the new provided information and return 401",
-    //   async () => {
-    //     const response = await request(app)
-    //       .put(
-    //         userResourcePath +
-    //           `/${clientAuthenticated.id}/clients/${userClient.client.id}`
-    //       )
-    //       .send(updateClientBody)
-    //       .set("authorization", "Bearer " + accessTokenAsClient)
-    //       .set("refreshToken", "Bearer " + refreshTokenAsClient)
-    //       .expect(401);
+    test(
+      `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/clients/:id ` +
+        `with the name ${updateClientBody.name}, and sending an ID that's not your own. ` +
+        "then it shouldn't update the User with the new provided information and return 422",
+      async () => {
+        const response = await request(app)
+          .put(
+            userResourcePath +
+              `/${clientAuthenticated.id}/clients/${userClient.client.id}`
+          )
+          .send(updatedFields)
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + refreshTokenAsClient)
+          .expect(422);
 
-    //     return expect(response.statusCode).toBe(401);
-    //   }
-    // );
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+
+    test(
+      `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/clients/:id ` +
+        `with the name ${updateClientBody.name}, and sending an ID and userId that's not are the user logged. ` +
+        "then it shouldn't update the User with the new provided information and return 401",
+      async () => {
+        const anotherUserClient = await prismaClient.user.findFirst({
+          where: {
+            id: {
+              not: clientAuthenticated.id,
+            },
+            AND: {
+              role: {
+                name: "CLIENT",
+              },
+            },
+          },
+          include: {
+            client: true,
+          },
+        });
+
+        const response = await request(app)
+          .put(
+            userResourcePath +
+              `/${anotherUserClient.id}/clients/${anotherUserClient.clientId}`
+          )
+          .send(updatedFields)
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + refreshTokenAsClient)
+          .expect(401);
+
+        return expect(response.statusCode).toBe(401);
+      }
+    );
   });
 
   describe("UPDATING CLIENT AS A MEMBER", () => {
@@ -435,13 +471,57 @@ describe("TEST TO GET CLIENT RESOURCE", () => {
   describe("GETTING CLIENT AS A CLIENT", () => {
     test(
       `When an authenticated CLIENT accesses GET ${clientResourcePath}/:id ` +
-        "with the ID of the first client, " +
-        "then it should return 401 status code",
+        "with the id and userId of the user client logged, " +
+        "then it should return 200 status code",
       async () => {
         const response = await request(app)
           .get(
             userResourcePath +
-              `/${userClient.id}/clients/${userClient.clientId}`
+              `/${clientAuthenticated.id}/clients/${clientAuthenticated.clientId}`
+          )
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + refreshTokenAsClient)
+          .expect(200);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.data).toHaveProperty("user");
+        expect(response.body.data.user).toHaveProperty(
+          "name",
+          clientAuthenticated.name
+        );
+        expect(response.body.data.user).toHaveProperty(
+          "id",
+          clientAuthenticated.id
+        );
+        return expect(response.body.data.user).toHaveProperty(
+          "clientId",
+          clientAuthenticated.clientId
+        );
+      }
+    );
+
+    test(
+      `When an authenticated CLIENT accesses GET ${clientResourcePath}/:id ` +
+        "with the id and userId different from the user client logged." +
+        "then it should return 401 status code",
+      async () => {
+        const anotherUserClients = await prismaClient.user.findFirst({
+          where: {
+            role: {
+              name: "CLIENT",
+            },
+            AND: {
+              id: {
+                not: userClient.id,
+              },
+            },
+          },
+        });
+
+        const response = await request(app)
+          .get(
+            userResourcePath +
+              `/${anotherUserClients.id}/clients/${anotherUserClients.clientId}`
           )
           .set("authorization", "Bearer " + accessTokenAsClient)
           .set("refreshToken", "Bearer " + refreshTokenAsClient)

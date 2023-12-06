@@ -18,7 +18,6 @@ export const updateUserController = async (
 
     return next();
   } catch (error) {
-    console.log("Error updating user = ", error);
     return unprocessableEntity(res, { message: "Error updating user" });
   }
 };

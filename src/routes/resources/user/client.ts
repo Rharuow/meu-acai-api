@@ -158,6 +158,7 @@ clientRouter.put(
 clientRouter.get(
   "/:userId/clients/:id",
   validationAdminOrClientAccessToken,
+  validationUserOwnId,
   addIncludesClientAndRoleAtBody,
   getUserController
 );
