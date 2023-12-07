@@ -172,7 +172,7 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Router to delete many ADMIN
         - **CLIENT**
           - **REFACTOR**
-            - [ ] The client should only delete their own account.
+            - [x] The client should only delete their own account.
           - **IMPROVEMENTS:**
             - [x] Client Model in Schema
             - [x] Router to create Client
