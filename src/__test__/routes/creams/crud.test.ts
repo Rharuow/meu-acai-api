@@ -67,74 +67,84 @@ const updateCreamRequestBody: UpdateCreamRequestBody = {
 
 const creamResourcePath = "/api/v1/resources/creams";
 
-describe("CRUD cream", () => {
+describe("CRUD CREAM RESOURCE", () => {
   // CREATE
-  test("when access POST /api/v1/resources/creams authenticated as ADMIN role, create at DB a cream resource with name 'Test Cream', price '9.99', amount '1', unit 'unit' and createdBy 'Test Admin'", async () => {
-    // Verify if cream already exists
-    const creamAlreadyExists = await prismaClient.cream.findUnique({
-      where: { name: createCreamRequestBody.name },
-    });
-    // if exists, delete it
-    if (creamAlreadyExists)
-      await prismaClient.cream.delete({
-        where: { name: createCreamRequestBody.name },
+  describe("TEST TO CREATE CREAM RESOURCE", () => {
+    describe("CREATING CREAM AS AN ADMIN", () => {
+      test(`when access POST ${creamResourcePath} authenticated as ADMIN role, create at DB a cream resource with name 'Test Cream', price '9.99', amount '1', unit 'unit' and createdBy 'Test Admin'`, async () => {
+        // Verify if cream already exists
+        const creamAlreadyExists = await prismaClient.cream.findUnique({
+          where: { name: createCreamRequestBody.name },
+        });
+        // if exists, delete it
+        if (creamAlreadyExists)
+          await prismaClient.cream.delete({
+            where: { name: createCreamRequestBody.name },
+          });
+
+        const response = await request(app)
+          .post(creamResourcePath)
+          .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+          .send(createCreamRequestBody)
+          .expect(200);
+
+        return expect(response.statusCode).toBe(200);
       });
 
-    const response = await request(app)
-      .post(creamResourcePath)
-      .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-      .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-      .send(createCreamRequestBody)
-      .expect(200);
+      test(`when access POST ${creamResourcePath} authenticated as ADMIN role and send name cream that's already exists in DB must return 422 status with message 'Unique constraint failed on the fields: name'`, async () => {
+        const response = await request(app)
+          .post(creamResourcePath)
+          .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
+          .send(createCreamRequestBody)
+          .expect(422);
 
-    return expect(response.statusCode).toBe(200);
-  });
+        expect(response.body).toHaveProperty(
+          "message",
+          "Unique constraint failed on the fields: name"
+        );
 
-  test("when access POST /api/v1/resources/creams authenticated as ADMIN role and send name cream that's already exists in DB must return 422 status with message 'Unique constraint failed on the fields: name'", async () => {
-    const response = await request(app)
-      .post(creamResourcePath)
-      .set("authorization", `Bearer ${accessTokenAsAdmin}`)
-      .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
-      .send(createCreamRequestBody)
-      .expect(422);
+        return expect(response.statusCode).toBe(422);
+      });
+    });
 
-    expect(response.body).toHaveProperty(
-      "message",
-      "Unique constraint failed on the fields: name"
-    );
+    describe("CREATING CREAM AS A CLIENT", () => {
+      test(`when access POST ${creamResourcePath} with authentication as CLIENT role, return 401`, async () => {
+        const response = await request(app)
+          .post(creamResourcePath)
+          .set("authorization", `Bearer ${accessTokenAsClient}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
+          .send(createCreamRequestBody)
+          .expect(401);
 
-    return expect(response.statusCode).toBe(422);
-  });
+        return expect(response.statusCode).toBe(401);
+      });
+    });
 
-  test("when access POST /api/v1/resources/creams without authentication, return 401", async () => {
-    const response = await request(app)
-      .post(creamResourcePath)
-      .send(createCreamRequestBody)
-      .expect(401);
+    describe("CREATING CREAM AS A MEMBER", () => {
+      test(`when access POST ${creamResourcePath} with authentication as member role, return 401`, async () => {
+        const response = await request(app)
+          .post(creamResourcePath)
+          .set("authorization", `Bearer ${accessTokenAsMember}`)
+          .set("refreshToken", `Bearer ${refreshTokenAsMember}`)
+          .send(createCreamRequestBody)
+          .expect(401);
 
-    return expect(response.statusCode).toBe(401);
-  });
+        return expect(response.statusCode).toBe(401);
+      });
+    });
 
-  test("when access POST /api/v1/resources/creams with authentication as client role, return 401", async () => {
-    const response = await request(app)
-      .post(creamResourcePath)
-      .set("authorization", `Bearer ${accessTokenAsClient}`)
-      .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
-      .send(createCreamRequestBody)
-      .expect(401);
+    describe("CREATING CREAM WITHOUT AUTHENTICATION", () => {
+      test(`when access POST ${creamResourcePath} without authentication, return 401`, async () => {
+        const response = await request(app)
+          .post(creamResourcePath)
+          .send(createCreamRequestBody)
+          .expect(401);
 
-    return expect(response.statusCode).toBe(401);
-  });
-
-  test("when access POST /api/v1/resources/creams with authentication as member role, return 401", async () => {
-    const response = await request(app)
-      .post(creamResourcePath)
-      .set("authorization", `Bearer ${accessTokenAsMember}`)
-      .set("refreshToken", `Bearer ${refreshTokenAsMember}`)
-      .send(createCreamRequestBody)
-      .expect(401);
-
-    return expect(response.statusCode).toBe(401);
+        return expect(response.statusCode).toBe(401);
+      });
+    });
   });
 
   // GET
