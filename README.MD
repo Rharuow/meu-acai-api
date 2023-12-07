@@ -123,7 +123,8 @@ To get started with the Meu Açai API, follow these steps:
           - **REFACTOR:**
             - [x] In the test description, utilize variables for routers and parameters.
             - [x] Separate the CRUD routes into different descriptions.
-            - [ ] A client should update their data.
+            - [x] A member should update their own data.
+            - [x] A member should get their own data.
           - **IMPROVEMENTS:**
             - [x] Test to CREATE Client
             - [x] Test for failed cases in CREATE a Client
@@ -140,7 +141,7 @@ To get started with the Meu Açai API, follow these steps:
 
         - **CREAM**
           - **REFACTOR:**
-            - [ ] In the test description, utilize variables for routers and parameters.
+            - [ ] In the test description, use variables for routers and parameters.
             - [ ] Separate the CRUD routes into different descriptions.
           - **IMPROVEMENTS:**
             - [x] Test to CREATE Cream

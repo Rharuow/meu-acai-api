@@ -9,6 +9,7 @@ import { addNextToBody } from "@middlewares/addNextToBody";
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationAdminOrMemberAccessToken } from "@middlewares/authorization/validationAdminOrMemberAccessToken";
 import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
+import { validationUserOwnId } from "@middlewares/authorization/validationUserOwnId";
 import {
   validationParams,
   validationQueryParams,
@@ -137,6 +138,7 @@ memberRouter.post(
 memberRouter.put(
   "/:userId/members/:id",
   validationAdminOrMemberAccessToken,
+  validationUserOwnId,
   checkExact(
     [
       checkSchema(validationUpdateMemberBodySchema, ["body"]),

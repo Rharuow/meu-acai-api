@@ -38,3 +38,9 @@ export const createTwentyCreams = async () => {
     }));
   await prismaClient.cream.createMany({ data: creams });
 };
+
+export const cleanAllKindOfUsersAndRole = async () => {
+  await prismaClient.address.deleteMany();
+  await prismaClient.user.deleteMany();
+  await prismaClient.cream.deleteMany();
+};

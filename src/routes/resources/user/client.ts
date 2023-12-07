@@ -7,7 +7,7 @@ import {
   validationParams,
   validationQueryParams,
 } from "@middlewares/paramsRouter";
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { updateClientController } from "@controllers/user/client/update";
 import { addRoleIdAtBody } from "@middlewares/resources/user/client/addRoleIdAtBody";
 import { addIncludesClientAndRoleAtBody } from "@middlewares/resources/user/client/addIncludesClientAndRoleAtBody";
@@ -25,6 +25,8 @@ import { validationAdminAccessToken } from "@middlewares/authorization/validatio
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationUserOwnId } from "@middlewares/authorization/validationUserOwnId";
 import { updateBodyClient } from "@middlewares/resources/user/client/updateBody";
+import { VerifyErrors, verify } from "jsonwebtoken";
+import { Role, User } from "@prisma/client";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {

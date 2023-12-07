@@ -38,13 +38,6 @@ export const validationAdminOrMemberAccessToken = async (
       return unauthorized(res);
     }
 
-    if (user.role.name === "MEMBER") {
-      const member = await findMember({ userId: user.id });
-      req.body.clientId = member.clientId;
-      req.body.memberId = member.id;
-      return next();
-    }
-
     return next();
   } catch (error) {
     return unauthorized(res);
