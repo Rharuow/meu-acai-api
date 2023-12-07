@@ -29,6 +29,8 @@ const createAdminBody = {
 
 const updateAdminBody = {
   name: "Test Admin Updated",
+  email: "testadminupdated@mail.com",
+  phone: "(00)000000000",
 };
 
 const createAdminBodyMissingPassword = {
@@ -223,7 +225,7 @@ describe("CRUD ADMIN RESOURCE", () => {
     describe("UPDATING ADMIN AS AN ADMIN", () => {
       test(
         `When an authenticated admin accesses PUT ${userResourcePath}/:userId/admins/:id ` +
-          `with name ${updateAdminBody.name}, ` +
+          `with name ${updateAdminBody.name}, email ${updateAdminBody.email} and phone ${updateAdminBody.phone} ` +
           "then it should update the User with the new provided information",
         async () => {
           const response = await request(app)
@@ -238,9 +240,23 @@ describe("CRUD ADMIN RESOURCE", () => {
           userAdmin = {
             ...userAdmin,
             name: updateAdminBody.name,
+            admin: {
+              ...userAdmin.admin,
+              phone: updateAdminBody.phone,
+              email: updateAdminBody.email,
+            },
           };
 
           expect(response.body.data.user.name).toBe(userAdmin.name);
+          expect(response.body.data.user).toHaveProperty("admin");
+          expect(response.body.data.user.admin).toHaveProperty(
+            "email",
+            updateAdminBody.email
+          );
+          expect(response.body.data.user.admin).toHaveProperty(
+            "phone",
+            updateAdminBody.phone
+          );
           expect(response.body.data.user.id).toBe(userAdmin.id);
           expect(
             response.body.data.user.admin.id === response.body.data.user.adminId

@@ -162,9 +162,8 @@ To get started with the Meu Açai API, follow these steps:
     - **Resources:**
       - **User:**
         - **ADMIN**
-          - **REFACTOR:**
-            - [ ] Add email and phone as optional fields in the Admin Model Schema.
           - **IMPROVEMENTS:**
+            - [x] Add email and phone as optional fields in the Admin Model Schema.
             - [x] Admin Model in Schema
             - [x] Router to create ADMIN
             - [x] Router to update ADMIN
@@ -172,6 +171,8 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Router to list with pagination and filters ADMIN
             - [x] Router to delete many ADMIN
         - **CLIENT**
+          - **REFACTOR**
+            - [ ] The client should only delete their own account.
           - **IMPROVEMENTS:**
             - [x] Client Model in Schema
             - [x] Router to create Client
@@ -181,6 +182,8 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Router to delete Client
             - [x] Router to delete many Client
         - **MEMBER**
+          - **REFACTOR**
+            - [ ] The member should only delete their own account.
           - **IMPROVEMENTS:**
             - [x] Member Model in Schema
             - [x] Router to create Member

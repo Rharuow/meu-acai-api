@@ -62,6 +62,18 @@ export const validationUpdateAdminBodySchema: Schema = {
     isString: true,
     errorMessage: "role must be a string",
   },
+  email: {
+    notEmpty: false,
+    optional: true,
+    isString: true,
+    errorMessage: "email must be a string",
+  },
+  phone: {
+    notEmpty: false,
+    optional: true,
+    isString: true,
+    errorMessage: "phone must be a string",
+  },
 };
 
 adminRouter.post(
