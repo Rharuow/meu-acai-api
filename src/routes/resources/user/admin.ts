@@ -11,6 +11,7 @@ import {
 import { addIncludesAdminAndRoleAtBody } from "@middlewares/resources/user/admin/addIncludesAdminAndRoleAtBody";
 import { addIncludesAdminAtQuery } from "@middlewares/resources/user/admin/addIncludesAdminAtQuery";
 import { addRoleIdAtBody } from "@middlewares/resources/user/admin/addRoleIdAtBody";
+import { updateBodyAdmin } from "@middlewares/resources/user/admin/updateBody";
 import { updateBodyUser } from "@middlewares/resources/user/updateBody";
 import { Router } from "express";
 import {
@@ -95,6 +96,7 @@ adminRouter.put(
   ),
   validationParams,
   updateBodyUser,
+  updateBodyAdmin,
   updateUserController,
   updateAdminController
 );

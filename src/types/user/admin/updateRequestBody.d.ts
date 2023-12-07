@@ -1,1 +1,4 @@
-export type UpdateAdminRequestBody = {};
+export type UpdateAdminRequestBody = {
+  email?: string;
+  phone?: string;
+};
