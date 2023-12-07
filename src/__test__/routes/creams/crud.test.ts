@@ -68,7 +68,6 @@ const updateCreamRequestBody: UpdateCreamRequestBody = {
 const creamResourcePath = "/api/v1/resources/creams";
 
 describe("CRUD CREAM RESOURCE", () => {
-  // CREATE
   describe("TEST TO CREATE CREAM RESOURCE", () => {
     describe("CREATING CREAM AS AN ADMIN", () => {
       test(`when access POST ${creamResourcePath} authenticated as ADMIN role, create at DB a cream resource with name 'Test Cream', price '9.99', amount '1', unit 'unit' and createdBy 'Test Admin'`, async () => {
@@ -148,64 +147,74 @@ describe("CRUD CREAM RESOURCE", () => {
   });
 
   // GET
-  test("when access GET /api/v1/resources/:id with authentication as Admin, return 200 and the cream at body reponse", async () => {
-    cream = await prismaClient.cream.findFirst({
-      where: { name: "Test Cream" },
+  describe("TEST TO GET CREAM RESOURCE", () => {
+    describe("GETTING CREAM AS AN ADMIN", () => {
+      test(`when access GET ${creamResourcePath}/:id with authentication as ADMIN, return 200 and the cream at body reponse`, async () => {
+        cream = await prismaClient.cream.findFirst({
+          where: { name: "Test Cream" },
+        });
+
+        const response = await request(app)
+          .get(creamResourcePath + `/${cream.id}`)
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+          .expect(200);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("name", cream.name);
+        expect(response.body).toHaveProperty("amount", cream.amount);
+        expect(response.body).toHaveProperty("id", cream.id);
+        expect(response.body).toHaveProperty("available", cream.available);
+        expect(response.body).toHaveProperty("unit", cream.unit);
+        return expect(response.body).toHaveProperty("price", cream.price);
+      });
     });
 
-    const response = await request(app)
-      .get(creamResourcePath + `/${cream.id}`)
-      .set("authorization", "Bearer " + accessTokenAsAdmin)
-      .set("refreshToken", refreshTokenAsAdmin)
-      .expect(200);
+    describe("GETTING CREAM AS AN CLIENT", () => {
+      test(`when access GET ${creamResourcePath}/:id with authentication as CLIENT, return 200 and the cream at body reponse`, async () => {
+        const response = await request(app)
+          .get(creamResourcePath + `/${cream.id}`)
+          .set("authorization", "Bearer " + accessTokenAsClient)
+          .set("refreshToken", "Bearer " + refreshTokenAsClient)
+          .expect(200);
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("name", cream.name);
-    expect(response.body).toHaveProperty("amount", cream.amount);
-    expect(response.body).toHaveProperty("id", cream.id);
-    expect(response.body).toHaveProperty("available", cream.available);
-    expect(response.body).toHaveProperty("unit", cream.unit);
-    return expect(response.body).toHaveProperty("price", cream.price);
-  });
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("name", cream.name);
+        expect(response.body).toHaveProperty("amount", cream.amount);
+        expect(response.body).toHaveProperty("id", cream.id);
+        expect(response.body).toHaveProperty("available", cream.available);
+        expect(response.body).toHaveProperty("unit", cream.unit);
+        return expect(response.body).toHaveProperty("price", cream.price);
+      });
+    });
 
-  test("when access GET /api/v1/resources/:id with authentication as Client, return 200 and the cream at body reponse", async () => {
-    const response = await request(app)
-      .get(creamResourcePath + `/${cream.id}`)
-      .set("authorization", "Bearer " + accessTokenAsClient)
-      .set("refreshToken", refreshTokenAsClient)
-      .expect(200);
+    describe("GETTING CREAM AS AN MEMBER", () => {
+      test(`when access GET ${creamResourcePath}/:id with authentication as MEMBER, return 200 and the cream at body reponse`, async () => {
+        const response = await request(app)
+          .get(creamResourcePath + `/${cream.id}`)
+          .set("authorization", "Bearer " + accessTokenAsMember)
+          .set("refreshToken", "Bearer " + refreshTokenAsMember)
+          .expect(200);
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("name", cream.name);
-    expect(response.body).toHaveProperty("amount", cream.amount);
-    expect(response.body).toHaveProperty("id", cream.id);
-    expect(response.body).toHaveProperty("available", cream.available);
-    expect(response.body).toHaveProperty("unit", cream.unit);
-    return expect(response.body).toHaveProperty("price", cream.price);
-  });
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("name", cream.name);
+        expect(response.body).toHaveProperty("amount", cream.amount);
+        expect(response.body).toHaveProperty("id", cream.id);
+        expect(response.body).toHaveProperty("available", cream.available);
+        expect(response.body).toHaveProperty("unit", cream.unit);
+        return expect(response.body).toHaveProperty("price", cream.price);
+      });
+    });
 
-  test("when access GET /api/v1/resources/:id with authentication as Member, return 200 and the cream at body reponse", async () => {
-    const response = await request(app)
-      .get(creamResourcePath + `/${cream.id}`)
-      .set("authorization", "Bearer " + accessTokenAsMember)
-      .set("refreshToken", refreshTokenAsMember)
-      .expect(200);
+    describe("GETTING CREAM WITHOUT AUTHENTICATION", () => {
+      test(`when access GET ${creamResourcePath}/:id without authentication, return 401 and the message at body reponse with 'Unauthorized: No access token provided'`, async () => {
+        const response = await request(app)
+          .get(creamResourcePath + `/${cream.id}`)
+          .expect(401);
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("name", cream.name);
-    expect(response.body).toHaveProperty("amount", cream.amount);
-    expect(response.body).toHaveProperty("id", cream.id);
-    expect(response.body).toHaveProperty("available", cream.available);
-    expect(response.body).toHaveProperty("unit", cream.unit);
-    return expect(response.body).toHaveProperty("price", cream.price);
-  });
-
-  test("when access GET /api/v1/resources/:id without authentication, return 401 and the message at body reponse with 'Unauthorized: No access token provided'", async () => {
-    const response = await request(app)
-      .get(creamResourcePath + `/${cream.id}`)
-      .expect(401);
-
-    return expect(response.statusCode).toBe(401);
+        return expect(response.statusCode).toBe(401);
+      });
+    });
   });
 
   // UPDATE
