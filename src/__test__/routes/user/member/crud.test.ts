@@ -8,6 +8,7 @@ import { encodeSha256 } from "@libs/crypto";
 import { prismaClient } from "@libs/prisma";
 import { createClient } from "@repositories/user/client";
 import { isBooleanAttribute } from "@/__test__/utils/isBooleanAttribute";
+import { VerifyErrors, verify } from "jsonwebtoken";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -161,7 +162,6 @@ afterAll(async () => {
 
 describe("CRUD MEMBER RESOURCE", () => {
   describe("TEST TO CREATE MEMBER RESOURCE", () => {
-    // CREATE
     describe("CREATING MEMBER AS AN ADMIN", () => {
       test(
         `When an authenticated ADMIN accesses POST ${memberResourcePath} ` +
@@ -951,17 +951,6 @@ describe("CRUD MEMBER RESOURCE", () => {
           return expect(response.statusCode).toBe(422);
         }
       );
-
-      test(
-        `When accesses DELETE ${userResourcePath}/:id with without authentication ` +
-          "then it should return a 401 status",
-        async () => {
-          const response = await request(app)
-            .delete(userResourcePath + `/${userMemberAdmin.id}`)
-            .expect(401);
-          return expect(response.statusCode).toBe(401);
-        }
-      );
     });
 
     describe("DELETING MEMBER AS AN CLIENT", () => {
@@ -984,7 +973,7 @@ describe("CRUD MEMBER RESOURCE", () => {
           "then it should return a 422 status",
         async () => {
           const response = await request(app)
-            .delete(userResourcePath + `/members/some-id-invalid`)
+            .delete(userResourcePath + `/members/some-invalid-id`)
             .set("authorization", "Bearer " + accessTokenAsClient)
             .set("refreshToken", "Bearer " + refreshTokenAsClient)
             .expect(422);
@@ -994,27 +983,55 @@ describe("CRUD MEMBER RESOURCE", () => {
     });
 
     describe("DELETING MEMBER AS AN MEMBER", () => {
+      let memberAuthenticated: User & { role?: Role };
       test(
-        `When an authenticated MEMBER accesses DELETE ${userResourcePath}/:id ` +
+        `When an authenticated MEMBER accesses DELETE ${memberResourcePath}/member/:id ` +
+          "in which the id is the member authenticated, then it should return a 204 status",
+        async () => {
+          verify(
+            accessTokenAsMember,
+            process.env.TOKEN_SECRET,
+            (err: VerifyErrors, user: User & { role?: Role }) => {
+              err && console.log("err = ", err.message);
+              memberAuthenticated = user;
+            }
+          );
+          const response = await request(app)
+            .delete(memberResourcePath + `/member/${memberAuthenticated.id}`)
+            .set("authorization", "Bearer " + accessTokenAsMember)
+            .set("refreshToken", "Bearer " + refreshTokenAsMember)
+            .expect(204);
+
+          const allUsers = await prismaClient.user.findMany();
+
+          expect(
+            allUsers.some((user) => user.id === memberAuthenticated.id)
+          ).toBeFalsy();
+          return expect(response.statusCode).toBe(204);
+        }
+      );
+
+      test(
+        `When an authenticated MEMBER accesses DELETE ${memberResourcePath}/member/:id ` +
           "then it should return a 401 status",
         async () => {
           const response = await request(app)
-            .delete(userResourcePath + `/${userMemberClient.id}`)
+            .delete(memberResourcePath + `/member/${userMemberClient.id}`)
             .set("authorization", "Bearer " + accessTokenAsMember)
             .set("refreshToken", "Bearer " + refreshTokenAsMember)
             .expect(401);
           return expect(response.statusCode).toBe(401);
         }
       );
+    });
 
+    describe("DELETING MEMBER WITHOUT AUTHENTICATION", () => {
       test(
-        `When an authenticated MEMBER accesses DELETE ${userResourcePath}/members/:id ` +
+        `When accesses DELETE ${userResourcePath}/:id with without authentication ` +
           "then it should return a 401 status",
         async () => {
           const response = await request(app)
-            .delete(userResourcePath + `/members/${userMemberClient.id}`)
-            .set("authorization", "Bearer " + accessTokenAsMember)
-            .set("refreshToken", "Bearer " + refreshTokenAsMember)
+            .delete(userResourcePath + `/${userMemberAdmin.id}`)
             .expect(401);
           return expect(response.statusCode).toBe(401);
         }
