@@ -4,14 +4,14 @@ import { unprocessableEntity } from "@serializer/erros/422";
 import { Request, Response } from "express";
 
 export const deleteUserController = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { id, userId } = req.params;
 
   try {
-    await deleteUser({ id });
+    await deleteUser({ id: userId || id });
 
-    return res.status(204).send("cream is deleted");
+    return res.status(204).send("user is deleted");
   } catch (error) {
-    return unprocessableEntity(res);
+    return unprocessableEntity(res, "Error deleting user " + error.message);
   }
 };
 

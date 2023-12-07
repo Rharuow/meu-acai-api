@@ -111,6 +111,7 @@ beforeAll(async () => {
     }
   );
 });
+
 describe("CRUD CLIENT RESOURCE", () => {
   describe("TEST TO CREATE CLIENT RESOURCE", () => {
     describe("CREATING CLIENT AS AN ADMIN", () => {
@@ -751,22 +752,6 @@ describe("CRUD CLIENT RESOURCE", () => {
       );
     });
 
-    describe("DELETING CLIENT AS A CLIENT", () => {
-      test(
-        `When an authenticated CLIENT accesses DELETE ${userResourcePath}/:id ` +
-          "then it should return a 401 status",
-        async () => {
-          const response = await request(app)
-            .delete(userResourcePath + `/${userClient.id}`)
-            .set("authorization", "Bearer " + accessTokenAsClient)
-            .set("refreshToken", "Bearer " + refreshTokenAsClient)
-            .expect(401);
-
-          return expect(response.statusCode).toBe(401);
-        }
-      );
-    });
-
     describe("DELETING CLIENT AS A MEMBER", () => {
       test(
         `When an authenticated MEMBER accesses DELETE ${userResourcePath}/:id ` +
@@ -779,6 +764,35 @@ describe("CRUD CLIENT RESOURCE", () => {
             .expect(401);
 
           return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
+
+    describe("DELETING CLIENT AS A CLIENT", () => {
+      test(
+        `When an authenticated CLIENT accesses DELETE ${clientResourcePath}/:id ` +
+          "in which the id isn't the client authenticated, then it should return a 401 status",
+        async () => {
+          const response = await request(app)
+            .delete(clientResourcePath + `/${userClient.id}`)
+            .set("authorization", "Bearer " + accessTokenAsClient)
+            .set("refreshToken", "Bearer " + refreshTokenAsClient)
+            .expect(401);
+
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+      test(
+        `When an authenticated CLIENT accesses DELETE ${clientResourcePath}/:id ` +
+          "in which the id is the client authenticated, then it should return a 204 status",
+        async () => {
+          const response = await request(app)
+            .delete(clientResourcePath + `/${clientAuthenticated.id}`)
+            .set("authorization", "Bearer " + accessTokenAsClient)
+            .set("refreshToken", "Bearer " + refreshTokenAsClient)
+            .expect(204);
+
+          return expect(response.statusCode).toBe(204);
         }
       );
     });

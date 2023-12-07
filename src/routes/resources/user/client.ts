@@ -7,13 +7,14 @@ import {
   validationParams,
   validationQueryParams,
 } from "@middlewares/paramsRouter";
-import { NextFunction, Request, Response, Router } from "express";
+import { Router } from "express";
 import { updateClientController } from "@controllers/user/client/update";
 import { addRoleIdAtBody } from "@middlewares/resources/user/client/addRoleIdAtBody";
 import { addIncludesClientAndRoleAtBody } from "@middlewares/resources/user/client/addIncludesClientAndRoleAtBody";
 import { addIncludesClientAtQuery } from "@middlewares/resources/user/client/addIncludesClientAtQuery";
 import {
   Schema,
+  body,
   checkExact,
   checkSchema,
   param,
@@ -25,8 +26,7 @@ import { validationAdminAccessToken } from "@middlewares/authorization/validatio
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationUserOwnId } from "@middlewares/authorization/validationUserOwnId";
 import { updateBodyClient } from "@middlewares/resources/user/client/updateBody";
-import { VerifyErrors, verify } from "jsonwebtoken";
-import { Role, User } from "@prisma/client";
+import { deleteUserController } from "@controllers/user/delete";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {
@@ -124,7 +124,7 @@ clientRouter.post(
     [
       checkSchema(validationCreateClientBodySchema, ["body"]),
       query([], "Query parameters unpermitted"), // check if has any query parameters
-      param([], "Query parameters unpermitted"), // check if has any router parameters
+      param([], "Router parameters unpermitted"), // check if has any router parameters
     ],
     {
       message: "Param(s) not permitted",
@@ -134,6 +134,20 @@ clientRouter.post(
   addNextToBody,
   createUserController,
   createClientController
+);
+
+clientRouter.delete(
+  "/clients/:userId",
+  checkExact([
+    body([], "Body parameters unpermitted"),
+    query([], "Query parameters unpermitted"),
+    param(["userId"], "Router parameters unpermitted"),
+  ]),
+  validationParams,
+  validationAdminOrClientAccessToken,
+  addRoleIdAtBody,
+  validationUserOwnId,
+  deleteUserController
 );
 
 clientRouter.put(

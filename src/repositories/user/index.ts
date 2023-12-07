@@ -252,18 +252,24 @@ export const deleteUser = async ({ id }: { id: string }) => {
     where: {
       userId: id,
     },
+    include: {
+      address: true,
+    },
   });
 
-  if (hasClient) {
+  console.log("hasClient = ", hasClient);
+
+  if (hasClient && hasClient.addressId) {
     await prismaClient.address.update({
       where: {
-        clientId: hasClient.id,
+        id: hasClient.addressId,
       },
       data: {
         clientId: null,
       },
     });
   }
+
   const user = await prismaClient.user.delete({ where: { id } });
 
   return user;
