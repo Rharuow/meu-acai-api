@@ -163,7 +163,7 @@ To get started with the Meu Açai API, follow these steps:
       - **User:**
         - **ADMIN**
           - **IMPROVEMENTS:**
-            - [ ] Add email and phone as optional fields in the Admin Model Schema.
+            - [x] Add email and phone as optional fields in the Admin Model Schema.
             - [x] Admin Model in Schema
             - [x] Router to create ADMIN
             - [x] Router to update ADMIN
