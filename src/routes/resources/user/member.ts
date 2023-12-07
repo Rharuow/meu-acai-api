@@ -21,6 +21,7 @@ import { updateBodyMember } from "@middlewares/resources/user/member/updateBodyU
 import { Router } from "express";
 import {
   Schema,
+  body,
   checkExact,
   checkSchema,
   param,
@@ -156,7 +157,25 @@ memberRouter.put(
 );
 
 memberRouter.delete(
+  "/members/member/:userId",
+  validationAdminOrMemberAccessToken,
+  checkExact([
+    body([], "Body parameters unpermitted"),
+    query([], "Query parameters unpermitted"),
+    param(["userId"], "Router parameters unpermitted"),
+  ]),
+  validationParams,
+  validationUserOwnId,
+  deleteUserController
+);
+
+memberRouter.delete(
   "/members/:id",
+  checkExact([
+    body([], "Body parameters unpermitted"),
+    query([], "Query parameters unpermitted"),
+    param(["id"], "Router parameters unpermitted"),
+  ]),
   validationAdminOrClientAccessToken,
   deleteUserController
 );

@@ -782,6 +782,7 @@ describe("CRUD CLIENT RESOURCE", () => {
           return expect(response.statusCode).toBe(401);
         }
       );
+
       test(
         `When an authenticated CLIENT accesses DELETE ${clientResourcePath}/:id ` +
           "in which the id is the client authenticated, then it should return a 204 status",
