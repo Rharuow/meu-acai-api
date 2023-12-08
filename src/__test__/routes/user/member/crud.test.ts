@@ -908,15 +908,45 @@ describe("CRUD MEMBER RESOURCE", () => {
           `with name ${updateBody.name}, email ${updateBody.email} and phone ${updateBody.phone} at body request, while in the params route the userId and the id are the authenticated user ` +
           "should return 200",
         async () => {
+          const memberToEditTest = await prismaClient.user.create({
+            data: {
+              name: "Test member to edit",
+              password: encodeSha256("123"),
+              roleId: memberAuthenticated.roleId,
+              member: {
+                create: {
+                  clientId: clientReferenceToMemberAsClient.id,
+                },
+              },
+            },
+            include: {
+              member: true,
+            },
+          });
+
+          const memberLogged = await request(app)
+            .post("/api/v1/signin")
+            .send({ name: memberToEditTest.name, password: "123" })
+            .set("Accept", "application/json")
+            .expect(200);
+
           const response = await request(app)
             .put(
               userResourcePath +
-                `/${memberAuthenticated.id}/members/${memberAuthenticated.memberId}`
+                `/${memberToEditTest.id}/members/${memberToEditTest.member.id}`
             )
             .send(updateBody)
-            .set("authorization", "Bearer " + accessTokenAsMember)
-            .set("refreshToken", "Bearer " + refreshTokenAsMember)
+            .set("authorization", "Bearer " + memberLogged.body.accessToken)
+            .set("refreshToken", "Bearer " + memberLogged.body.refreshToken)
             .expect(200);
+
+          console.log("response.body = ", response.body);
+
+          await prismaClient.user.delete({
+            where: {
+              id: memberToEditTest.id,
+            },
+          });
 
           return expect(response.statusCode).toBe(200);
         }
