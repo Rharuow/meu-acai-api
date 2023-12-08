@@ -1,5 +1,8 @@
 import { createUserController } from "@controllers/user/create";
-import { deleteUserController } from "@controllers/user/delete";
+import {
+  deleteManyUsersController,
+  deleteUserController,
+} from "@controllers/user/delete";
 import { getUserController } from "@controllers/user/get";
 import { listUserController } from "@controllers/user/list";
 import { createMemberController } from "@controllers/user/member/create";
@@ -8,16 +11,19 @@ import { updateUserController } from "@controllers/user/update";
 import { addNextToBody } from "@middlewares/addNextToBody";
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationAdminOrMemberAccessToken } from "@middlewares/authorization/validationAdminOrMemberAccessToken";
+import { validationClientAccessToken } from "@middlewares/authorization/validationClientAccessToken";
 import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
 import { validationUserOwnId } from "@middlewares/authorization/validationUserOwnId";
 import {
   validationParams,
   validationQueryParams,
 } from "@middlewares/paramsRouter";
+import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
 import { addIncludesMemberAndRoleAtBody } from "@middlewares/resources/user/member/addIncludesMemberAndRoleAtBody";
 import { addIncludesMemberAtQuery } from "@middlewares/resources/user/member/addIncludesMemberAtQuery";
 import { addRoleIdAtBody } from "@middlewares/resources/user/member/addRoleIdAtBody";
 import { updateBodyMember } from "@middlewares/resources/user/member/updateBodyUser";
+import { validationMembersIds } from "@middlewares/resources/user/member/validationMemberIds";
 import { Router } from "express";
 import {
   Schema,
@@ -167,6 +173,14 @@ memberRouter.delete(
   validationParams,
   validationUserOwnId,
   deleteUserController
+);
+
+memberRouter.delete(
+  "/members/deleteMany",
+  idsInQueryParams,
+  validationClientAccessToken,
+  validationMembersIds,
+  deleteManyUsersController
 );
 
 memberRouter.delete(

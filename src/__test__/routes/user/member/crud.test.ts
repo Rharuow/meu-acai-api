@@ -906,7 +906,7 @@ describe("CRUD MEMBER RESOURCE", () => {
       test(
         `When an authenticated MEMBER accesses PUT ${userResourcePath}/:userId/members/:id ` +
           `with name ${updateBody.name}, email ${updateBody.email} and phone ${updateBody.phone} at body request, while in the params route the userId and the id are the authenticated user ` +
-          "should return 401",
+          "should return 200",
         async () => {
           const response = await request(app)
             .put(
@@ -983,7 +983,6 @@ describe("CRUD MEMBER RESOURCE", () => {
     });
 
     describe("DELETING MEMBER AS AN MEMBER", () => {
-      let memberAuthenticated: User & { role?: Role };
       test(
         `When an authenticated MEMBER accesses DELETE ${memberResourcePath}/member/:id ` +
           "in which the id is the member authenticated, then it should return a 204 status",
@@ -1034,6 +1033,154 @@ describe("CRUD MEMBER RESOURCE", () => {
             .delete(userResourcePath + `/${userMemberAdmin.id}`)
             .expect(401);
           return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
+
+    describe("DELETING MANY MEMBER AS AN ADMIN", () => {
+      let manyMembers: Array<User & {}>;
+      beforeAll(async () => {
+        // CREATING CLIENT TO TEST MEMBERS
+        const userClient = await prismaClient.user.create({
+          data: {
+            name: "TEST CREATE CLIENT TO DELETE MANY MEMBERS",
+            password: encodeSha256("123"),
+            roleId: clientAuthenticated.roleId,
+            client: {
+              create: {
+                address: {
+                  create: {
+                    house: "1000",
+                    square: "1000",
+                  },
+                },
+              },
+            },
+          },
+          include: {
+            client: true,
+          },
+        });
+
+        // CREATING MANY USERS
+        for (let index = 0; index < 20; index++) {
+          await prismaClient.user.create({
+            data: {
+              name: `TEST MEMBER TO DELETE MANY ${index}`,
+              password: "123",
+              roleId: memberAuthenticated.roleId,
+              member: {
+                create: {
+                  clientId: userClient.client.id,
+                },
+              },
+            },
+          });
+        }
+
+        manyMembers = await prismaClient.user.findMany({
+          where: {
+            name: {
+              contains: "TEST MEMBER TO DELETE MANY",
+            },
+          },
+          include: {
+            role: true,
+            member: true,
+          },
+        });
+      });
+
+      afterAll(async () => {
+        await prismaClient.user.deleteMany({
+          where: {
+            OR: [
+              { name: "TEST CREATE CLIENT TO DELETE MANY MEMBERS" },
+              {
+                name: {
+                  contains: "TEST MEMBER TO DELETE MANY",
+                },
+              },
+            ],
+          },
+        });
+
+        await prismaClient.address.deleteMany({
+          where: {
+            square: "1000",
+            house: "1000",
+          },
+        });
+      });
+
+      test(
+        `When a CLIENT accesses DELETE MANY ${memberResourcePath}/deleteMany?ids=id1&id2 ` +
+          "in which the ids that to belong to the client logged then it should return a 204 status",
+        async () => {
+          const clientAuthenticated = await request(app)
+            .post("/api/v1/signin")
+            .send({
+              name: "TEST CREATE CLIENT TO DELETE MANY MEMBERS",
+              password: "123",
+            })
+            .set("Accept", "application/json")
+            .expect(200);
+
+          const deleteManyRoute =
+            memberResourcePath +
+            `/deleteMany?ids=${manyMembers
+              .map((member) => member.id)
+              .join(",")}`;
+
+          const response = await request(app)
+            .delete(deleteManyRoute)
+            .set(
+              "authorization",
+              "Bearer " + clientAuthenticated.body.accessToken
+            )
+            .set(
+              "refreshToken",
+              "Bearer " + clientAuthenticated.body.refreshToken
+            )
+            .expect(204);
+
+          return expect(response.statusCode).toBe(204);
+        }
+      );
+
+      test(
+        `When a CLIENT accesses DELETE MANY ${memberResourcePath}/deleteMany?ids=id1&id2 ` +
+          "in which the ids that don't belong to the client logged then it should return a 401 status",
+        async () => {
+          const deleteManyRoute =
+            memberResourcePath +
+            `/deleteMany?ids=${manyMembers
+              .map((member) => member.id)
+              .join(",")}`;
+
+          const response = await request(app)
+            .delete(deleteManyRoute)
+            .set("authorization", "Bearer " + accessTokenAsClient)
+            .set("refreshToken", "Bearer " + refreshTokenAsClient)
+            .expect(401);
+
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+
+      test(
+        `When a CLIENT accesses DELETE MANY ${memberResourcePath}/deleteMany ` +
+          "without ids, then it should return a 400 status",
+        async () => {
+          const deleteManyRoute = memberResourcePath + `/deleteMany`;
+
+          const response = await request(app)
+            .delete(deleteManyRoute)
+            .set("authorization", "Bearer " + accessTokenAsClient)
+            .set("refreshToken", "Bearer " + refreshTokenAsClient)
+            .expect(400);
+
+          return expect(response.statusCode).toBe(400);
         }
       );
     });
