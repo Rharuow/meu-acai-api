@@ -4,15 +4,13 @@ import { Response } from "express";
 export const createAdminSerializer = ({
   res,
   user,
-  admin,
 }: {
   res: Response;
-  user: User;
-  admin: Admin;
+  user: User & { admin: Admin };
 }) => {
   return res.json({
     message: "User created successfully",
-    data: { user: { ...user, admin } },
+    data: { user },
   });
 };
 

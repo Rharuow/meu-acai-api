@@ -1,4 +1,3 @@
-import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
 import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
 import { app } from "@/app";
 import { prismaClient } from "@libs/prisma";
@@ -6,6 +5,10 @@ import { encodeSha256 } from "@libs/crypto";
 import { Admin, Role, User } from "@prisma/client";
 import { getUserByNameAndPassword } from "@repositories/user";
 import request from "supertest";
+import {
+  cleanAdminTestDatabase,
+  presetToAdminTests,
+} from "@/__test__/utils/presets/routes/admin";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -51,22 +54,23 @@ const createManyAdmins = Array(15)
 let userAdmin: User & { role?: Role } & { admin?: Admin };
 
 beforeAll(async () => {
-  await createAllKindOfUserAndRoles();
+  const { userAdmin, userClient, userMember } = await presetToAdminTests();
+
   const responseSignInAsAdmin = await request(app)
     .post("/api/v1/signin")
-    .send(userAsAdmin)
+    .send({ name: userAdmin.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
   const responseSignInAsClient = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send({ name: userClient.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
   const responseSignInAsMember = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send({ name: userMember.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
@@ -78,6 +82,10 @@ beforeAll(async () => {
 
   accessTokenAsMember = responseSignInAsMember.body.accessToken;
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
+});
+
+afterAll(async () => {
+  await cleanAdminTestDatabase();
 });
 
 describe("CRUD ADMIN RESOURCE", () => {
@@ -259,7 +267,7 @@ describe("CRUD ADMIN RESOURCE", () => {
           );
           expect(response.body.data.user.id).toBe(userAdmin.id);
           expect(
-            response.body.data.user.admin.id === response.body.data.user.adminId
+            response.body.data.user.admin.id === userAdmin.admin.id
           ).toBeTruthy();
           expect(response.body.data.user.admin.id).toBe(userAdmin.admin.id);
           return expect(response.statusCode).toBe(200);

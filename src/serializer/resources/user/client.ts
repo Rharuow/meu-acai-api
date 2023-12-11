@@ -4,15 +4,13 @@ import { Response } from "express";
 export const createClientSerializer = ({
   res,
   user,
-  client,
 }: {
   res: Response;
-  user: User;
-  client: Client;
+  user: User & { client?: Client; roleId?: string };
 }) => {
   return res.json({
     message: "User created successfully",
-    data: { user: { ...user, client } },
+    data: { user: { ...user } },
   });
 };
 

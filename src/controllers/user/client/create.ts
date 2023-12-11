@@ -3,16 +3,17 @@ import { createClientSerializer } from "@serializer/resources/user/client";
 import { unprocessableEntity } from "@serializer/erros/422";
 import { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
+import { CreateUserRequestBody } from "@/types/user/createRequestbody";
+import { CreateClientRequestBody } from "@/types/user/client/createRequestBody";
 
-export const createClientController = async (req: Request, res: Response) => {
-  const { user, address } = req.body;
+export const createClientController = async (
+  req: Request<{}, {}, CreateUserRequestBody & CreateClientRequestBody, {}>,
+  res: Response
+) => {
   try {
-    const client = await createClient({
-      userId: user.id,
-      address,
-    });
+    const client = await createClient(req.body);
 
-    return createClientSerializer({ res, user, client });
+    return createClientSerializer({ res, user: client });
   } catch (error) {
     // Check if the error is due to a unique constraint violation
     if (

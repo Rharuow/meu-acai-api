@@ -1,15 +1,35 @@
+import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 import { CreateMemberRequestBody } from "@/types/user/member/createRequestBody";
 import { UpdateMemberRequestBody } from "@/types/user/member/updateRequestBody";
+import { encodeSha256 } from "@libs/crypto";
 import { prismaClient } from "@libs/prisma";
 
-export const createMember = async (params: CreateMemberRequestBody) => {
-  const member = await prismaClient.member.create({
+export const createMember = async ({
+  clientId,
+  name,
+  password,
+  roleId,
+  email,
+  phone,
+  relationship,
+}: CreateMemberRequestBody & CreateUserRequestBody) => {
+  const member = await prismaClient.user.create({
     data: {
-      clientId: params.clientId,
-      userId: params.userId,
-      ...(params.email && { email: params.email }),
-      ...(params.phone && { phone: params.phone }),
-      ...(params.relationship && { relationship: params.relationship }),
+      name,
+      password: encodeSha256(password),
+      roleId,
+      member: {
+        create: {
+          clientId,
+          ...(phone && { phone }),
+          ...(email && { email }),
+          ...(relationship && { relationship }),
+        },
+      },
+    },
+    include: {
+      member: true,
+      role: true,
     },
   });
 

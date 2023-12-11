@@ -12,11 +12,11 @@ export const validationAdminAccessToken = async (
 ) => {
   const { authorization } = req.headers;
 
-  if (!authorization) return unauthorized(res);
+  if (!authorization) return unauthorized(res, "No authorization required");
 
   const accessToken = authorization.split("Bearer ")[1];
 
-  if (!accessToken) return unauthorized(res);
+  if (!accessToken) return unauthorized(res, "Format token required");
 
   try {
     const user = await new Promise<User & { role: Role }>((resolve, reject) => {
@@ -35,7 +35,7 @@ export const validationAdminAccessToken = async (
     });
 
     if (!user || user.role.name !== "ADMIN") {
-      return unauthorized(res);
+      return unauthorized(res, "User haven't access token");
     }
 
     const admin = await prismaClient.admin.findFirstOrThrow({
@@ -45,6 +45,7 @@ export const validationAdminAccessToken = async (
     res.locals.adminId = admin.id;
     return next();
   } catch (error) {
+    console.log("res = ", res);
     return unauthorized(res);
   }
 };

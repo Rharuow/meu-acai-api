@@ -1,38 +1,39 @@
-import { Params } from "@repositories/utils/queryBuilder";
+import { CreateUserRequestBody } from "./../../../types/user/createRequestbody.d";
 import { CreateClientRequestBody } from "@/types/user/client/createRequestBody";
 import { UpdateClientRequestBody } from "@/types/user/client/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
-import {
-  createAddress,
-  getAddressByHouseAndSquare,
-} from "@repositories/address";
+
+import { encodeSha256 } from "@libs/crypto";
 
 export const createClient = async ({
-  userId,
   address: { house, square },
-}: CreateClientRequestBody) => {
-  let address = await getAddressByHouseAndSquare({ house, square });
-
-  if (!address) address = await createAddress({ house, square });
-
-  const client = await prismaClient.client.create({
+  name,
+  password,
+  roleId,
+  email,
+  phone,
+}: CreateClientRequestBody & CreateUserRequestBody) => {
+  const client = await prismaClient.user.create({
     data: {
-      addressId: address.id,
-      userId,
+      name,
+      password: encodeSha256(password),
+      roleId,
+      client: {
+        create: {
+          ...(email && { email }),
+          ...(phone && { phone }),
+          address: {
+            create: {
+              house,
+              square,
+            },
+          },
+        },
+      },
     },
-  });
-
-  await prismaClient.user.update({
-    where: { id: userId },
-    data: {
-      clientId: client.id,
-    },
-  });
-
-  await prismaClient.address.update({
-    where: { id: address.id },
-    data: {
-      clientId: client.id,
+    include: {
+      role: true,
+      client: true,
     },
   });
   return client;

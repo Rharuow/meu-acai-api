@@ -90,7 +90,6 @@ adminRouter.post(
     }
   ),
   validationParams,
-  createUserController,
   createAdminController
 );
 

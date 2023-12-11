@@ -4,15 +4,13 @@ import { Response } from "express";
 export const createMemberSerializer = ({
   res,
   user,
-  member,
 }: {
   res: Response;
-  user: User;
-  member: Member;
+  user: User & { member?: Member; roleId?: string };
 }) => {
   return res.json({
     message: "User created successfully",
-    data: { user: { ...user, member } },
+    data: { user: { ...user } },
   });
 };
 
