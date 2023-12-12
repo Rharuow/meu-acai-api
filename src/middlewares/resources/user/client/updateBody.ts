@@ -3,12 +3,11 @@ import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
 import { badRequest } from "@serializer/erros/400";
 import { NextFunction, Request, Response } from "express";
 
-export const updateBodyClient = (
+export const updateBodyClient = async (
   req: Request<
+    { id: string; userId: string },
     {},
-    {},
-    UpdateClientRequestBody &
-      UpdateUserRequestBody & { client?: UpdateClientRequestBody },
+    UpdateClientRequestBody & UpdateUserRequestBody,
     {}
   >,
   res: Response,
@@ -21,11 +20,6 @@ export const updateBodyClient = (
       res,
       message: "At least one property must exist in the request body",
     });
-
-  req.body.client = {
-    ...(email && { email }),
-    ...(phone && { phone }),
-  };
 
   return next();
 };

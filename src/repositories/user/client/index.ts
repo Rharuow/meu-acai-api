@@ -4,6 +4,8 @@ import { UpdateClientRequestBody } from "@/types/user/client/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
 
 import { encodeSha256 } from "@libs/crypto";
+import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
+import { Client, Role, User } from "@prisma/client";
 
 export const createClient = async ({
   address: { house, square },
@@ -40,22 +42,66 @@ export const createClient = async ({
 };
 
 export const updateClient = async ({
-  userId,
   id,
-  fields,
+  userId,
+  fields: { email, password, name, phone },
 }: {
   userId: string;
   id: string;
-  fields: UpdateClientRequestBody;
+  fields: UpdateUserRequestBody & UpdateClientRequestBody;
 }) => {
-  return await prismaClient.client.update({
-    where: { userId, id },
-    data: fields,
-  });
+  try {
+    const { user, ...client } = await prismaClient.client.update({
+      where: { id },
+      data: {
+        ...(email && { email }),
+        ...(phone && { phone }),
+        user: {
+          update: {
+            where: { id: userId },
+            data: {
+              ...(name && { name }),
+              ...(password && { password }),
+            },
+          },
+        },
+      },
+      include: {
+        user: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+    return { ...user, client };
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
-export const getClient = async ({ id }: { id: string }) => {
-  return await prismaClient.client.findUnique({ where: { id } });
+export const getClient: ({
+  id,
+}: {
+  id: string;
+}) => Promise<User & { client: Client; role: Role }> = async ({ id }) => {
+  const { user, ...client } = await prismaClient.client.findUnique({
+    where: { id },
+    include: {
+      user: {
+        include: {
+          role: true,
+        },
+      },
+    },
+  });
+
+  return {
+    ...user,
+    client: {
+      ...client,
+    },
+  };
 };
 
 export const findClient = async (params: {

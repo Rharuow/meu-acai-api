@@ -1,3 +1,5 @@
+import { UpdateClientRequestBody } from "@/types/user/client/updateRequestBody";
+import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
 import { Role, User } from "@prisma/client";
 import { getUser } from "@repositories/user";
 import { unauthorized } from "@serializer/erros/401";
@@ -5,7 +7,12 @@ import { NextFunction, Request, Response } from "express";
 import { VerifyErrors, verify } from "jsonwebtoken";
 
 export const validationUserOwnId = async (
-  req: Request,
+  req: Request<
+    { id: string; userId: string },
+    {},
+    UpdateUserRequestBody & UpdateClientRequestBody,
+    qs.ParsedQs
+  >,
   res: Response,
   next: NextFunction
 ) => {

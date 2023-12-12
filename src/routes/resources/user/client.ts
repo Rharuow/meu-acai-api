@@ -27,6 +27,7 @@ import { validationAdminOrClientAccessToken } from "@middlewares/authorization/v
 import { validationUserOwnId } from "@middlewares/authorization/validationUserOwnId";
 import { updateBodyClient } from "@middlewares/resources/user/client/updateBody";
 import { deleteUserController } from "@controllers/user/delete";
+import { clientBelongsToUser } from "@middlewares/resources/user/client/validationClientBelongsToUser";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {
@@ -131,8 +132,6 @@ clientRouter.post(
     }
   ),
   validationParams,
-  addNextToBody,
-  createUserController,
   createClientController
 );
 
@@ -153,6 +152,7 @@ clientRouter.delete(
 clientRouter.put(
   "/:userId/clients/:id",
   validationAdminOrClientAccessToken,
+  clientBelongsToUser,
   validationUserOwnId,
   checkExact(
     [
@@ -165,9 +165,7 @@ clientRouter.put(
     }
   ),
   validationParams,
-  updateBodyUser,
   updateBodyClient,
-  updateUserController,
   updateClientController
 );
 

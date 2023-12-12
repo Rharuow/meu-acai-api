@@ -26,16 +26,14 @@ export const createManyClientSerializer = ({
 
 export const updateClientSerializer = ({
   res,
-  user,
   client,
 }: {
   res: Response;
-  user: User;
-  client: Client;
+  client: User & { client: Client; role: Role };
 }) => {
   return res.json({
     message: "User updated successfully",
-    data: { user: { ...user, client } },
+    data: { user: client },
   });
 };
 

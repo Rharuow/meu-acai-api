@@ -163,7 +163,7 @@ To get started with the Meu Açai API, follow these steps:
 
     - **Resources:**
 
-      - **User:**
+      - **USER:**
 
         - **ADMIN**
           - **IMPROVEMENTS:**
@@ -192,6 +192,8 @@ To get started with the Meu Açai API, follow these steps:
             - [x] The client should only delete their own account.
           - **IMPROVEMENTS:**
             - [x] CLIENT Model in Schema
+            - [ ] Router to change role of user
+            - [ ] Router to change address
             - [x] Router to create CLIENT ( POST "/api/v1/resources/users/clients" )
                   {
                   name: string;
@@ -216,6 +218,7 @@ To get started with the Meu Açai API, follow these steps:
             - [x] The member should only delete their own account.
           - **IMPROVEMENTS:**
             - [x] Member Model in Schema
+            - [ ] Router to change CLIENT reference (constrain PERMITION ADMIN )
             - [x] Router to create Member ( POST "/api/v1/resources/users/members" )
                   {
                   name: string;

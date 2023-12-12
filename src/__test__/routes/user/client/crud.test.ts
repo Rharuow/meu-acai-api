@@ -1,9 +1,3 @@
-import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
-import {
-  userAsAdmin,
-  userAsClient,
-  userAsMember,
-} from "@/__test__/utils/users";
 import { app } from "@/app";
 import { prismaClient } from "@libs/prisma";
 import { encodeSha256 } from "@libs/crypto";
@@ -11,6 +5,10 @@ import { Client, Role, User } from "@prisma/client";
 import { getUserByNameAndPassword } from "@repositories/user";
 import request from "supertest";
 import { verify } from "jsonwebtoken";
+import {
+  cleanClientTestDatabase,
+  presetToClientTests,
+} from "@/__test__/utils/presets/routes/client";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -50,13 +48,14 @@ const createClientBodyMissingName = {
   password: "Missing name",
 };
 
-let clientAuthenticated: User & { role: Role };
+let clientAuthenticated: User & { role: Role; client: Client };
 
 const createManyClients = Array(15)
   .fill(null)
   .map((_, index) => ({
     name: `Test Client ${index + 1}`,
     password: "123",
+    email: `testemailclient${index}@mail.com`,
     address: {
       square: (index + 3 + 100).toString(),
       house: (index + 3 + 100).toString(),
@@ -66,22 +65,22 @@ const createManyClients = Array(15)
 let userClient: User & { role?: Role } & { client?: Client };
 
 beforeAll(async () => {
-  await createAllKindOfUserAndRoles();
+  const { userAdmin, userClient, userMember } = await presetToClientTests();
   const responseSignInAsAdmin = await request(app)
     .post("/api/v1/signin")
-    .send(userAsAdmin)
+    .send({ name: userAdmin.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
   const responseSignInAsClient = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send({ name: userClient.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
   const responseSignInAsMember = await request(app)
     .post("/api/v1/signin")
-    .send(userAsMember)
+    .send({ name: userMember.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
@@ -105,11 +104,16 @@ beforeAll(async () => {
         },
         include: {
           role: true,
+          client: true,
         },
       });
       clientAuthenticated = userLogged;
     }
   );
+});
+
+afterAll(async () => {
+  await cleanClientTestDatabase();
 });
 
 describe("CRUD CLIENT RESOURCE", () => {
@@ -280,8 +284,7 @@ describe("CRUD CLIENT RESOURCE", () => {
           expect(response.body.data.user.name).toBe(updateClientBody.name);
           expect(response.body.data.user.id).toBe(userClient.id);
           expect(
-            response.body.data.user.client.id ===
-              response.body.data.user.clientId
+            response.body.data.user.client.id === userClient.client.id
           ).toBeTruthy();
           expect(response.body.data.user.client.id).toBe(userClient.client.id);
           return expect(response.statusCode).toBe(200);
@@ -309,7 +312,7 @@ describe("CRUD CLIENT RESOURCE", () => {
       test(
         `When an authenticated ADMIN accesses PUT ${userResourcePath}/:userId/clients/:id ` +
           "with invalid params, " +
-          "then it shouldn't update the User with the new provided information and return 401",
+          "then it shouldn't update the User with the new provided information and return 422",
         async () => {
           const response = await request(app)
             .put(
@@ -339,7 +342,7 @@ describe("CRUD CLIENT RESOURCE", () => {
           const response = await request(app)
             .put(
               userResourcePath +
-                `/${clientAuthenticated.id}/clients/${clientAuthenticated.clientId}`
+                `/${clientAuthenticated.id}/clients/${clientAuthenticated.client.id}`
             )
             .send(updatedFields)
             .set("authorization", "Bearer " + accessTokenAsClient)
@@ -372,7 +375,7 @@ describe("CRUD CLIENT RESOURCE", () => {
       test(
         `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/clients/:id ` +
           `with the name ${updateClientBody.name}, and sending an ID and userId that's not are the user logged. ` +
-          "then it shouldn't update the User with the new provided information and return 401",
+          "then it shouldn't update the User with the new provided information and return 422",
         async () => {
           const anotherUserClient = await prismaClient.user.findFirst({
             where: {
@@ -398,9 +401,9 @@ describe("CRUD CLIENT RESOURCE", () => {
             .send(updatedFields)
             .set("authorization", "Bearer " + accessTokenAsClient)
             .set("refreshToken", "Bearer " + refreshTokenAsClient)
-            .expect(401);
+            .expect(422);
 
-          return expect(response.statusCode).toBe(401);
+          return expect(response.statusCode).toBe(422);
         }
       );
     });
@@ -590,67 +593,32 @@ describe("CRUD CLIENT RESOURCE", () => {
             })
           ).id;
 
-          await prismaClient.address.createMany({
-            data: createManyClients.map((client) => ({
-              house: client.address.house,
-              square: client.address.square,
-            })),
-          });
-
-          const addressesIds = await prismaClient.address.findMany({
-            where: {
-              OR: createManyClients.map((client) => ({
-                house: client.address.house,
-                square: client.address.square,
-              })),
-            },
-          });
-
-          await prismaClient.user.createMany({
-            data: createManyClients.map((client) => ({
-              name: client.name,
-              password: client.password,
-              roleId,
-            })),
-          });
-
-          const usersIds = await prismaClient.user.findMany({
-            where: {
-              OR: createManyClients.map((client) => ({
-                name: client.name,
-                password: client.password,
-              })),
-            },
-          });
-
-          await prismaClient.client.createMany({
-            data: createManyClients.map((client, index) => ({
-              addressId: addressesIds[index].id,
-              userId: usersIds[index].id,
-            })),
-          });
+          for (let index = 0; index < createManyClients.length; index++) {
+            await prismaClient.user.create({
+              data: {
+                name: createManyClients[index].name,
+                password: createManyClients[index].password,
+                roleId,
+                client: {
+                  create: {
+                    email: createManyClients[index].email,
+                    address: {
+                      create: {
+                        house: createManyClients[index].address.house,
+                        square: createManyClients[index].address.square,
+                      },
+                    },
+                  },
+                },
+              },
+            });
+          }
 
           const response = await request(app)
             .get(clientResourcePath)
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(200);
-
-          await prismaClient.client.deleteMany({
-            where: {
-              addressId: {
-                in: addressesIds.map((addressId) => addressId.id),
-              },
-            },
-          });
-
-          await prismaClient.address.deleteMany({
-            where: {
-              id: {
-                in: addressesIds.map((addressId) => addressId.id),
-              },
-            },
-          });
 
           expect(response.body.data.length).toBe(10);
           expect(response.body.page).toBe(1);
@@ -824,6 +792,8 @@ describe("CRUD CLIENT RESOURCE", () => {
               },
             },
           });
+
+          console.log(await prismaClient.user.findMany());
 
           const response = await request(app)
             .delete(

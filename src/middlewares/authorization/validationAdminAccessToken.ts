@@ -45,7 +45,6 @@ export const validationAdminAccessToken = async (
     res.locals.adminId = admin.id;
     return next();
   } catch (error) {
-    console.log("res = ", res);
     return unauthorized(res);
   }
 };
