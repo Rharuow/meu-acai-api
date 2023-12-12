@@ -3,12 +3,16 @@ import { User } from "@prisma/client";
 import { VerifyErrors, verify } from "jsonwebtoken";
 import request from "supertest";
 import { userAsAdmin } from "../utils/users";
-import { createAllKindOfUserAndRoles } from "../utils/beforeAll/Users";
+import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
+import { createClientRoleIfNotExist } from "../utils/createClientRoleIfNotExists";
+import { createMemberRoleIfNotExist } from "../utils/createMemberRoleIfNotExists";
 
 const futureTime = Math.floor(Date.now() / 1000) + 10;
 
 beforeAll(async () => {
-  await createAllKindOfUserAndRoles();
+  await createAdminRoleIfNotExist();
+  await createClientRoleIfNotExist();
+  await createMemberRoleIfNotExist();
 });
 
 describe("Refresh token router", () => {

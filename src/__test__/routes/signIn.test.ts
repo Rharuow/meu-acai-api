@@ -3,13 +3,17 @@ import { User } from "@prisma/client";
 import { verify } from "jsonwebtoken";
 import request from "supertest";
 import { userAsAdmin } from "../utils/users";
-import { createAllKindOfUserAndRoles } from "../utils/beforeAll/Users";
+import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
+import { createClientRoleIfNotExist } from "../utils/createClientRoleIfNotExists";
+import { createMemberRoleIfNotExist } from "../utils/createMemberRoleIfNotExists";
 
 let accessToken: string;
 let refreshToken: string;
 
 beforeAll(async () => {
-  await createAllKindOfUserAndRoles();
+  await createAdminRoleIfNotExist();
+  await createClientRoleIfNotExist();
+  await createMemberRoleIfNotExist();
 });
 
 describe("Sign in route", () => {
