@@ -793,8 +793,6 @@ describe("CRUD CLIENT RESOURCE", () => {
             },
           });
 
-          console.log(await prismaClient.user.findMany());
-
           const response = await request(app)
             .delete(
               `${userResourcePath}/deleteMany?ids=${clientsToDelete

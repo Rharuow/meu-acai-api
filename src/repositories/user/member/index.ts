@@ -1,6 +1,7 @@
 import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 import { CreateMemberRequestBody } from "@/types/user/member/createRequestBody";
 import { UpdateMemberRequestBody } from "@/types/user/member/updateRequestBody";
+import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
 import { encodeSha256 } from "@libs/crypto";
 import { prismaClient } from "@libs/prisma";
 
@@ -39,16 +40,37 @@ export const createMember = async ({
 export const updateMember = async ({
   userId,
   id,
-  fields,
+  fields: { email, name, password, relationship, phone },
 }: {
   userId: string;
   id: string;
-  fields: UpdateMemberRequestBody;
+  fields: UpdateMemberRequestBody & UpdateUserRequestBody;
 }) => {
-  return await prismaClient.member.update({
-    where: { userId, id },
-    data: fields,
+  const { user, ...member } = await prismaClient.member.update({
+    where: { id },
+    data: {
+      ...(relationship && { relationship }),
+      ...(phone && { phone }),
+      ...(email && { email }),
+      user: {
+        update: {
+          where: { id: userId },
+          data: {
+            ...(name && { name }),
+            ...(password && { password }),
+          },
+        },
+      },
+    },
+    include: {
+      user: {
+        include: {
+          role: true,
+        },
+      },
+    },
   });
+  return { ...user, member };
 };
 
 export const getMember = async ({ id }: { id: string }) => {

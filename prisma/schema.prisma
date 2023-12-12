@@ -80,7 +80,7 @@ model Member {
   relationship  String?
   userId        String      @unique
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clientId      String      @unique
+  clientId      String      
   client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }
 

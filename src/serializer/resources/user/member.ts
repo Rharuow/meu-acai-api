@@ -6,11 +6,11 @@ export const createMemberSerializer = ({
   user,
 }: {
   res: Response;
-  user: User & { member?: Member; roleId?: string };
+  user: User & { member: Member; roleId: string };
 }) => {
   return res.json({
     message: "User created successfully",
-    data: { user: { ...user } },
+    data: { user },
   });
 };
 
@@ -26,16 +26,14 @@ export const createManyMemberSerializer = ({
 
 export const updateMemberSerializer = ({
   res,
-  user,
   member,
 }: {
   res: Response;
-  user: User;
-  member: Member;
+  member: User & { member?: Member } & { role?: Role };
 }) => {
   return res.json({
     message: "User updated successfully",
-    data: { user: { ...user, member } },
+    data: { user: member },
   });
 };
 

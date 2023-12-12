@@ -138,7 +138,6 @@ memberRouter.post(
   ),
   validationParams,
   addNextToBody,
-  createUserController,
   createMemberController
 );
 
@@ -158,7 +157,6 @@ memberRouter.put(
   ),
   validationParams,
   updateBodyMember,
-  updateUserController,
   updateMemberController
 );
 
