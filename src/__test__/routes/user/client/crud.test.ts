@@ -29,8 +29,8 @@ const createClientBody = {
   name: "Test Client Created",
   password: "123",
   address: {
-    square: "2",
-    house: "2",
+    square: "createClientBody 2",
+    house: "createClientBody 2",
   },
 };
 
