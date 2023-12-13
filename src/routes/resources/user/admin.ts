@@ -1,9 +1,7 @@
 import { createAdminController } from "@controllers/user/admin/create";
 import { updateAdminController } from "@controllers/user/admin/update";
-import { createUserController } from "@controllers/user/create";
 import { getUserController } from "@controllers/user/get";
 import { listUserController } from "@controllers/user/list";
-import { updateUserController } from "@controllers/user/update";
 import {
   validationParams,
   validationQueryParams,
@@ -90,7 +88,6 @@ adminRouter.post(
     }
   ),
   validationParams,
-  createUserController,
   createAdminController
 );
 
@@ -109,7 +106,6 @@ adminRouter.put(
   validationParams,
   updateBodyUser,
   updateBodyAdmin,
-  updateUserController,
   updateAdminController
 );
 

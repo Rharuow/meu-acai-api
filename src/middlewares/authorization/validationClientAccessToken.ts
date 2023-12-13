@@ -5,18 +5,18 @@ import { getUser } from "@repositories/user";
 import { NextFunction, Request, Response } from "express";
 import { VerifyErrors, verify } from "jsonwebtoken";
 
-export const validationAdminAccessToken = async (
+export const validationClientAccessToken = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const { authorization } = req.headers;
 
-  if (!authorization) return unauthorized(res, "No authorization required");
+  if (!authorization) return unauthorized(res);
 
   const accessToken = authorization.split("Bearer ")[1];
 
-  if (!accessToken) return unauthorized(res, "Format token required");
+  if (!accessToken) return unauthorized(res);
 
   try {
     const user = await new Promise<User & { role: Role }>((resolve, reject) => {
@@ -34,15 +34,15 @@ export const validationAdminAccessToken = async (
       );
     });
 
-    if (!user || user.role.name !== "ADMIN") {
-      return unauthorized(res, "User haven't access token");
+    if (!user || user.role.name !== "CLIENT") {
+      return unauthorized(res);
     }
 
-    const admin = await prismaClient.admin.findFirstOrThrow({
+    const client = await prismaClient.client.findFirstOrThrow({
       where: { userId: user.id },
     });
 
-    res.locals.adminId = admin.id;
+    res.locals.clientId = client.id;
     return next();
   } catch (error) {
     return unauthorized(res);

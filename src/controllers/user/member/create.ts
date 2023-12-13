@@ -4,20 +4,16 @@ import { unprocessableEntity } from "@serializer/erros/422";
 import { Request, Response } from "express";
 import { Prisma, User } from "@prisma/client";
 import { CreateMemberRequestBody } from "@/types/user/member/createRequestBody";
+import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 
 export const createMemberController = async (
-  req: Request<{}, {}, CreateMemberRequestBody & { user: User }, {}>,
+  req: Request<{}, {}, CreateMemberRequestBody & CreateUserRequestBody, {}>,
   res: Response
 ) => {
   try {
-    const { user } = req.body;
-    const member = await createMember({
-      ...req.body,
-      userId: user.id,
-      clientId: req.body.clientId,
-    });
+    const member = await createMember(req.body);
 
-    return createMemberSerializer({ res, user, member });
+    return createMemberSerializer({ res, user: member });
   } catch (error) {
     console.error("Error creating member = ", error);
     // Check if the error is due to a unique constraint violation

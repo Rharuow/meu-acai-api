@@ -2,6 +2,8 @@ import { Params } from "@repositories/utils/queryBuilder";
 import { CreateAdminRequestBody } from "@/types/user/admin/createRequestBody";
 import { UpdateAdminRequestBody } from "@/types/user/admin/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
+import { encodeSha256 } from "@libs/crypto";
+import { userInMemory, usersInMemory } from "@libs/memory-cache";
 
 export type ParamsAdmin = Params & {
   orderBy:
@@ -13,19 +15,34 @@ export type ParamsAdmin = Params & {
     | "createdAt:desc";
 };
 
-export const createAdmin = async ({ userId }: CreateAdminRequestBody) => {
-  const admin = await prismaClient.admin.create({
+export const createAdmin = async ({
+  name,
+  password,
+  roleId,
+  email,
+  phone,
+}: CreateAdminRequestBody) => {
+  const userAdmin = await prismaClient.user.create({
     data: {
-      userId,
+      name,
+      password: encodeSha256(password),
+      roleId,
+      admin: {
+        create: {
+          ...(email && { email }),
+          ...(phone && { phone }),
+        },
+      },
+    },
+
+    include: {
+      admin: true,
+      role: true,
     },
   });
-  await prismaClient.user.update({
-    where: { id: userId },
-    data: {
-      adminId: admin.id,
-    },
-  });
-  return admin;
+  userInMemory.clear();
+  usersInMemory.clear();
+  return userAdmin;
 };
 
 export const updateAdmin = async ({
@@ -37,6 +54,8 @@ export const updateAdmin = async ({
   id: string;
   fields: UpdateAdminRequestBody;
 }) => {
+  userInMemory.clear();
+  usersInMemory.clear();
   return await prismaClient.admin.update({
     where: { userId, id },
     data: fields,

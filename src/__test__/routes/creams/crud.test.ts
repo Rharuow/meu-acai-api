@@ -1,14 +1,14 @@
 import { app } from "@/app";
 import request from "supertest";
-import { userAsAdmin, userAsClient } from "../../utils/users";
 import { prismaClient } from "@libs/prisma";
-import {
-  createAllKindOfUserAndRoles,
-  createTwentyCreams,
-} from "@/__test__/utils/beforeAll/Users";
 import { Cream } from "@prisma/client";
 import { CreateCreamRequestBody } from "@/types/creams/createRequestbody";
 import { UpdateCreamRequestBody } from "@/types/creams/updateRequestBody";
+import {
+  cleanCreamTestDatabase,
+  createTwentyCreams,
+  presetToCreamTests,
+} from "@/__test__/presets/routes/creams";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -24,23 +24,24 @@ let cream: Cream;
 let creamsToDelete: Array<Cream>;
 
 beforeAll(async () => {
-  await createAllKindOfUserAndRoles();
+  const { userAdmin, userClient, userMember } = await presetToCreamTests();
+
   await createTwentyCreams();
   const responseSignInAsAdmin = await request(app)
     .post("/api/v1/signin")
-    .send(userAsAdmin)
+    .send({ name: userAdmin.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
   const responseSignInAsClient = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send({ name: userClient.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
   const responseSignInAsMember = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send({ name: userMember.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
@@ -52,6 +53,10 @@ beforeAll(async () => {
 
   accessTokenAsMember = responseSignInAsMember.body.accessToken;
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
+});
+
+afterAll(async () => {
+  await cleanCreamTestDatabase();
 });
 
 const createCreamRequestBody: CreateCreamRequestBody = {

@@ -1,8 +1,6 @@
 import { createClientController } from "@controllers/user/client/create";
-import { createUserController } from "@controllers/user/create";
 import { getUserController } from "@controllers/user/get";
 import { listUserController } from "@controllers/user/list";
-import { updateUserController } from "@controllers/user/update";
 import {
   validationParams,
   validationQueryParams,
@@ -27,6 +25,7 @@ import { validationAdminOrClientAccessToken } from "@middlewares/authorization/v
 import { validationUserOwnId } from "@middlewares/authorization/validationUserOwnId";
 import { updateBodyClient } from "@middlewares/resources/user/client/updateBody";
 import { deleteUserController } from "@controllers/user/delete";
+import { clientBelongsToUser } from "@middlewares/resources/user/client/validationClientBelongsToUser";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {
@@ -131,8 +130,6 @@ clientRouter.post(
     }
   ),
   validationParams,
-  addNextToBody,
-  createUserController,
   createClientController
 );
 
@@ -153,6 +150,7 @@ clientRouter.delete(
 clientRouter.put(
   "/:userId/clients/:id",
   validationAdminOrClientAccessToken,
+  clientBelongsToUser,
   validationUserOwnId,
   checkExact(
     [
@@ -165,9 +163,7 @@ clientRouter.put(
     }
   ),
   validationParams,
-  updateBodyUser,
   updateBodyClient,
-  updateUserController,
   updateClientController
 );
 

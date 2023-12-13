@@ -11,7 +11,7 @@ export const idsInQueryParams = (
 
   const ids = req.query.ids.split(",");
 
-  if (!ids || !Array.isArray(ids)) {
+  if (!ids || !Array.isArray(ids) || ids.length <= 0) {
     return badRequest({ res, message: "Invalid or missing IDs" });
   }
 

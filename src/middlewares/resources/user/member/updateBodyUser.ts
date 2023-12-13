@@ -4,15 +4,7 @@ import { badRequest } from "@serializer/erros/400";
 import { NextFunction, Request, Response } from "express";
 
 export const updateBodyMember = (
-  req: Request<
-    {},
-    {},
-    UpdateUserRequestBody &
-      UpdateMemberRequestBody & { user?: UpdateUserRequestBody } & {
-        member: UpdateMemberRequestBody;
-      },
-    {}
-  >,
+  req: Request<{}, {}, UpdateUserRequestBody & UpdateMemberRequestBody, {}>,
   res: Response,
   next: NextFunction
 ) => {
@@ -22,18 +14,6 @@ export const updateBodyMember = (
       res,
       message: "At least one property must exist in the request body",
     });
-
-  req.body.user = {
-    ...(name && { name }),
-    ...(password && { password }),
-    ...(roleId && { roleId }),
-  };
-
-  req.body.member = {
-    ...(email && { email }),
-    ...(phone && { phone }),
-    ...(relationship && { relationship }),
-  };
 
   return next();
 };

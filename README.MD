@@ -158,44 +158,103 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Test for failed cases in DELETE MANY a Cream
 
 - **FEATS:**
+
   - **Routes:**
+
     - **Resources:**
-      - **User:**
+
+      - **USER:**
+
         - **ADMIN**
           - **IMPROVEMENTS:**
             - [x] Add email and phone as optional fields in the Admin Model Schema.
             - [x] Admin Model in Schema
-            - [x] Router to create ADMIN
-            - [x] Router to update ADMIN
-            - [x] Router to get ADMIN
-            - [x] Router to list with pagination and filters ADMIN
-            - [x] Router to delete many ADMIN
+            - [x] Router to create ADMIN ( POST /api/v1/resources/users/admins )
+                  {
+                  name: string;
+                  password: string;
+                  email?: string;
+                  phone?: string
+                  }
+            - [x] Router to update ADMIN ( PUT /api/v1/resources/users/admins/:id )
+                  {
+                  name?: stirng;
+                  password?: string;
+                  email?: string;
+                  phone?: string
+                  }
+            - [x] Router to get ADMIN ( GET /api/v1/resources/users/admins/:id )
+            - [x] Router to list with pagination and filters ADMIN ( GET /api/v1/resources/users/admins)
+            - [x] Router to delete ADMIN ( DELETE /api/v1/resources/users/:id )
+            - [x] Router to delete many ADMIN ( DELETE /api/v1/resources/users/admins/deleteMany?ids=id1&id2)
         - **CLIENT**
           - **REFACTOR**
             - [x] The client should only delete their own account.
           - **IMPROVEMENTS:**
-            - [x] Client Model in Schema
-            - [x] Router to create Client
-            - [x] Router to update Client
-            - [x] Router to get Client
-            - [x] Router to list with pagination and filters Client
-            - [x] Router to delete Client
-            - [x] Router to delete many Client
+            - [x] CLIENT Model in Schema
+            - [ ] Router to change role of user
+            - [ ] Router to change address
+            - [x] Router to create CLIENT ( POST "/api/v1/resources/users/clients" )
+                  {
+                  name: string;
+                  password: string;
+                  email?: string;
+                  phone?: string
+                  }
+            - [x] Router to update CLIENT ( PUT "/api/v1/resources/users/clients/:id" )
+                  {
+                  name?: string;
+                  password?: string;
+                  email?: string;
+                  phone?: string
+                  }
+            - [x] Router to get CLIENT ( GET /api/v1/resources/users/clients/:id )
+            - [x] Router to list with pagination and filters CLIENT ( GET /api/v1/resources/users/clients)
+            - [x] Router to delete CLIENT ( DELETE /api/v1/resources/users/:id )
+            - [x] Router to delete CLIENT own account ( DELETE /api/v1/resources/users/clients/:userId)
+            - [x] Router to delete many CLIENT ( DELETE /api/v1/resources/users/clients/deleteMany?ids=id1&id2)
         - **MEMBER**
           - **REFACTOR**
-            - [ ] The member should only delete their own account.
+            - [x] The member should only delete their own account.
           - **IMPROVEMENTS:**
             - [x] Member Model in Schema
-            - [x] Router to create Member
-            - [x] Router to update Member
-            - [x] Router to get Member
-            - [x] Router to list with pagination and filters Member
-            - [ ] Router to delete many Member
+            - [ ] Router to change CLIENT reference (constrain PERMITION ADMIN )
+            - [x] Router to create Member ( POST "/api/v1/resources/users/members" )
+                  {
+                  name: string;
+                  password: string;
+                  email?: string;
+                  phone?: string
+                  }
+            - [x] Router to update Member ( PUT "/api/v1/resources/users/members/:id" )
+                  {
+                  name?: string;
+                  password?: string;
+                  email?: string;
+                  phone?: string
+                  }
+            - [x] Router to get Member ( GET "/api/v1/resources/users/members/:id" )
+            - [x] Router to list with pagination and filters Member ( GET "/api/v1/resources/users/members/" )
+            - [x] Router to delete many Member ( DELETE "/api/v1/resources/users/members/deleteMany?ids=id1&id2" )
+
       - **CREAM:**
         - **IMPROVEMENTS:**
           - [x] Cream Model in Schema
-          - [x] Router to create Cream
-          - [x] Router to update Cream
-          - [x] Router to get Cream
-          - [x] Router to list with pagination and filters Cream
-          - [x] Router to delete Cream
+          - [x] Router to create Cream ( POST "/api/v1/resources/creams" )
+                {
+                name: string,
+                price: float,
+                amount: number,
+                unit: string
+                }
+          - [x] Router to update Cream ( PUT "/api/v1/resources/creams/:id" )
+                {
+                name?: string,
+                price?: float,
+                amount?: number,
+                unit?: string
+                }
+          - [x] Router to get Cream ( GET "/api/v1/resources/creams/:id" )
+          - [x] Router to list with pagination and filters Cream ( GET "/api/v1/resources/creams" )
+          - [x] Router to delete Cream ( DELETE "/api/v1/resources/creams/:id" )
+          - [x] Router to delete many Cream ( DELETE "/api/v1/resources/creams/delteMany?ids=id1&id2" )

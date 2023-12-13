@@ -36,32 +36,6 @@ export const validationUserAccessToken = async (
 
     if (!user) return unauthorized(res);
 
-    if (user.role.name === "MEMBER") {
-      const userWithMember = await prismaClient.user.findUnique({
-        where: {
-          id: user.id,
-        },
-        include: {
-          client: {
-            include: {
-              members: true,
-            },
-          },
-        },
-      });
-
-      req.query.customFilter = {
-        id: {
-          in: userWithMember.client.members.map((member) => member.userId),
-        },
-        AND: {
-          id: {
-            not: user.id,
-          },
-        },
-      };
-    }
-
     if (user.role.name === "CLIENT") {
       const userWithMember = await prismaClient.user.findUnique({
         where: {
@@ -85,6 +59,7 @@ export const validationUserAccessToken = async (
 
     return next();
   } catch (error) {
+    console.log(error);
     return unauthorized(res);
   }
 };

@@ -7,28 +7,20 @@ import { Request, Response } from "express";
 
 export const updateMemberController = async (
   req: Request<
-    { id: string },
+    { id: string; userId: string },
     {},
-    UpdateMemberRequestBody &
-      UpdateMemberRequestBody & { user: User } & {
-        member: UpdateMemberRequestBody;
-      },
+    UpdateMemberRequestBody & UpdateMemberRequestBody,
     {}
   >,
   res: Response
 ) => {
-  const { user, member: memberFields } = req.body;
-
-  const { id } = req.params;
+  const { id, userId } = req.params;
 
   try {
-    const member = memberFields
-      ? await updateMember({ userId: user.id, id, fields: memberFields })
-      : await getMember({ id });
+    const member = await updateMember({ fields: req.body, id, userId });
 
     return updateMemberSerializer({
       res,
-      user: { ...user, memberId: member.id },
       member,
     });
   } catch (error) {

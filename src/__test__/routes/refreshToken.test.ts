@@ -1,21 +1,79 @@
 import { app } from "@/app";
-import { User } from "@prisma/client";
+import { Admin, Client, Member, Role, User } from "@prisma/client";
 import { VerifyErrors, verify } from "jsonwebtoken";
 import request from "supertest";
-import { userAsAdmin } from "../utils/users";
-import { createAllKindOfUserAndRoles } from "../utils/beforeAll/Users";
+import { createAdmin } from "@repositories/user/admin";
+import { createClient } from "@repositories/user/client";
+import { createMember } from "@repositories/user/member";
+import { prismaClient } from "@libs/prisma";
+import { createAdminRoleIfNotExist } from "../presets/createAdminRoleIfNotExists";
+import { createClientRoleIfNotExist } from "../presets/createClientRoleIfNotExists";
+import { createMemberRoleIfNotExist } from "../presets/createMemberRoleIfNotExists";
 
 const futureTime = Math.floor(Date.now() / 1000) + 10;
 
+let userAdmin: User & { role: Role; admin: Admin };
+
+const createAdminBody = {
+  name: "Test Admin to refreshToekn test",
+  password: "123",
+};
+
+let userClient: User & { role: Role; client: Client };
+
+const createClientBody = {
+  name: "Test Client to refreshToekn test",
+  password: "123",
+};
+
+let userMember: User & { role: Role; member: Member };
+
+const createMemberBody = {
+  name: "Test Member to refreshToekn test",
+  password: "123",
+};
+
 beforeAll(async () => {
-  await createAllKindOfUserAndRoles();
+  const roleIdAdmin = await createAdminRoleIfNotExist();
+  const roleIdClient = await createClientRoleIfNotExist();
+  const roleIdMember = await createMemberRoleIfNotExist();
+
+  userAdmin = await createAdmin({
+    ...createAdminBody,
+    roleId: roleIdAdmin,
+  });
+
+  userClient = await createClient({
+    ...createClientBody,
+    roleId: roleIdClient,
+    address: {
+      house: createClientBody.name,
+      square: createClientBody.name,
+    },
+  });
+
+  userMember = await createMember({
+    ...createMemberBody,
+    roleId: roleIdMember,
+    clientId: userClient.client.id,
+  });
+});
+
+afterAll(async () => {
+  await prismaClient.user.deleteMany({
+    where: {
+      id: {
+        in: [userAdmin.id, userClient.id, userMember.id],
+      },
+    },
+  });
 });
 
 describe("Refresh token router", () => {
   test("when the accessToken expires, the refresh token router is called to regenerate a new access token", async () => {
     const responseSignIn = await request(app)
       .post("/api/v1/signin")
-      .send(userAsAdmin)
+      .send(createAdminBody)
       .set("Accept", "application/json")
       .expect(200);
 

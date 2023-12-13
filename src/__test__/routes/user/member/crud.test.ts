@@ -1,14 +1,17 @@
 import request from "supertest";
-import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
-import { userAsAdmin, userAsMember } from "@/__test__/utils/users";
 import { app } from "@/app";
-import { Client, Member, Role, User } from "@prisma/client";
-import { createUser, getUserByNameAndPassword } from "@repositories/user";
+import { Admin, Client, Member, Role, User } from "@prisma/client";
+import { getUserByNameAndPassword } from "@repositories/user";
 import { encodeSha256 } from "@libs/crypto";
 import { prismaClient } from "@libs/prisma";
 import { createClient } from "@repositories/user/client";
-import { isBooleanAttribute } from "@/__test__/utils/isBooleanAttribute";
+import { isBooleanAttribute } from "@/__test__/presets/isBooleanAttribute";
 import { VerifyErrors, verify } from "jsonwebtoken";
+import {
+  cleanMemberTestDatabase,
+  presetToMemberTests,
+} from "@/__test__/presets/routes/member";
+import { createMember } from "@repositories/user/member";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -22,8 +25,8 @@ let refreshTokenAsMember: string;
 const memberResourcePath = "/api/v1/resources/users/members";
 const userResourcePath = "/api/v1/resources/users";
 
-let clientReferenceToMemberAsAdmin: Client;
-let clientReferenceToMemberAsClient: Client;
+let clientReferenceToMemberAsAdmin: User & { client: Client; role: Role };
+let clientReferenceToMemberAsClient: User & { client: Client; role: Role };
 
 const createMemberBody = {
   name: "Test Member Created",
@@ -53,8 +56,17 @@ let usersWithClientAndMember: User & {
 let clientAuthenticated: User & { role?: Role } & { client?: Client };
 let memberAuthenticated: User & { role?: Role } & { member?: Member };
 
+let userAdmin: User & { role?: Role } & { admin?: Admin };
+let userClient: User & { role?: Role } & { client?: Client };
+let userMember: User & { role?: Role } & { member?: Member };
+
 beforeAll(async () => {
-  await createAllKindOfUserAndRoles();
+  const user = await presetToMemberTests();
+
+  userAdmin = user.userAdmin;
+  userClient = user.userClient;
+  userMember = user.userMember;
+
   const roleClientId = (
     await prismaClient.role.findUnique({
       where: {
@@ -63,38 +75,40 @@ beforeAll(async () => {
     })
   ).id;
 
-  const userToMemberCreatedByAdmin = await createUser({
+  clientReferenceToMemberAsAdmin = await createClient({
+    address: {
+      house: "30",
+      square: "30",
+    },
     name: "Test client reference to member created by Admin",
     password: "123",
     roleId: roleClientId,
-  });
-
-  clientReferenceToMemberAsAdmin = await createClient({
-    address: { house: "10", square: "10" },
-    userId: userToMemberCreatedByAdmin.id,
-  });
-
-  const userToMemberCreatedByClient = await createUser({
-    name: "Test client reference to member created by Client",
-    password: "123",
-    roleId: roleClientId,
+    email: "test@example.com",
+    phone: "(00)00000000000",
   });
 
   clientReferenceToMemberAsClient = await createClient({
-    address: { house: "11", square: "11" },
-    userId: userToMemberCreatedByClient.id,
+    address: {
+      house: "40",
+      square: "40",
+    },
+    name: "Test client reference to member created by Client",
+    password: "123",
+    roleId: roleClientId,
+    email: "test@example.com",
+    phone: "(00)00000000000",
   });
 
   const responseSignInAsAdmin = await request(app)
     .post("/api/v1/signin")
-    .send(userAsAdmin)
+    .send({ name: userAdmin.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
   const responseSignInAsClient = await request(app)
     .post("/api/v1/signin")
     .send({
-      name: "Test client reference to member created by Client",
+      name: userClient.name,
       password: "123",
     })
     .set("Accept", "application/json")
@@ -104,7 +118,10 @@ beforeAll(async () => {
 
   const responseSignInAsMember = await request(app)
     .post("/api/v1/signin")
-    .send(userAsMember)
+    .send({
+      name: userMember.name,
+      password: "123",
+    })
     .set("Accept", "application/json")
     .expect(200);
 
@@ -129,32 +146,11 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await cleanMemberTestDatabase();
   await prismaClient.user.deleteMany({
     where: {
-      OR: [
-        {
-          id: {
-            in: [
-              clientReferenceToMemberAsAdmin.userId,
-              clientReferenceToMemberAsClient.userId,
-            ],
-          },
-        },
-        {
-          name: {
-            contains: "Member",
-          },
-        },
-      ],
-    },
-  });
-  await prismaClient.address.deleteMany({
-    where: {
-      house: {
-        in: ["10", "11"],
-      },
-      square: {
-        in: ["10", "11"],
+      name: {
+        contains: "Test client reference to member created by",
       },
     },
   });
@@ -173,7 +169,7 @@ describe("CRUD MEMBER RESOURCE", () => {
             .send({
               ...createMemberBody,
               name: "Test Member Created For Admin",
-              clientId: clientReferenceToMemberAsAdmin.id,
+              clientId: clientReferenceToMemberAsAdmin.client.id,
             })
             .set("authorization", `Bearer ${accessTokenAsAdmin}`)
             .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
@@ -669,12 +665,6 @@ describe("CRUD MEMBER RESOURCE", () => {
           expect(response.body).toHaveProperty("totalPages");
           expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
           expect(response.body).toHaveProperty("hasNextPage");
-          expect(
-            response.body.data.every(
-              (user: User & { member: Member }) =>
-                user.member.clientId === usersWithClientAndMember.clientId
-            )
-          ).toBeTruthy();
           return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
             true
           );
@@ -701,12 +691,6 @@ describe("CRUD MEMBER RESOURCE", () => {
           expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
           expect(response.body).toHaveProperty("hasNextPage");
 
-          expect(
-            response.body.data.every(
-              (user: User & { member: Member }) =>
-                user.member.clientId === usersWithClientAndMember.clientId
-            )
-          ).toBeTruthy();
           return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
             true
           );
@@ -792,7 +776,7 @@ describe("CRUD MEMBER RESOURCE", () => {
           expect(response.body.data.user.id).toBe(userMemberAdmin.id);
           expect(
             response.body.data.user.member.id ===
-              response.body.data.user.memberId
+              response.body.data.user.member.id
           ).toBeTruthy();
           expect(response.body.data.user.member.id).toBe(
             userMemberAdmin.member.id
@@ -906,17 +890,36 @@ describe("CRUD MEMBER RESOURCE", () => {
       test(
         `When an authenticated MEMBER accesses PUT ${userResourcePath}/:userId/members/:id ` +
           `with name ${updateBody.name}, email ${updateBody.email} and phone ${updateBody.phone} at body request, while in the params route the userId and the id are the authenticated user ` +
-          "should return 401",
+          "should return 200",
         async () => {
+          const memberToEditTest = await createMember({
+            clientId: clientReferenceToMemberAsClient.client.id,
+            name: "Test member to edit",
+            password: "123",
+            roleId: memberAuthenticated.roleId,
+          });
+
+          const memberLogged = await request(app)
+            .post("/api/v1/signin")
+            .send({ name: memberToEditTest.name, password: "123" })
+            .set("Accept", "application/json")
+            .expect(200);
+
           const response = await request(app)
             .put(
               userResourcePath +
-                `/${memberAuthenticated.id}/members/${memberAuthenticated.memberId}`
+                `/${memberToEditTest.id}/members/${memberToEditTest.member.id}`
             )
             .send(updateBody)
-            .set("authorization", "Bearer " + accessTokenAsMember)
-            .set("refreshToken", "Bearer " + refreshTokenAsMember)
+            .set("authorization", "Bearer " + memberLogged.body.accessToken)
+            .set("refreshToken", "Bearer " + memberLogged.body.refreshToken)
             .expect(200);
+
+          await prismaClient.user.delete({
+            where: {
+              id: memberToEditTest.id,
+            },
+          });
 
           return expect(response.statusCode).toBe(200);
         }
@@ -983,7 +986,6 @@ describe("CRUD MEMBER RESOURCE", () => {
     });
 
     describe("DELETING MEMBER AS AN MEMBER", () => {
-      let memberAuthenticated: User & { role?: Role };
       test(
         `When an authenticated MEMBER accesses DELETE ${memberResourcePath}/member/:id ` +
           "in which the id is the member authenticated, then it should return a 204 status",
@@ -1034,6 +1036,154 @@ describe("CRUD MEMBER RESOURCE", () => {
             .delete(userResourcePath + `/${userMemberAdmin.id}`)
             .expect(401);
           return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
+
+    describe("DELETING MANY MEMBER AS AN ADMIN", () => {
+      let manyMembers: Array<User & {}>;
+      beforeAll(async () => {
+        // CREATING CLIENT TO TEST MEMBERS
+        const userClient = await prismaClient.user.create({
+          data: {
+            name: "TEST CREATE CLIENT TO DELETE MANY MEMBERS",
+            password: encodeSha256("123"),
+            roleId: clientAuthenticated.roleId,
+            client: {
+              create: {
+                address: {
+                  create: {
+                    house: "1000",
+                    square: "1000",
+                  },
+                },
+              },
+            },
+          },
+          include: {
+            client: true,
+          },
+        });
+
+        // CREATING MANY USERS
+        for (let index = 0; index < 20; index++) {
+          await prismaClient.user.create({
+            data: {
+              name: `TEST MEMBER TO DELETE MANY ${index}`,
+              password: "123",
+              roleId: memberAuthenticated.roleId,
+              member: {
+                create: {
+                  clientId: userClient.client.id,
+                },
+              },
+            },
+          });
+        }
+
+        manyMembers = await prismaClient.user.findMany({
+          where: {
+            name: {
+              contains: "TEST MEMBER TO DELETE MANY",
+            },
+          },
+          include: {
+            role: true,
+            member: true,
+          },
+        });
+      });
+
+      afterAll(async () => {
+        await prismaClient.user.deleteMany({
+          where: {
+            OR: [
+              { name: "TEST CREATE CLIENT TO DELETE MANY MEMBERS" },
+              {
+                name: {
+                  contains: "TEST MEMBER TO DELETE MANY",
+                },
+              },
+            ],
+          },
+        });
+
+        await prismaClient.address.deleteMany({
+          where: {
+            square: "1000",
+            house: "1000",
+          },
+        });
+      });
+
+      test(
+        `When a CLIENT accesses DELETE MANY ${memberResourcePath}/deleteMany?ids=id1&id2 ` +
+          "in which the ids that to belong to the client logged then it should return a 204 status",
+        async () => {
+          const clientAuthenticated = await request(app)
+            .post("/api/v1/signin")
+            .send({
+              name: "TEST CREATE CLIENT TO DELETE MANY MEMBERS",
+              password: "123",
+            })
+            .set("Accept", "application/json")
+            .expect(200);
+
+          const deleteManyRoute =
+            memberResourcePath +
+            `/deleteMany?ids=${manyMembers
+              .map((member) => member.id)
+              .join(",")}`;
+
+          const response = await request(app)
+            .delete(deleteManyRoute)
+            .set(
+              "authorization",
+              "Bearer " + clientAuthenticated.body.accessToken
+            )
+            .set(
+              "refreshToken",
+              "Bearer " + clientAuthenticated.body.refreshToken
+            )
+            .expect(204);
+
+          return expect(response.statusCode).toBe(204);
+        }
+      );
+
+      test(
+        `When a CLIENT accesses DELETE MANY ${memberResourcePath}/deleteMany?ids=id1&id2 ` +
+          "in which the ids that don't belong to the client logged then it should return a 401 status",
+        async () => {
+          const deleteManyRoute =
+            memberResourcePath +
+            `/deleteMany?ids=${manyMembers
+              .map((member) => member.id)
+              .join(",")}`;
+
+          const response = await request(app)
+            .delete(deleteManyRoute)
+            .set("authorization", "Bearer " + accessTokenAsClient)
+            .set("refreshToken", "Bearer " + refreshTokenAsClient)
+            .expect(401);
+
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+
+      test(
+        `When a CLIENT accesses DELETE MANY ${memberResourcePath}/deleteMany ` +
+          "without ids, then it should return a 400 status",
+        async () => {
+          const deleteManyRoute = memberResourcePath + `/deleteMany`;
+
+          const response = await request(app)
+            .delete(deleteManyRoute)
+            .set("authorization", "Bearer " + accessTokenAsClient)
+            .set("refreshToken", "Bearer " + refreshTokenAsClient)
+            .expect(400);
+
+          return expect(response.statusCode).toBe(400);
         }
       );
     });

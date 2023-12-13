@@ -1,3 +1,6 @@
+import { CreateUserRequestBody } from "../createRequestbody";
+
 export type CreateAdminRequestBody = {
-  userId: string;
-};
+  email?: string;
+  phone?: string;
+} & CreateUserRequestBody;

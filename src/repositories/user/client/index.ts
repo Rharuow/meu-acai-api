@@ -1,60 +1,112 @@
-import { Params } from "@repositories/utils/queryBuilder";
+import { CreateUserRequestBody } from "./../../../types/user/createRequestbody.d";
 import { CreateClientRequestBody } from "@/types/user/client/createRequestBody";
 import { UpdateClientRequestBody } from "@/types/user/client/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
-import {
-  createAddress,
-  getAddressByHouseAndSquare,
-} from "@repositories/address";
+
+import { encodeSha256 } from "@libs/crypto";
+import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
+import { Client, Role, User } from "@prisma/client";
+import { userInMemory, usersInMemory } from "@libs/memory-cache";
 
 export const createClient = async ({
-  userId,
   address: { house, square },
-}: CreateClientRequestBody) => {
-  let address = await getAddressByHouseAndSquare({ house, square });
-
-  if (!address) address = await createAddress({ house, square });
-
-  const client = await prismaClient.client.create({
+  name,
+  password,
+  roleId,
+  email,
+  phone,
+}: CreateClientRequestBody & CreateUserRequestBody) => {
+  const client = await prismaClient.user.create({
     data: {
-      addressId: address.id,
-      userId,
+      name,
+      password: encodeSha256(password),
+      roleId,
+      client: {
+        create: {
+          ...(email && { email }),
+          ...(phone && { phone }),
+          address: {
+            create: {
+              house,
+              square,
+            },
+          },
+        },
+      },
+    },
+    include: {
+      role: true,
+      client: true,
     },
   });
-
-  await prismaClient.user.update({
-    where: { id: userId },
-    data: {
-      clientId: client.id,
-    },
-  });
-
-  await prismaClient.address.update({
-    where: { id: address.id },
-    data: {
-      clientId: client.id,
-    },
-  });
+  userInMemory.clear();
+  usersInMemory.clear();
   return client;
 };
 
 export const updateClient = async ({
-  userId,
   id,
-  fields,
+  userId,
+  fields: { email, password, name, phone },
 }: {
   userId: string;
   id: string;
-  fields: UpdateClientRequestBody;
+  fields: UpdateUserRequestBody & UpdateClientRequestBody;
 }) => {
-  return await prismaClient.client.update({
-    where: { userId, id },
-    data: fields,
-  });
+  try {
+    const { user, ...client } = await prismaClient.client.update({
+      where: { id },
+      data: {
+        ...(email && { email }),
+        ...(phone && { phone }),
+        user: {
+          update: {
+            where: { id: userId },
+            data: {
+              ...(name && { name }),
+              ...(password && { password }),
+            },
+          },
+        },
+      },
+      include: {
+        user: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+    userInMemory.clear();
+    usersInMemory.clear();
+    return { ...user, client };
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
-export const getClient = async ({ id }: { id: string }) => {
-  return await prismaClient.client.findUnique({ where: { id } });
+export const getClient: ({
+  id,
+}: {
+  id: string;
+}) => Promise<User & { client: Client; role: Role }> = async ({ id }) => {
+  const { user, ...client } = await prismaClient.client.findUnique({
+    where: { id },
+    include: {
+      user: {
+        include: {
+          role: true,
+        },
+      },
+    },
+  });
+
+  return {
+    ...user,
+    client: {
+      ...client,
+    },
+  };
 };
 
 export const findClient = async (params: {

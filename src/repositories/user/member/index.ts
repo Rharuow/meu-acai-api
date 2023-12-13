@@ -1,34 +1,80 @@
+import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 import { CreateMemberRequestBody } from "@/types/user/member/createRequestBody";
 import { UpdateMemberRequestBody } from "@/types/user/member/updateRequestBody";
+import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
+import { encodeSha256 } from "@libs/crypto";
+import { userInMemory, usersInMemory } from "@libs/memory-cache";
 import { prismaClient } from "@libs/prisma";
 
-export const createMember = async (params: CreateMemberRequestBody) => {
-  const member = await prismaClient.member.create({
+export const createMember = async ({
+  clientId,
+  name,
+  password,
+  roleId,
+  email,
+  phone,
+  relationship,
+}: CreateMemberRequestBody & CreateUserRequestBody) => {
+  const member = await prismaClient.user.create({
     data: {
-      clientId: params.clientId,
-      userId: params.userId,
-      ...(params.email && { email: params.email }),
-      ...(params.phone && { phone: params.phone }),
-      ...(params.relationship && { relationship: params.relationship }),
+      name,
+      password: encodeSha256(password),
+      roleId,
+      member: {
+        create: {
+          clientId,
+          ...(phone && { phone }),
+          ...(email && { email }),
+          ...(relationship && { relationship }),
+        },
+      },
+    },
+    include: {
+      member: true,
+      role: true,
     },
   });
-
+  userInMemory.clear();
+  usersInMemory.clear();
   return member;
 };
 
 export const updateMember = async ({
   userId,
   id,
-  fields,
+  fields: { email, name, password, relationship, phone },
 }: {
   userId: string;
   id: string;
-  fields: UpdateMemberRequestBody;
+  fields: UpdateMemberRequestBody & UpdateUserRequestBody;
 }) => {
-  return await prismaClient.member.update({
-    where: { userId, id },
-    data: fields,
+  const { user, ...member } = await prismaClient.member.update({
+    where: { id },
+    data: {
+      ...(relationship && { relationship }),
+      ...(phone && { phone }),
+      ...(email && { email }),
+      user: {
+        update: {
+          where: { id: userId },
+          data: {
+            ...(name && { name }),
+            ...(password && { password }),
+          },
+        },
+      },
+    },
+    include: {
+      user: {
+        include: {
+          role: true,
+        },
+      },
+    },
   });
+  userInMemory.clear();
+  usersInMemory.clear();
+  return { ...user, member };
 };
 
 export const getMember = async ({ id }: { id: string }) => {

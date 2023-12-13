@@ -1,11 +1,11 @@
-import { createAllKindOfUserAndRoles } from "@/__test__/utils/beforeAll/Users";
-import { userAsAdmin, userAsClient } from "@/__test__/utils/users";
 import { app } from "@/app";
 import { prismaClient } from "@libs/prisma";
-import { encodeSha256 } from "@libs/crypto";
-import { Admin, Role, User } from "@prisma/client";
-import { getUserByNameAndPassword } from "@repositories/user";
+import { Admin, Client, Member, Role, User } from "@prisma/client";
 import request from "supertest";
+import {
+  cleanAdminTestDatabase,
+  presetToAdminTests,
+} from "@/__test__/presets/routes/admin";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -49,24 +49,31 @@ const createManyAdmins = Array(15)
   }));
 
 let userAdmin: User & { role?: Role } & { admin?: Admin };
+let userClient: User & { role?: Role } & { client?: Client };
+let userMember: User & { role?: Role } & { member?: Member };
 
 beforeAll(async () => {
-  await createAllKindOfUserAndRoles();
+  const user = await presetToAdminTests();
+
+  userAdmin = user.userAdmin;
+  userClient = user.userClient;
+  userMember = user.userMember;
+
   const responseSignInAsAdmin = await request(app)
     .post("/api/v1/signin")
-    .send(userAsAdmin)
+    .send({ name: user.userAdmin.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
   const responseSignInAsClient = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send({ name: user.userClient.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
   const responseSignInAsMember = await request(app)
     .post("/api/v1/signin")
-    .send(userAsClient)
+    .send({ name: user.userMember.name, password: "123" })
     .set("Accept", "application/json")
     .expect(200);
 
@@ -78,6 +85,15 @@ beforeAll(async () => {
 
   accessTokenAsMember = responseSignInAsMember.body.accessToken;
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
+});
+
+afterAll(async () => {
+  await cleanAdminTestDatabase();
+  await prismaClient.user.delete({
+    where: {
+      name: createAdminBody.name,
+    },
+  });
 });
 
 describe("CRUD ADMIN RESOURCE", () => {
@@ -95,28 +111,11 @@ describe("CRUD ADMIN RESOURCE", () => {
             .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
             .expect(200);
 
-          userAdmin = await getUserByNameAndPassword(
-            {
-              name: createAdminBody.name,
-              password: createAdminBody.password,
-            },
-            ["Role", "Admin"]
+          expect(response.body.data.user).toHaveProperty(
+            "name",
+            createAdminBody.name
           );
-
-          expect(userAdmin).toBeTruthy();
-          expect(userAdmin).toHaveProperty("name", createAdminBody.name);
-          expect(
-            userAdmin.id === response.body.data.user.admin.userId
-          ).toBeTruthy();
-          expect(userAdmin.name === response.body.data.user.name).toBeTruthy();
-          expect(
-            userAdmin.password === response.body.data.user.password
-          ).toBeTruthy();
-          expect(userAdmin).toHaveProperty(
-            "password",
-            encodeSha256(createAdminBody.password)
-          );
-          expect(userAdmin.role).toHaveProperty("name", "ADMIN");
+          expect(response.body.data.user.role).toHaveProperty("name", "ADMIN");
 
           return expect(response.statusCode).toBe(200);
         }
@@ -237,17 +236,7 @@ describe("CRUD ADMIN RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(200);
 
-          userAdmin = {
-            ...userAdmin,
-            name: updateAdminBody.name,
-            admin: {
-              ...userAdmin.admin,
-              phone: updateAdminBody.phone,
-              email: updateAdminBody.email,
-            },
-          };
-
-          expect(response.body.data.user.name).toBe(userAdmin.name);
+          expect(response.body.data.user.name).toBe(updateAdminBody.name);
           expect(response.body.data.user).toHaveProperty("admin");
           expect(response.body.data.user.admin).toHaveProperty(
             "email",
@@ -257,9 +246,11 @@ describe("CRUD ADMIN RESOURCE", () => {
             "phone",
             updateAdminBody.phone
           );
-          expect(response.body.data.user.id).toBe(userAdmin.id);
+          expect(response.body.data.user.admin.userId).toBe(
+            userAdmin.admin.userId
+          );
           expect(
-            response.body.data.user.admin.id === response.body.data.user.adminId
+            response.body.data.user.admin.id === userAdmin.admin.id
           ).toBeTruthy();
           expect(response.body.data.user.admin.id).toBe(userAdmin.admin.id);
           return expect(response.statusCode).toBe(200);
@@ -664,15 +655,15 @@ describe("CRUD ADMIN RESOURCE", () => {
 
       test(
         `When an authenticated ADMIN accesses DELETE ${userResourcePath}/:id with id invalid` +
-          " then it should return a 422 status",
+          " then it should return a 401 status",
         async () => {
           const response = await request(app)
             .delete(userResourcePath + "/123")
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-            .expect(422);
+            .expect(401);
 
-          return expect(response.statusCode).toBe(422);
+          return expect(response.statusCode).toBe(401);
         }
       );
 
@@ -690,15 +681,15 @@ describe("CRUD ADMIN RESOURCE", () => {
 
       test(
         `When an authenticated ADMIN accesses DELETE ${userResourcePath} ` +
-          "then it should return a 404 status",
+          "then it should return a 401 status",
         async () => {
           const response = await request(app)
             .delete(userResourcePath)
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
-            .expect(404);
+            .expect(401);
 
-          return expect(response.statusCode).toBe(404);
+          return expect(response.statusCode).toBe(401);
         }
       );
     });

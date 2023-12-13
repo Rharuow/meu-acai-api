@@ -34,7 +34,7 @@ model User {
   password    String
   roleId      String
   role        Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  adminId     String? @unique
+  adminId     String? @unique @map("adminId")
   admin       Admin?
   clientId    String? @unique
   client      Client?
@@ -65,8 +65,8 @@ model Client {
   phone       String?
   userId      String      @unique
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  addressId   String      @unique
-  address     Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  addressId   String?      @unique
+  address     Address?  
   members     Member[]
 }
 
@@ -80,7 +80,7 @@ model Member {
   relationship  String?
   userId        String      @unique
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clientId      String      @unique
+  clientId      String      
   client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }
 
@@ -91,9 +91,9 @@ model Address {
   updatedAt     DateTime    @updatedAt
   square        String
   house         String
-  clientId      String?     @unique
-  client        Client?
-  @@unique([house, square], name: "unique_house_square")
+  clientId      String      @unique
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  @@unique([house, square], name: "house_square")
 }
 
 model Topping {
