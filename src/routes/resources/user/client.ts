@@ -1,8 +1,6 @@
 import { createClientController } from "@controllers/user/client/create";
-import { createUserController } from "@controllers/user/create";
 import { getUserController } from "@controllers/user/get";
 import { listUserController } from "@controllers/user/list";
-import { updateUserController } from "@controllers/user/update";
 import {
   validationParams,
   validationQueryParams,

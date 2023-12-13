@@ -3,6 +3,7 @@ import { CreateAdminRequestBody } from "@/types/user/admin/createRequestBody";
 import { UpdateAdminRequestBody } from "@/types/user/admin/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
 import { encodeSha256 } from "@libs/crypto";
+import { userInMemory, usersInMemory } from "@libs/memory-cache";
 
 export type ParamsAdmin = Params & {
   orderBy:
@@ -39,6 +40,8 @@ export const createAdmin = async ({
       role: true,
     },
   });
+  userInMemory.clear();
+  usersInMemory.clear();
   return userAdmin;
 };
 
@@ -51,6 +54,8 @@ export const updateAdmin = async ({
   id: string;
   fields: UpdateAdminRequestBody;
 }) => {
+  userInMemory.clear();
+  usersInMemory.clear();
   return await prismaClient.admin.update({
     where: { userId, id },
     data: fields,

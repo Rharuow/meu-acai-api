@@ -6,6 +6,7 @@ import { prismaClient } from "@libs/prisma";
 import { encodeSha256 } from "@libs/crypto";
 import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
 import { Client, Role, User } from "@prisma/client";
+import { userInMemory, usersInMemory } from "@libs/memory-cache";
 
 export const createClient = async ({
   address: { house, square },
@@ -38,6 +39,8 @@ export const createClient = async ({
       client: true,
     },
   });
+  userInMemory.clear();
+  usersInMemory.clear();
   return client;
 };
 
@@ -74,6 +77,8 @@ export const updateClient = async ({
         },
       },
     });
+    userInMemory.clear();
+    usersInMemory.clear();
     return { ...user, client };
   } catch (error) {
     throw new Error(error);

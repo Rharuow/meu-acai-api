@@ -1,4 +1,3 @@
-import { createUserController } from "@controllers/user/create";
 import {
   deleteManyUsersController,
   deleteUserController,
@@ -7,7 +6,6 @@ import { getUserController } from "@controllers/user/get";
 import { listUserController } from "@controllers/user/list";
 import { createMemberController } from "@controllers/user/member/create";
 import { updateMemberController } from "@controllers/user/member/update";
-import { updateUserController } from "@controllers/user/update";
 import { addNextToBody } from "@middlewares/addNextToBody";
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationAdminOrMemberAccessToken } from "@middlewares/authorization/validationAdminOrMemberAccessToken";
@@ -117,7 +115,7 @@ memberRouter.get(
 memberRouter.get(
   "/members",
   validationQueryParams,
-  validationUserAccessToken,
+  validationAdminOrClientAccessToken,
   addIncludesMemberAtQuery,
   listUserController
 );

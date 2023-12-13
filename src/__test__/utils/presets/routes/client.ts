@@ -5,6 +5,7 @@ import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
 import { prismaClient } from "@libs/prisma";
+import { Admin, Client, Member, Role, User } from "@prisma/client";
 
 const createAdminToAuthenticate = {
   name: "Test Admin Authenticate to client crud test",
@@ -21,23 +22,27 @@ const createMemberToAuthenticate = {
   password: "123",
 };
 
+let userAdmin: User & { role: Role; admin: Admin };
+let userClient: User & { role: Role; client: Client };
+let userMember: User & { role: Role; member: Member };
+
 export const presetToClientTests = async () => {
   const RoleAdminId = await createAdminRoleIfNotExist();
   const RoleClientId = await createClientRoleIfNotExist();
   const RoleMemberId = await createMemberRoleIfNotExist();
 
-  const userAdmin = await createAdmin({
+  userAdmin = await createAdmin({
     ...createAdminToAuthenticate,
     roleId: RoleAdminId,
   });
 
-  const userClient = await createClient({
+  userClient = await createClient({
     ...createClientToAuthenticate,
-    address: { house: "2", square: "2" },
+    address: { house: "1", square: "1" },
     roleId: RoleClientId,
   });
 
-  const userMember = await createMember({
+  userMember = await createMember({
     ...createMemberToAuthenticate,
     clientId: userClient.client.id,
     roleId: RoleMemberId,
@@ -49,12 +54,8 @@ export const presetToClientTests = async () => {
 export const cleanClientTestDatabase = async () => {
   await prismaClient.user.deleteMany({
     where: {
-      name: {
-        in: [
-          createAdminToAuthenticate.name,
-          createClientToAuthenticate.name,
-          createMemberToAuthenticate.name,
-        ],
+      id: {
+        in: [userAdmin.id, userClient.id, userMember.id],
       },
     },
   });

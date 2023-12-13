@@ -5,6 +5,7 @@ import { createMemberRoleIfNotExist } from "../../createMemberRoleIfNotExists";
 import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
+import { Admin, Client, Member, Role, User } from "@prisma/client";
 
 const createAdminToAuthenticate = {
   name: "Test Admin Authenticate to cream crud test",
@@ -21,23 +22,27 @@ const createMemberToAuthenticate = {
   password: "123",
 };
 
+let userAdmin: User & { role: Role; admin: Admin };
+let userClient: User & { role: Role; client: Client };
+let userMember: User & { role: Role; member: Member };
+
 export const presetToCreamTests = async () => {
   const RoleAdminId = await createAdminRoleIfNotExist();
   const RoleClientId = await createClientRoleIfNotExist();
   const RoleMemberId = await createMemberRoleIfNotExist();
 
-  const userAdmin = await createAdmin({
+  userAdmin = await createAdmin({
     ...createAdminToAuthenticate,
     roleId: RoleAdminId,
   });
 
-  const userClient = await createClient({
+  userClient = await createClient({
     ...createClientToAuthenticate,
-    address: { house: "0", square: "0" },
+    address: { house: "2", square: "2" },
     roleId: RoleClientId,
   });
 
-  const userMember = await createMember({
+  userMember = await createMember({
     ...createMemberToAuthenticate,
     clientId: userClient.client.id,
     roleId: RoleMemberId,
@@ -49,12 +54,8 @@ export const presetToCreamTests = async () => {
 export const cleanCreamTestDatabase = async () => {
   await prismaClient.user.deleteMany({
     where: {
-      name: {
-        in: [
-          createAdminToAuthenticate.name,
-          createClientToAuthenticate.name,
-          createMemberToAuthenticate.name,
-        ],
+      id: {
+        in: [userAdmin.id, userClient.id, userMember.id],
       },
     },
   });

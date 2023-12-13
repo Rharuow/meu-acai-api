@@ -3,6 +3,7 @@ import { CreateMemberRequestBody } from "@/types/user/member/createRequestBody";
 import { UpdateMemberRequestBody } from "@/types/user/member/updateRequestBody";
 import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
 import { encodeSha256 } from "@libs/crypto";
+import { userInMemory, usersInMemory } from "@libs/memory-cache";
 import { prismaClient } from "@libs/prisma";
 
 export const createMember = async ({
@@ -33,7 +34,8 @@ export const createMember = async ({
       role: true,
     },
   });
-
+  userInMemory.clear();
+  usersInMemory.clear();
   return member;
 };
 
@@ -70,6 +72,8 @@ export const updateMember = async ({
       },
     },
   });
+  userInMemory.clear();
+  usersInMemory.clear();
   return { ...user, member };
 };
 

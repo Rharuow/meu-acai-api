@@ -145,42 +145,6 @@ export const getUser = async ({
   return userInMemory.retrieveItemValue(reference);
 };
 
-export const createUser = async ({
-  name,
-  password,
-  roleId,
-}: CreateUserRequestBody) => {
-  userInMemory.clear();
-  usersInMemory.clear();
-  return await prismaClient.user.create({
-    data: {
-      name,
-      password: encodeSha256(password),
-      roleId,
-    },
-  });
-};
-
-export const updateUser: ({
-  id,
-  fields,
-}: {
-  id: string;
-  fields: UpdateUserRequestBody;
-}) => Promise<User & { role?: Role }> = async ({ fields, id }) => {
-  userInMemory.clear();
-  usersInMemory.clear();
-  const { name, password, roleId } = fields;
-  return await prismaClient.user.update({
-    where: { id },
-    data: {
-      ...(name && { name }),
-      ...(password && { password }),
-      ...(roleId && { roleId }),
-    },
-  });
-};
-
 export const listUsers: (params: ParamsUser) => Promise<
   [
     Array<

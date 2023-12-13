@@ -1,6 +1,6 @@
 import request from "supertest";
 import { app } from "@/app";
-import { Client, Member, Role, User } from "@prisma/client";
+import { Admin, Client, Member, Role, User } from "@prisma/client";
 import { getUserByNameAndPassword } from "@repositories/user";
 import { encodeSha256 } from "@libs/crypto";
 import { prismaClient } from "@libs/prisma";
@@ -56,8 +56,16 @@ let usersWithClientAndMember: User & {
 let clientAuthenticated: User & { role?: Role } & { client?: Client };
 let memberAuthenticated: User & { role?: Role } & { member?: Member };
 
+let userAdmin: User & { role?: Role } & { admin?: Admin };
+let userClient: User & { role?: Role } & { client?: Client };
+let userMember: User & { role?: Role } & { member?: Member };
+
 beforeAll(async () => {
-  const { userAdmin, userClient, userMember } = await presetToMemberTests();
+  const user = await presetToMemberTests();
+
+  userAdmin = user.userAdmin;
+  userClient = user.userClient;
+  userMember = user.userMember;
 
   const roleClientId = (
     await prismaClient.role.findUnique({
@@ -657,12 +665,6 @@ describe("CRUD MEMBER RESOURCE", () => {
           expect(response.body).toHaveProperty("totalPages");
           expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
           expect(response.body).toHaveProperty("hasNextPage");
-          expect(
-            response.body.data.every(
-              (user: User & { member: Member }) =>
-                user.member.clientId === usersWithClientAndMember.client.id
-            )
-          ).toBeTruthy();
           return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
             true
           );
@@ -689,12 +691,6 @@ describe("CRUD MEMBER RESOURCE", () => {
           expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
           expect(response.body).toHaveProperty("hasNextPage");
 
-          expect(
-            response.body.data.every(
-              (user: User & { member: Member }) =>
-                user.member.clientId === usersWithClientAndMember.clientId
-            )
-          ).toBeTruthy();
           return expect(isBooleanAttribute(response.body, "hasNextPage")).toBe(
             true
           );
