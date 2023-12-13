@@ -8,7 +8,7 @@ import { verify } from "jsonwebtoken";
 import {
   cleanClientTestDatabase,
   presetToClientTests,
-} from "@/__test__/utils/presets/routes/client";
+} from "@/__test__/presets/routes/client";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;

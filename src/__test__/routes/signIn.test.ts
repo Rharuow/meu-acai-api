@@ -2,13 +2,13 @@ import { app } from "@/app";
 import { Admin, Client, Member, Role, User } from "@prisma/client";
 import { verify } from "jsonwebtoken";
 import request from "supertest";
-import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
-import { createClientRoleIfNotExist } from "../utils/createClientRoleIfNotExists";
-import { createMemberRoleIfNotExist } from "../utils/createMemberRoleIfNotExists";
 import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
 import { prismaClient } from "@libs/prisma";
+import { createAdminRoleIfNotExist } from "../presets/createAdminRoleIfNotExists";
+import { createClientRoleIfNotExist } from "../presets/createClientRoleIfNotExists";
+import { createMemberRoleIfNotExist } from "../presets/createMemberRoleIfNotExists";
 
 let accessToken: string;
 let refreshToken: string;
@@ -96,7 +96,7 @@ describe("Sign in route", () => {
       expect(response.body.user).toHaveProperty("name");
       expect(response.body.user).toHaveProperty("roleId");
 
-      accessToken = response.body.token;
+      accessToken = response.body.accessToken;
       refreshToken = response.body.refreshToken;
 
       verify(
@@ -116,7 +116,7 @@ describe("Sign in route", () => {
         (err: any, decoded: User) => {
           if (err) console.log("Token verification failed:", err.message);
           else {
-            expect(decoded.name).toBe("Test Admin");
+            expect(decoded.name).toBe(userAdmin.name);
           }
         }
       );
@@ -141,6 +141,22 @@ describe("Sign in route", () => {
     } catch (error) {
       throw new Error(error.message);
     }
+  });
+
+  test("when expiring accessToken and trying to get user, a error is returned", async () => {
+    const futureTime = Math.floor(Date.now() / 1000) + 5;
+
+    return verify(
+      accessToken,
+      process.env.TOKEN_SECRET,
+      { clockTimestamp: futureTime },
+      (err: any, decode: any) => {
+        expect(err).toBeTruthy();
+        expect(decode).toBeUndefined();
+        expect(err.name).toBe("TokenExpiredError");
+        expect(err.message).toBe("jwt expired");
+      }
+    );
   });
 
   test("when send missing params in body, return 422", async () => {

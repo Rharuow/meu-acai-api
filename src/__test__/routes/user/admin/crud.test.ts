@@ -5,7 +5,7 @@ import request from "supertest";
 import {
   cleanAdminTestDatabase,
   presetToAdminTests,
-} from "@/__test__/utils/presets/routes/admin";
+} from "@/__test__/presets/routes/admin";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;

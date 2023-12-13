@@ -1,24 +1,24 @@
+import { createAdminRoleIfNotExist } from "../createAdminRoleIfNotExists";
+import { createClientRoleIfNotExist } from "../createClientRoleIfNotExists";
+import { createMemberRoleIfNotExist } from "../createMemberRoleIfNotExists";
 import { createAdmin } from "@repositories/user/admin";
-import { createAdminRoleIfNotExist } from "../../createAdminRoleIfNotExists";
-import { createClientRoleIfNotExist } from "../../createClientRoleIfNotExists";
-import { createMemberRoleIfNotExist } from "../../createMemberRoleIfNotExists";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
 import { prismaClient } from "@libs/prisma";
 import { Admin, Client, Member, Role, User } from "@prisma/client";
 
 const createAdminToAuthenticate = {
-  name: "Test Admin Authenticate to admin crud test",
+  name: "Test Admin Authenticate to client crud test",
   password: "123",
 };
 
 const createClientToAuthenticate = {
-  name: "Test Client Authenticate to admin crud test",
+  name: "Test Client Authenticate to client crud test",
   password: "123",
 };
 
 const createMemberToAuthenticate = {
-  name: "Test Member Authenticate to admin crud test",
+  name: "Test Member Authenticate to client crud test",
   password: "123",
 };
 
@@ -26,7 +26,7 @@ let userAdmin: User & { role: Role; admin: Admin };
 let userClient: User & { role: Role; client: Client };
 let userMember: User & { role: Role; member: Member };
 
-export const presetToAdminTests = async () => {
+export const presetToClientTests = async () => {
   const RoleAdminId = await createAdminRoleIfNotExist();
   const RoleClientId = await createClientRoleIfNotExist();
   const RoleMemberId = await createMemberRoleIfNotExist();
@@ -38,7 +38,7 @@ export const presetToAdminTests = async () => {
 
   userClient = await createClient({
     ...createClientToAuthenticate,
-    address: { house: "0", square: "0" },
+    address: { house: "1", square: "1" },
     roleId: RoleClientId,
   });
 
@@ -51,7 +51,7 @@ export const presetToAdminTests = async () => {
   return { userAdmin, userClient, userMember };
 };
 
-export const cleanAdminTestDatabase = async () => {
+export const cleanClientTestDatabase = async () => {
   await prismaClient.user.deleteMany({
     where: {
       id: {

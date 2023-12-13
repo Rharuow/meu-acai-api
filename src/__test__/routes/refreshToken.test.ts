@@ -2,13 +2,13 @@ import { app } from "@/app";
 import { Admin, Client, Member, Role, User } from "@prisma/client";
 import { VerifyErrors, verify } from "jsonwebtoken";
 import request from "supertest";
-import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
-import { createClientRoleIfNotExist } from "../utils/createClientRoleIfNotExists";
-import { createMemberRoleIfNotExist } from "../utils/createMemberRoleIfNotExists";
 import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
 import { prismaClient } from "@libs/prisma";
+import { createAdminRoleIfNotExist } from "../presets/createAdminRoleIfNotExists";
+import { createClientRoleIfNotExist } from "../presets/createClientRoleIfNotExists";
+import { createMemberRoleIfNotExist } from "../presets/createMemberRoleIfNotExists";
 
 const futureTime = Math.floor(Date.now() / 1000) + 10;
 

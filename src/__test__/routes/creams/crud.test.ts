@@ -8,7 +8,7 @@ import {
   cleanCreamTestDatabase,
   createTwentyCreams,
   presetToCreamTests,
-} from "@/__test__/utils/presets/routes/creams";
+} from "@/__test__/presets/routes/creams";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;

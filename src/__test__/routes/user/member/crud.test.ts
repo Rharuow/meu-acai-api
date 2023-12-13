@@ -5,12 +5,12 @@ import { getUserByNameAndPassword } from "@repositories/user";
 import { encodeSha256 } from "@libs/crypto";
 import { prismaClient } from "@libs/prisma";
 import { createClient } from "@repositories/user/client";
-import { isBooleanAttribute } from "@/__test__/utils/isBooleanAttribute";
+import { isBooleanAttribute } from "@/__test__/presets/isBooleanAttribute";
 import { VerifyErrors, verify } from "jsonwebtoken";
 import {
   cleanMemberTestDatabase,
   presetToMemberTests,
-} from "@/__test__/utils/presets/routes/member";
+} from "@/__test__/presets/routes/member";
 import { createMember } from "@repositories/user/member";
 
 let accessTokenAsAdmin: string;

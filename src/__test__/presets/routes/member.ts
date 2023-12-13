@@ -1,24 +1,24 @@
-import { prismaClient } from "@libs/prisma";
-import { createAdminRoleIfNotExist } from "../../createAdminRoleIfNotExists";
-import { createClientRoleIfNotExist } from "../../createClientRoleIfNotExists";
-import { createMemberRoleIfNotExist } from "../../createMemberRoleIfNotExists";
+import { createAdminRoleIfNotExist } from "../createAdminRoleIfNotExists";
+import { createClientRoleIfNotExist } from "../createClientRoleIfNotExists";
+import { createMemberRoleIfNotExist } from "../createMemberRoleIfNotExists";
 import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
+import { prismaClient } from "@libs/prisma";
 import { Admin, Client, Member, Role, User } from "@prisma/client";
 
 const createAdminToAuthenticate = {
-  name: "Test Admin Authenticate to cream crud test",
+  name: "Test Admin Authenticate to member crud test",
   password: "123",
 };
 
 const createClientToAuthenticate = {
-  name: "Test Client Authenticate to cream crud test",
+  name: "Test Client Authenticate to member crud test",
   password: "123",
 };
 
 const createMemberToAuthenticate = {
-  name: "Test Member Authenticate to cream crud test",
+  name: "Test Member Authenticate to member crud test",
   password: "123",
 };
 
@@ -26,7 +26,7 @@ let userAdmin: User & { role: Role; admin: Admin };
 let userClient: User & { role: Role; client: Client };
 let userMember: User & { role: Role; member: Member };
 
-export const presetToCreamTests = async () => {
+export const presetToMemberTests = async () => {
   const RoleAdminId = await createAdminRoleIfNotExist();
   const RoleClientId = await createClientRoleIfNotExist();
   const RoleMemberId = await createMemberRoleIfNotExist();
@@ -38,7 +38,7 @@ export const presetToCreamTests = async () => {
 
   userClient = await createClient({
     ...createClientToAuthenticate,
-    address: { house: "2", square: "2" },
+    address: { house: "3", square: "3" },
     roleId: RoleClientId,
   });
 
@@ -51,7 +51,7 @@ export const presetToCreamTests = async () => {
   return { userAdmin, userClient, userMember };
 };
 
-export const cleanCreamTestDatabase = async () => {
+export const cleanMemberTestDatabase = async () => {
   await prismaClient.user.deleteMany({
     where: {
       id: {
@@ -59,21 +59,4 @@ export const cleanCreamTestDatabase = async () => {
       },
     },
   });
-};
-
-export const createTwentyCreams = async () => {
-  const amoundCreams = await prismaClient.cream.count();
-  if (amoundCreams >= 20) return;
-  const adminId = (await prismaClient.admin.findFirst()).id;
-
-  const creams = Array(20)
-    .fill(null)
-    .map((_, index) => ({
-      adminId,
-      amount: index + 1,
-      name: `Test to list creams ${index}`,
-      price: index + 10,
-      unit: index % 2 === 0 ? "box" : "bag",
-    }));
-  await prismaClient.cream.createMany({ data: creams });
 };
