@@ -192,7 +192,7 @@ To get started with the Meu Açai API, follow these steps:
             - [x] The client should only delete their own account.
           - **IMPROVEMENTS:**
             - [x] CLIENT Model in Schema
-            - [ ] Router to change role of user
+            - [ ] Router to swap Client and Member entities
             - [ ] Router to change address
             - [x] Router to create CLIENT ( POST "/api/v1/resources/users/clients" )
                   {
