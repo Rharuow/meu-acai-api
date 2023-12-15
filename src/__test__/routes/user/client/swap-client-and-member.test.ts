@@ -100,10 +100,11 @@ beforeAll(async () => {
 
   accessTokenMember = `Bearer ${responseSignInAsMember.body.accessToken}`;
   refreshTokenMember = `Bearer ${responseSignInAsMember.body.refreshToken}`;
+  return;
 });
 
 afterAll(async () => {
-  await prismaClient.user.deleteMany({
+  return await prismaClient.user.deleteMany({
     where: {
       id: {
         in: [
@@ -119,6 +120,61 @@ afterAll(async () => {
 describe("SWAP BETWEEN CLIENT AND MEMBER", () => {
   const basePathRouter = "/api/v1/resources/users/clients/swap";
   describe("SWAP AS ADMIN", () => {
+    let secondaryClient: User & { role: Role; client: Client };
+    let memberBelongsToSecondaryClient: User & { role: Role; member: Member };
+
+    const createSecondaryClientBody = {
+      address: { house: "secondary client", square: "secondary client" },
+      password: "123",
+      name: "Test Secondary client",
+    };
+
+    const createMemberToSecondaryClient = {
+      name: "Test member to secondary client",
+      password: "123",
+    };
+
+    beforeAll(async () => {
+      secondaryClient = await createClient({
+        ...createSecondaryClientBody,
+        roleId: userClientAuthenticated.roleId,
+      });
+      memberBelongsToSecondaryClient = await createMember({
+        ...createMemberToSecondaryClient,
+        roleId: userMemberAuthenticated.roleId,
+        clientId: secondaryClient.client.id,
+      });
+    });
+
+    afterAll(async () => {
+      await prismaClient.user.deleteMany({
+        where: {
+          id: {
+            in: [secondaryClient.id, memberBelongsToSecondaryClient.id],
+          },
+        },
+      });
+    });
+
+    test(
+      `When an Admin access PUT ${basePathRouter}/:id` +
+        " sending in the body the memberId that's belongs to other client," +
+        " then the status code 400 with message in body response 'Member not belongs to this client.'",
+      async () => {
+        const response = await request(app)
+          .put(`${basePathRouter}/${userClientAuthenticated.client.id}`)
+          .send({ memberId: memberBelongsToSecondaryClient.member.id })
+          .set("authorization", accessTokenAdmin)
+          .set("refreshToken", refreshTokenAdmin)
+          .expect(400);
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Member not belongs to this client."
+        );
+      }
+    );
+
     test(
       `When an Admin access PUT ${basePathRouter}/:id` +
         " sending in body the memberId that will be swapped," +

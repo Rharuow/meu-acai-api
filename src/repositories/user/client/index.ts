@@ -210,7 +210,6 @@ export const swapClient = async ({
     include: {
       client: {
         include: {
-          members: true,
           address: true,
         },
       },
