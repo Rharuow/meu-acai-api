@@ -35,7 +35,7 @@ export const validationAdminAccessToken = async (
     });
 
     if (!user || user.role.name !== "ADMIN") {
-      return unauthorized(res, "User haven't access token");
+      return unauthorized(res, "User haven't permission");
     }
 
     const admin = await prismaClient.admin.findFirstOrThrow({

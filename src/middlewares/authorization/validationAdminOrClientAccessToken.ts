@@ -12,11 +12,11 @@ export const validationAdminOrClientAccessToken = async (
 ) => {
   const { authorization } = req.headers;
 
-  if (!authorization) return unauthorized(res);
+  if (!authorization) return unauthorized(res, "Authorization is missing");
 
   const accessToken = authorization.split("Bearer ")[1];
 
-  if (!accessToken) return unauthorized(res);
+  if (!accessToken) return unauthorized(res, "Access token is missing");
 
   try {
     const user = await new Promise<User & { role: Role }>((resolve, reject) => {
@@ -35,7 +35,7 @@ export const validationAdminOrClientAccessToken = async (
     });
 
     if (!user || (user.role.name !== "ADMIN" && user.role.name !== "CLIENT")) {
-      return unauthorized(res);
+      return unauthorized(res, "User has no permissions");
     }
 
     if (user.role.name === "CLIENT") {
@@ -46,6 +46,6 @@ export const validationAdminOrClientAccessToken = async (
 
     return next();
   } catch (error) {
-    return unauthorized(res);
+    return unauthorized(res, error.message);
   }
 };

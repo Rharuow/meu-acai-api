@@ -26,6 +26,8 @@ import { validationUserOwnId } from "@middlewares/authorization/validationUserOw
 import { updateBodyClient } from "@middlewares/resources/user/client/updateBody";
 import { deleteUserController } from "@controllers/user/delete";
 import { clientBelongsToUser } from "@middlewares/resources/user/client/validationClientBelongsToUser";
+import { validationMemberBelongsToClient } from "@middlewares/resources/user/client/swap/validationMemberBelongsToClient";
+import { swapClientController } from "@controllers/user/client/swap";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {
@@ -71,6 +73,14 @@ export const validationCreateClientBodySchema: Schema = {
         return true;
       },
     },
+  },
+};
+
+export const validationSwapClientBodySchema: Schema = {
+  memberId: {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "memberId must be a string and not empty",
   },
 };
 
@@ -145,6 +155,24 @@ clientRouter.delete(
   addRoleIdAtBody,
   validationUserOwnId,
   deleteUserController
+);
+
+clientRouter.put(
+  "/clients/swap/:id",
+  validationAdminAccessToken,
+  checkExact(
+    [
+      checkSchema(validationSwapClientBodySchema, ["body"]),
+      query([], "Query parameters unpermitted"), // check if has any query parameters
+      param(["id"], 'The "id" parameter is required'), // check if 'id' is present in the route parameters
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
+  validationParams,
+  validationMemberBelongsToClient,
+  swapClientController
 );
 
 clientRouter.put(

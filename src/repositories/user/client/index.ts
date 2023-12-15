@@ -5,7 +5,7 @@ import { prismaClient } from "@libs/prisma";
 
 import { encodeSha256 } from "@libs/crypto";
 import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
-import { Client, Role, User } from "@prisma/client";
+import { Client, ROLE, Role, User } from "@prisma/client";
 import { userInMemory, usersInMemory } from "@libs/memory-cache";
 
 export const createClient = async ({
@@ -113,6 +113,7 @@ export const findClient = async (params: {
   name?: string;
   userId?: string;
   id?: string;
+  includes?: Array<ROLE | "ADDRESS">;
 }) => {
   if (params.hasOwnProperty("name")) {
     const user = await prismaClient.user.findUnique({
@@ -120,7 +121,12 @@ export const findClient = async (params: {
         name: params.name,
       },
       include: {
-        client: true,
+        client: {
+          include: {
+            members: params.includes && params.includes.includes("MEMBER"),
+            address: params.includes && params.includes.includes("ADDRESS"),
+          },
+        },
       },
     });
 
@@ -132,7 +138,99 @@ export const findClient = async (params: {
       ...(params.userId && { userId: params.userId }),
       ...(params.id && { id: params.id }),
     },
+    include: {
+      members: params.includes && params.includes.includes("MEMBER"),
+      address: params.includes && params.includes.includes("ADDRESS"),
+    },
   });
 
   return client;
+};
+
+// TO-DO: ADD PRODUCTS RELATION TOO
+export const swapClient = async ({
+  memberId,
+  id,
+}: {
+  memberId: string;
+  id: string;
+}) => {
+  userInMemory.clear();
+  usersInMemory.clear();
+
+  const [client, member] = await Promise.all([
+    prismaClient.client.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        address: true,
+        members: true,
+        user: true,
+      },
+    }),
+    prismaClient.member.findUnique({
+      where: {
+        id: memberId,
+      },
+      include: {
+        user: true,
+      },
+    }),
+  ]);
+
+  await prismaClient.client.delete({
+    where: { id: client.id },
+  });
+
+  const newUserClient = await prismaClient.user.update({
+    where: {
+      id: member.userId,
+    },
+    data: {
+      client: {
+        create: {
+          address: {
+            create: {
+              house: client.address.house,
+              square: client.address.square,
+            },
+          },
+          members: {
+            createMany: {
+              data: client.members.filter((mbr) => mbr.id !== member.id),
+            },
+          },
+          ...(member.email && { email: member.email }),
+          ...(member.phone && { phone: member.phone }),
+        },
+      },
+      roleId: client.user.roleId,
+    },
+    include: {
+      client: {
+        include: {
+          address: true,
+        },
+      },
+      role: true,
+    },
+  });
+
+  await prismaClient.user.update({
+    where: {
+      id: client.userId,
+    },
+    data: {
+      member: {
+        create: {
+          clientId: newUserClient.client.id,
+          ...(client.email && { email: client.email }),
+          ...(client.phone && { phone: client.phone }),
+        },
+      },
+    },
+  });
+
+  return newUserClient;
 };

@@ -1,7 +1,7 @@
-import { createAdminRoleIfNotExist } from "../utils/createAdminRoleIfNotExists";
-import { createClientRoleIfNotExist } from "../utils/createClientRoleIfNotExists";
-import { createMemberRoleIfNotExist } from "../utils/createMemberRoleIfNotExists";
 import { prismaClient } from "@libs/prisma";
+import { createAdminRoleIfNotExist } from "../presets/createAdminRoleIfNotExists";
+import { createClientRoleIfNotExist } from "../presets/createClientRoleIfNotExists";
+import { createMemberRoleIfNotExist } from "../presets/createMemberRoleIfNotExists";
 
 beforeAll(async () => {
   await createAdminRoleIfNotExist();
