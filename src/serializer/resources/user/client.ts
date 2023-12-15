@@ -1,4 +1,4 @@
-import { Client, Role, User } from "@prisma/client";
+import { Client, Member, Role, User } from "@prisma/client";
 import { Response } from "express";
 
 export const createClientSerializer = ({
@@ -45,4 +45,14 @@ export const getClientSerializer = ({
   user: User & { client?: Client } & { role?: Role };
 }) => {
   return res.json({ message: "User founded successfully", data: { user } });
+};
+
+export const swapClientSerializer = ({
+  res,
+  user,
+}: {
+  res: Response;
+  user: User & { client?: Client; role?: Role };
+}) => {
+  return res.json({ message: "Client swapped successfully", data: { user } });
 };
