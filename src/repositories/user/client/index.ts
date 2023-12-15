@@ -123,8 +123,8 @@ export const findClient = async (params: {
       include: {
         client: {
           include: {
-            members: params.includes.includes("MEMBER"),
-            address: params.includes.includes("ADDRESS"),
+            members: params.includes && params.includes.includes("MEMBER"),
+            address: params.includes && params.includes.includes("ADDRESS"),
           },
         },
       },
@@ -139,8 +139,8 @@ export const findClient = async (params: {
       ...(params.id && { id: params.id }),
     },
     include: {
-      members: params.includes.includes("MEMBER"),
-      address: params.includes.includes("ADDRESS"),
+      members: params.includes && params.includes.includes("MEMBER"),
+      address: params.includes && params.includes.includes("ADDRESS"),
     },
   });
 

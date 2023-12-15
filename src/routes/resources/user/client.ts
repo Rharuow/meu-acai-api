@@ -158,6 +158,24 @@ clientRouter.delete(
 );
 
 clientRouter.put(
+  "/clients/swap/:id",
+  validationAdminAccessToken,
+  checkExact(
+    [
+      checkSchema(validationSwapClientBodySchema, ["body"]),
+      query([], "Query parameters unpermitted"), // check if has any query parameters
+      param(["id"], 'The "id" parameter is required'), // check if 'id' is present in the route parameters
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
+  validationParams,
+  validationMemberBelongsToClient,
+  swapClientController
+);
+
+clientRouter.put(
   "/:userId/clients/:id",
   validationAdminOrClientAccessToken,
   clientBelongsToUser,
@@ -175,24 +193,6 @@ clientRouter.put(
   validationParams,
   updateBodyClient,
   updateClientController
-);
-
-clientRouter.put(
-  "/clients/swap/:id",
-  validationAdminAccessToken,
-  validationMemberBelongsToClient,
-  checkExact(
-    [
-      checkSchema(validationSwapClientBodySchema, ["body"]),
-      query([], "Query parameters unpermitted"), // check if has any query parameters
-      param(["id"], 'The "id" parameter is required'), // check if 'id' is present in the route parameters
-    ],
-    {
-      message: "Param(s) not permitted",
-    }
-  ),
-  validationParams,
-  swapClientController
 );
 
 clientRouter.get(

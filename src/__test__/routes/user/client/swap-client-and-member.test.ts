@@ -74,23 +74,33 @@ beforeAll(async () => {
     roleId: roleIdMember,
   });
 
-  const responseSignInAsAdmin = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: adminCreateBody.name, password: adminCreateBody.password })
-    .set("Accept", "application/json")
-    .expect(200);
-
-  const responseSignInAsClient = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: clientCreateBody.name, password: clientCreateBody.password })
-    .set("Accept", "application/json")
-    .expect(200);
-
-  const responseSignInAsMember = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: memberCreateBody.name, password: memberCreateBody.password })
-    .set("Accept", "application/json")
-    .expect(200);
+  const [
+    responseSignInAsAdmin,
+    responseSignInAsClient,
+    responseSignInAsMember,
+  ] = await Promise.all([
+    request(app)
+      .post("/api/v1/signin")
+      .send({ name: adminCreateBody.name, password: adminCreateBody.password })
+      .set("Accept", "application/json")
+      .expect(200),
+    request(app)
+      .post("/api/v1/signin")
+      .send({
+        name: clientCreateBody.name,
+        password: clientCreateBody.password,
+      })
+      .set("Accept", "application/json")
+      .expect(200),
+    request(app)
+      .post("/api/v1/signin")
+      .send({
+        name: memberCreateBody.name,
+        password: memberCreateBody.password,
+      })
+      .set("Accept", "application/json")
+      .expect(200),
+  ]);
 
   accessTokenAdmin = `Bearer ${responseSignInAsAdmin.body.accessToken}`;
   refreshTokenAdmin = `Bearer ${responseSignInAsAdmin.body.refreshToken}`;
@@ -177,8 +187,69 @@ describe("SWAP BETWEEN CLIENT AND MEMBER", () => {
 
     test(
       `When an Admin access PUT ${basePathRouter}/:id` +
+        " with body content empty" +
+        " then the return status be equal to 422",
+      async () => {
+        const response = await request(app)
+          .put(basePathRouter + `/${userClientAuthenticated.client.id}`)
+          .set("authorization", accessTokenAdmin)
+          .set("refreshTojken", refreshTokenAdmin)
+          .expect(422);
+
+        expect(response.body).toHaveProperty("errors");
+        expect(response.body.errors[0]).toHaveProperty(
+          "msg",
+          "memberId must be a string and not empty"
+        );
+
+        return expect(response.status).toBe(422);
+      }
+    );
+
+    test(
+      `When an Admin access PUT ${basePathRouter}/:id` +
+        " sending invalid memberId in body" +
+        " then the response should be status 400 and have a property message in body with value 'Member not belongs to this client.'",
+      async () => {
+        const response = await request(app)
+          .put(basePathRouter + `/${userClientAuthenticated.client.id}`)
+          .send({
+            memberId: "invalid-member-id",
+          })
+          .set("authorization", accessTokenAdmin)
+          .set("refreshToken", refreshTokenAdmin)
+          .expect(400);
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Member not belongs to this client."
+        );
+      }
+    );
+
+    test(
+      `When an Admin access token PUT ${basePathRouter}/:id` +
+        " sending in body the memberId valid but the client id in router is invalid" +
+        " result status should be 400 and the message 'No client found'",
+      async () => {
+        const response = await request(app)
+          .put(basePathRouter + "/invalid-id")
+          .send({
+            memberId: userMemberAuthenticated.member.id,
+          })
+          .set("authorization", accessTokenAdmin)
+          .set("refreshToken", refreshTokenAdmin)
+          .expect(400);
+
+        expect(response.body).toHaveProperty("message", "No client found");
+        return expect(response.statusCode).toBe(400);
+      }
+    );
+
+    test(
+      `When an Admin access PUT ${basePathRouter}/:id` +
         " sending in body the memberId that will be swapped," +
-        "then the member will be swapped to the client and the client will be swapped to the member",
+        " then the member will be swapped to the client and the client will be swapped to the member",
       async () => {
         const response = await request(app)
           .put(basePathRouter + `/${userClientAuthenticated.client.id}`)
@@ -223,6 +294,54 @@ describe("SWAP BETWEEN CLIENT AND MEMBER", () => {
         );
 
         return expect(response.statusCode).toBe(200);
+      }
+    );
+  });
+
+  describe("SWAP AS CLIENT", () => {
+    test(
+      `When a Client access ${basePathRouter}/:id` +
+        " sending memberId that belongs to one of it members or not" +
+        " the result should be 401 and in the body must be the message property with 'User haven't access token'",
+      async () => {
+        const response = await request(app)
+          .put(basePathRouter + `/${userClientAuthenticated.client.id}`)
+          .send({
+            memberId: userMemberAuthenticated.member.id,
+          })
+          .set("authorization", accessTokenClient)
+          .set("refreshToken", refreshTokenClient)
+          .expect(401);
+
+        expect(response.body).toHaveProperty(
+          "message",
+          "User haven't permission"
+        );
+        return expect(response.statusCode).toBe(401);
+      }
+    );
+  });
+
+  describe("SWAP AS MEMBER", () => {
+    test(
+      `When a Member access ${basePathRouter}/:id` +
+        " sending memberId" +
+        " the result should be 401 and in the body must be the message property with 'User haven't access token'",
+      async () => {
+        const response = await request(app)
+          .put(basePathRouter + `/${userClientAuthenticated.client.id}`)
+          .send({
+            memberId: userMemberAuthenticated.member.id,
+          })
+          .set("authorization", accessTokenMember)
+          .set("refreshToken", refreshTokenMember)
+          .expect(401);
+
+        expect(response.body).toHaveProperty(
+          "message",
+          "User haven't permission"
+        );
+        return expect(response.statusCode).toBe(401);
       }
     );
   });

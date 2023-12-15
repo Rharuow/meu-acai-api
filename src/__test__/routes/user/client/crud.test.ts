@@ -66,23 +66,28 @@ let userClient: User & { role?: Role } & { client?: Client };
 
 beforeAll(async () => {
   const { userAdmin, userClient, userMember } = await presetToClientTests();
-  const responseSignInAsAdmin = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: userAdmin.name, password: "123" })
-    .set("Accept", "application/json")
-    .expect(200);
 
-  const responseSignInAsClient = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: userClient.name, password: "123" })
-    .set("Accept", "application/json")
-    .expect(200);
-
-  const responseSignInAsMember = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: userMember.name, password: "123" })
-    .set("Accept", "application/json")
-    .expect(200);
+  const [
+    responseSignInAsAdmin,
+    responseSignInAsClient,
+    responseSignInAsMember,
+  ] = await Promise.all([
+    request(app)
+      .post("/api/v1/signin")
+      .send({ name: userAdmin.name, password: "123" })
+      .set("Accept", "application/json")
+      .expect(200),
+    request(app)
+      .post("/api/v1/signin")
+      .send({ name: userClient.name, password: "123" })
+      .set("Accept", "application/json")
+      .expect(200),
+    request(app)
+      .post("/api/v1/signin")
+      .send({ name: userMember.name, password: "123" })
+      .set("Accept", "application/json")
+      .expect(200),
+  ]);
 
   accessTokenAsAdmin = responseSignInAsAdmin.body.accessToken;
   refreshTokenAsAdmin = responseSignInAsAdmin.body.refreshToken;
@@ -337,7 +342,7 @@ describe("CRUD CLIENT RESOURCE", () => {
       test(
         `When an authenticated CLIENT accesses PUT ${userResourcePath}/:userId/clients/:id ` +
           `with the name ${updateClientBody.name}, and sending the own ID. ` +
-          "then it shouldn't update the User with the new provided information and return 200",
+          "Then it shouldn't update the User with the new provided information and return 200",
         async () => {
           const response = await request(app)
             .put(

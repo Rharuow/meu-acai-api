@@ -12,6 +12,8 @@ export const validationMemberBelongsToClient = async (
 
   const client = await findClient({ id, includes: ["MEMBER"] });
 
+  if (!client) return badRequest({ res, message: "No client found" });
+
   if (
     client.members.length > 0 &&
     client.members.some((member) => member.id === memberId)
