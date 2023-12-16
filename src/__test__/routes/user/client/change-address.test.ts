@@ -102,14 +102,14 @@ beforeAll(async () => {
         .expect(200),
     ]);
 
-  accessTokenAsAdmin = responseAdminSignIn.body.accessToken;
-  refreshTokenAsAdmin = responseAdminSignIn.body.refreshToken;
+  accessTokenAsAdmin = "Bearer " + responseAdminSignIn.body.accessToken;
+  refreshTokenAsAdmin = "Bearer " + responseAdminSignIn.body.refreshToken;
 
-  accessTokenAsClient = responseClientSignIn.body.accessToken;
-  refreshTokenAsClient = responseClientSignIn.body.refreshToken;
+  accessTokenAsClient = "Bearer " + responseClientSignIn.body.accessToken;
+  refreshTokenAsClient = "Bearer " + responseClientSignIn.body.refreshToken;
 
-  accessTokenAsMember = responseMemberSignIn.body.accessToken;
-  refreshTokenAsMember = responseMemberSignIn.body.refreshToken;
+  accessTokenAsMember = "Bearer " + responseMemberSignIn.body.accessToken;
+  refreshTokenAsMember = "Bearer " + responseMemberSignIn.body.refreshToken;
 });
 
 afterAll(async () => {
@@ -132,8 +132,10 @@ describe("CHANGE ADDRESS", () => {
     `/api/v1/resources/users/clients/${id}/change-address`;
   describe("CHANGE ADDRESS AS ADMIN", () => {
     const newAddress = {
-      house: "new house create by admin",
-      square: "new house create by admin",
+      address: {
+        house: "new house create by admin",
+        square: "new house create by admin",
+      },
     };
     test(
       `When an Admin accesses PUT ${basePath}` +
@@ -147,6 +149,17 @@ describe("CHANGE ADDRESS", () => {
           .set("refreshToken", refreshTokenAsAdmin)
           .expect(200);
 
+        const clientWithAddressUpdated = await prismaClient.client.findUnique({
+          where: {
+            id: userClientToAuthentication.client.id,
+          },
+        });
+
+        expect(response.body.data).toHaveProperty("user");
+        expect(response.body.data.user).toHaveProperty(
+          "name",
+          userClientToAuthentication.name
+        );
         return expect(response.statusCode).toBe(200);
       }
     );

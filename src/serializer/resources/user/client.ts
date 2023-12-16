@@ -56,3 +56,16 @@ export const swapClientSerializer = ({
 }) => {
   return res.json({ message: "Client swapped successfully", data: { user } });
 };
+
+export const updateAddressSerializer = ({
+  res,
+  user,
+}: {
+  res: Response;
+  user: User & { client?: Client; role?: Role };
+}) => {
+  return res.json({
+    message: "Client's address updated successfully",
+    data: { user },
+  });
+};
