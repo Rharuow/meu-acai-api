@@ -4,9 +4,11 @@ import { createClientRoleIfNotExist } from "../presets/createClientRoleIfNotExis
 import { createMemberRoleIfNotExist } from "../presets/createMemberRoleIfNotExists";
 
 beforeAll(async () => {
-  await createAdminRoleIfNotExist();
-  await createClientRoleIfNotExist();
-  await createMemberRoleIfNotExist();
+  await Promise.all([
+    createAdminRoleIfNotExist(),
+    createClientRoleIfNotExist(),
+    createMemberRoleIfNotExist(),
+  ]);
 });
 
 describe("CRUD of role resource", () => {

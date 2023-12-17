@@ -5,7 +5,7 @@ import { prismaClient } from "@libs/prisma";
 
 import { encodeSha256 } from "@libs/crypto";
 import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
-import { Client, ROLE, Role, User } from "@prisma/client";
+import { Address, Client, ROLE, Role, User } from "@prisma/client";
 import { userInMemory, usersInMemory } from "@libs/memory-cache";
 
 export const createClient = async ({
@@ -233,4 +233,36 @@ export const swapClient = async ({
   });
 
   return newUserClient;
+};
+
+export const updateAddress = async ({
+  cliendId,
+  address,
+}: {
+  cliendId: string;
+  address: { house: Address["house"]; square: Address["square"] };
+}) => {
+  const client = await prismaClient.client.update({
+    where: {
+      id: cliendId,
+    },
+    data: {
+      address: {
+        update: {
+          house: address.house,
+          square: address.square,
+        },
+      },
+    },
+    include: {
+      user: {
+        include: {
+          role: true,
+        },
+      },
+      address: true,
+    },
+  });
+
+  return { ...client.user, client };
 };

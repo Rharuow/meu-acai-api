@@ -75,55 +75,67 @@ beforeAll(async () => {
     })
   ).id;
 
-  clientReferenceToMemberAsAdmin = await createClient({
-    address: {
-      house: "30",
-      square: "30",
-    },
-    name: "Test client reference to member created by Admin",
-    password: "123",
-    roleId: roleClientId,
-    email: "test@example.com",
-    phone: "(00)00000000000",
-  });
-
-  clientReferenceToMemberAsClient = await createClient({
-    address: {
-      house: "40",
-      square: "40",
-    },
-    name: "Test client reference to member created by Client",
-    password: "123",
-    roleId: roleClientId,
-    email: "test@example.com",
-    phone: "(00)00000000000",
-  });
-
-  const responseSignInAsAdmin = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: userAdmin.name, password: "123" })
-    .set("Accept", "application/json")
-    .expect(200);
-
-  const responseSignInAsClient = await request(app)
-    .post("/api/v1/signin")
-    .send({
-      name: userClient.name,
+  const [
+    clientReferenceToMemberAsAdminCreated,
+    clientReferenceToMemberAsClientCreate,
+  ] = await Promise.all([
+    createClient({
+      address: {
+        house: "30",
+        square: "30",
+      },
+      name: "Test client reference to member created by Admin",
       password: "123",
-    })
-    .set("Accept", "application/json")
-    .expect(200);
+      roleId: roleClientId,
+      email: "test@example.com",
+      phone: "(00)00000000000",
+    }),
+    createClient({
+      address: {
+        house: "40",
+        square: "40",
+      },
+      name: "Test client reference to member created by Client",
+      password: "123",
+      roleId: roleClientId,
+      email: "test@example.com",
+      phone: "(00)00000000000",
+    }),
+  ]);
+
+  clientReferenceToMemberAsAdmin = clientReferenceToMemberAsAdminCreated;
+
+  clientReferenceToMemberAsClient = clientReferenceToMemberAsClientCreate;
+
+  const [
+    responseSignInAsAdmin,
+    responseSignInAsClient,
+    responseSignInAsMember,
+  ] = await Promise.all([
+    request(app)
+      .post("/api/v1/signin")
+      .send({ name: userAdmin.name, password: "123" })
+      .set("Accept", "application/json")
+      .expect(200),
+    request(app)
+      .post("/api/v1/signin")
+      .send({
+        name: userClient.name,
+        password: "123",
+      })
+      .set("Accept", "application/json")
+      .expect(200),
+    request(app)
+      .post("/api/v1/signin")
+      .send({
+        name: userMember.name,
+        password: "123",
+      })
+      .set("Accept", "application/json")
+      .expect(200),
+  ]);
 
   clientAuthenticated = responseSignInAsClient.body.user;
-
-  const responseSignInAsMember = await request(app)
-    .post("/api/v1/signin")
-    .send({
-      name: userMember.name,
-      password: "123",
-    })
-    .set("Accept", "application/json")
-    .expect(200);
 
   accessTokenAsAdmin = responseSignInAsAdmin.body.accessToken;
   refreshTokenAsAdmin = responseSignInAsAdmin.body.refreshToken;
@@ -149,9 +161,14 @@ afterAll(async () => {
   await cleanMemberTestDatabase();
   await prismaClient.user.deleteMany({
     where: {
-      name: {
-        contains: "Test client reference to member created by",
-      },
+      OR: [
+        { name: "Test Member Created For Client" },
+        {
+          name: {
+            contains: "Test client reference to member created by",
+          },
+        },
+      ],
     },
   });
 });

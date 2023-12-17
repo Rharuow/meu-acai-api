@@ -34,23 +34,30 @@ const createMemberBody = {
 };
 
 beforeAll(async () => {
-  const roleIdAdmin = await createAdminRoleIfNotExist();
-  const roleIdClient = await createClientRoleIfNotExist();
-  const roleIdMember = await createMemberRoleIfNotExist();
+  const [roleIdAdmin, roleIdClient, roleIdMember] = await Promise.all([
+    createAdminRoleIfNotExist(),
+    createClientRoleIfNotExist(),
+    createMemberRoleIfNotExist(),
+  ]);
 
-  userAdmin = await createAdmin({
-    ...createAdminBody,
-    roleId: roleIdAdmin,
-  });
+  const [userAdminCreated, userClientCreated] = await Promise.all([
+    createAdmin({
+      ...createAdminBody,
+      roleId: roleIdAdmin,
+    }),
+    createClient({
+      ...createClientBody,
+      roleId: roleIdClient,
+      address: {
+        house: createClientBody.name,
+        square: createClientBody.name,
+      },
+    }),
+  ]);
 
-  userClient = await createClient({
-    ...createClientBody,
-    roleId: roleIdClient,
-    address: {
-      house: createClientBody.name,
-      square: createClientBody.name,
-    },
-  });
+  userAdmin = userAdminCreated;
+
+  userClient = userClientCreated;
 
   userMember = await createMember({
     ...createMemberBody,

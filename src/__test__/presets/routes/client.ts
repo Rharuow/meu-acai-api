@@ -27,20 +27,27 @@ let userClient: User & { role: Role; client: Client };
 let userMember: User & { role: Role; member: Member };
 
 export const presetToClientTests = async () => {
-  const RoleAdminId = await createAdminRoleIfNotExist();
-  const RoleClientId = await createClientRoleIfNotExist();
-  const RoleMemberId = await createMemberRoleIfNotExist();
+  const [RoleAdminId, RoleClientId, RoleMemberId] = await Promise.all([
+    createAdminRoleIfNotExist(),
+    createClientRoleIfNotExist(),
+    createMemberRoleIfNotExist(),
+  ]);
 
-  userAdmin = await createAdmin({
-    ...createAdminToAuthenticate,
-    roleId: RoleAdminId,
-  });
+  const [userAdminCreated, userClientCreated] = await Promise.all([
+    createAdmin({
+      ...createAdminToAuthenticate,
+      roleId: RoleAdminId,
+    }),
+    createClient({
+      ...createClientToAuthenticate,
+      address: { house: "1", square: "1" },
+      roleId: RoleClientId,
+    }),
+  ]);
 
-  userClient = await createClient({
-    ...createClientToAuthenticate,
-    address: { house: "1", square: "1" },
-    roleId: RoleClientId,
-  });
+  userAdmin = userAdminCreated;
+
+  userClient = userClientCreated;
 
   userMember = await createMember({
     ...createMemberToAuthenticate,

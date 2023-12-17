@@ -59,23 +59,27 @@ beforeAll(async () => {
   userClient = user.userClient;
   userMember = user.userMember;
 
-  const responseSignInAsAdmin = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: user.userAdmin.name, password: "123" })
-    .set("Accept", "application/json")
-    .expect(200);
-
-  const responseSignInAsClient = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: user.userClient.name, password: "123" })
-    .set("Accept", "application/json")
-    .expect(200);
-
-  const responseSignInAsMember = await request(app)
-    .post("/api/v1/signin")
-    .send({ name: user.userMember.name, password: "123" })
-    .set("Accept", "application/json")
-    .expect(200);
+  const [
+    responseSignInAsAdmin,
+    responseSignInAsClient,
+    responseSignInAsMember,
+  ] = await Promise.all([
+    request(app)
+      .post("/api/v1/signin")
+      .send({ name: user.userAdmin.name, password: "123" })
+      .set("Accept", "application/json")
+      .expect(200),
+    request(app)
+      .post("/api/v1/signin")
+      .send({ name: user.userClient.name, password: "123" })
+      .set("Accept", "application/json")
+      .expect(200),
+    request(app)
+      .post("/api/v1/signin")
+      .send({ name: user.userMember.name, password: "123" })
+      .set("Accept", "application/json")
+      .expect(200),
+  ]);
 
   accessTokenAsAdmin = responseSignInAsAdmin.body.accessToken;
   refreshTokenAsAdmin = responseSignInAsAdmin.body.refreshToken;

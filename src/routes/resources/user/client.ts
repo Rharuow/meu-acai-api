@@ -18,8 +18,6 @@ import {
   param,
   query,
 } from "express-validator";
-import { addNextToBody } from "@middlewares/addNextToBody";
-import { updateBodyUser } from "@middlewares/resources/user/updateBody";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { validationAdminOrClientAccessToken } from "@middlewares/authorization/validationAdminOrClientAccessToken";
 import { validationUserOwnId } from "@middlewares/authorization/validationUserOwnId";
@@ -28,6 +26,9 @@ import { deleteUserController } from "@controllers/user/delete";
 import { clientBelongsToUser } from "@middlewares/resources/user/client/validationClientBelongsToUser";
 import { validationMemberBelongsToClient } from "@middlewares/resources/user/client/swap/validationMemberBelongsToClient";
 import { swapClientController } from "@controllers/user/client/swap";
+import { validationIfAddressAlreadyExists } from "@middlewares/resources/user/client/updatedAddress/validationIfAddressAlreadyExists";
+import { updateAddressController } from "@controllers/user/client/updateAddress";
+import { validationIfIdRouterClient } from "@middlewares/resources/user/client/updatedAddress/validationIfIdRouterClient";
 
 export const validationCreateClientBodySchema: Schema = {
   name: {
@@ -81,6 +82,19 @@ export const validationSwapClientBodySchema: Schema = {
     notEmpty: true,
     isString: true,
     errorMessage: "memberId must be a string and not empty",
+  },
+};
+
+export const validationUpdateAddressBodySchema: Schema = {
+  "address.house": {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "Address house must be a string and not empty",
+  },
+  "address.square": {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "Address square must be a string and not empty",
   },
 };
 
@@ -155,6 +169,25 @@ clientRouter.delete(
   addRoleIdAtBody,
   validationUserOwnId,
   deleteUserController
+);
+
+clientRouter.put(
+  "/clients/:id/change-address",
+  checkExact(
+    [
+      checkSchema(validationUpdateAddressBodySchema, ["body"]),
+      query([], "Query parameters unpermitted"), // check if has any query parameters
+      param(["id"], 'The "id" parameter is required'), // check if 'id' is present in the route parameters
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
+  validationParams,
+  validationIfAddressAlreadyExists,
+  validationAdminOrClientAccessToken,
+  validationIfIdRouterClient,
+  updateAddressController
 );
 
 clientRouter.put(
