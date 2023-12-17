@@ -260,6 +260,7 @@ export const updateAddress = async ({
           role: true,
         },
       },
+      address: true,
     },
   });
 

@@ -85,6 +85,19 @@ export const validationSwapClientBodySchema: Schema = {
   },
 };
 
+export const validationUpdateAddressBodySchema: Schema = {
+  "address.house": {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "Address house must be a string and not empty",
+  },
+  "address.square": {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "Address square must be a string and not empty",
+  },
+};
+
 export const validationUpdateClientBodySchema: Schema = {
   name: {
     notEmpty: false,
@@ -160,6 +173,17 @@ clientRouter.delete(
 
 clientRouter.put(
   "/clients/:id/change-address",
+  checkExact(
+    [
+      checkSchema(validationUpdateAddressBodySchema, ["body"]),
+      query([], "Query parameters unpermitted"), // check if has any query parameters
+      param(["id"], 'The "id" parameter is required'), // check if 'id' is present in the route parameters
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
+  validationParams,
   validationIfAddressAlreadyExists,
   validationAdminOrClientAccessToken,
   validationIfIdRouterClient,

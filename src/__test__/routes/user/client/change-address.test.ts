@@ -11,7 +11,7 @@ import { prismaClient } from "@libs/prisma";
 
 let userAdminToAuthentication: User & { role: Role; admin: Admin };
 let userClientToAuthentication: User & { role: Role; client: Client };
-let userMemberToAuuthentication: User & { role: Role; member: Member };
+let userMemberToAuthentication: User & { role: Role; member: Member };
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -68,7 +68,7 @@ beforeAll(async () => {
   userAdminToAuthentication = userAdminCreated;
   userClientToAuthentication = userClientCreated;
 
-  userMemberToAuuthentication = await createMember({
+  userMemberToAuthentication = await createMember({
     ...userMemberCreateBody,
     clientId: userClientToAuthentication.client.id,
     roleId: roleIdMember,
@@ -119,7 +119,7 @@ afterAll(async () => {
         in: [
           userAdminToAuthentication.id,
           userClientToAuthentication.id,
-          userMemberToAuuthentication.id,
+          userMemberToAuthentication.id,
         ],
       },
     },
@@ -153,6 +153,9 @@ describe("CHANGE ADDRESS", () => {
           where: {
             id: userClientToAuthentication.client.id,
           },
+          include: {
+            address: true,
+          },
         });
 
         expect(response.body.data).toHaveProperty("user");
@@ -160,7 +163,258 @@ describe("CHANGE ADDRESS", () => {
           "name",
           userClientToAuthentication.name
         );
+        expect(response.body.data.user).toHaveProperty(
+          "client.address.house",
+          clientWithAddressUpdated.address.house
+        );
+        expect(response.body.data.user).toHaveProperty(
+          "client.address.square",
+          clientWithAddressUpdated.address.square
+        );
         return expect(response.statusCode).toBe(200);
+      }
+    );
+
+    test(
+      `When an Admin accesses PUT ${basePath}` +
+        " and sends a request body the address.house and address.square that already exists " +
+        " then the response should have a status code 400 and the message in the body should contain the following message 'Address already exists'",
+      async () => {
+        const response = await request(app)
+          .put(setBasePath(userClientToAuthentication.client.id))
+          .set("authorization", accessTokenAsAdmin)
+          .set("refreshToken", refreshTokenAsAdmin)
+          .send(newAddress)
+          .expect(400);
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Address already exists"
+        );
+      }
+    );
+
+    test(
+      `When an Admin accesses PUT ${basePath}` +
+        " and not sends a request body " +
+        " then the response should have a status code 422",
+      async () => {
+        const response = await request(app)
+          .put(setBasePath(userClientToAuthentication.client.id))
+          .set("authorization", accessTokenAsAdmin)
+          .set("refreshToken", refreshTokenAsAdmin)
+          .expect(422);
+
+        expect(response.body).toHaveProperty("errors", response.body.errors);
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+  });
+
+  describe("CHANGE ADDRESS AS CLIENT", () => {
+    const newAddress = {
+      address: {
+        house: "new house create by client",
+        square: "new house create by client",
+      },
+    };
+    test(
+      `When a Client accesses PUT ${basePath}` +
+        " and sends a request body the new address with house and square that not exist and it own address" +
+        " then the response should have a status code 200 and the new address will be created and set to the client resource",
+      async () => {
+        const response = await request(app)
+          .put(setBasePath(userClientToAuthentication.client.id))
+          .send(newAddress)
+          .set("authorization", accessTokenAsClient)
+          .set("refreshToken", refreshTokenAsClient)
+          .expect(200);
+
+        const clientWithAddressUpdated = await prismaClient.client.findUnique({
+          where: {
+            id: userClientToAuthentication.client.id,
+          },
+          include: {
+            address: true,
+          },
+        });
+
+        expect(response.body.data).toHaveProperty("user");
+        expect(response.body.data.user).toHaveProperty(
+          "name",
+          userClientToAuthentication.name
+        );
+        expect(response.body.data.user).toHaveProperty(
+          "client.address.house",
+          clientWithAddressUpdated.address.house
+        );
+        expect(response.body.data.user).toHaveProperty(
+          "client.address.square",
+          clientWithAddressUpdated.address.square
+        );
+        return expect(response.statusCode).toBe(200);
+      }
+    );
+
+    const secondNewAddres = {
+      address: {
+        house: "new house create by other client",
+        square: "new house create by other client",
+      },
+    };
+    test(
+      `When a Client accesses PUT ${basePath}` +
+        " and sends a request body the new address with house and square that not exist and it isn't own address" +
+        " then the response should have a status code 400 and return in the body response the property message with value 'Id mismatch in user authenticated'",
+      async () => {
+        const newClient = await createClient({
+          address: {
+            square: "address to new client",
+            house: "address to new client",
+          },
+          name: "Test new Client to update Adress",
+          password: "123",
+          roleId: userAdminToAuthentication.roleId,
+        });
+
+        const response = await request(app)
+          .put(setBasePath(newClient.client.id))
+          .send(secondNewAddres)
+          .set("authorization", accessTokenAsClient)
+          .set("refreshToken", refreshTokenAsClient)
+          .expect(400);
+
+        await prismaClient.user.delete({
+          where: {
+            id: newClient.id,
+          },
+        });
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Id mismatch in user authenticated"
+        );
+      }
+    );
+
+    test(
+      `When an Client accesses PUT ${basePath}` +
+        " and sends a request body the address.house and address.square that already exists " +
+        " then the response should have a status code 400 and the message in the body should contain the following message 'Address already exists'",
+      async () => {
+        const response = await request(app)
+          .put(setBasePath(userClientToAuthentication.client.id))
+          .set("authorization", accessTokenAsClient)
+          .set("refreshToken", refreshTokenAsClient)
+          .send(newAddress)
+          .expect(400);
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Address already exists"
+        );
+      }
+    );
+
+    test(
+      `When an Client accesses PUT ${basePath}` +
+        " and not sends a request body " +
+        " then the response should have a status code 422",
+      async () => {
+        const response = await request(app)
+          .put(setBasePath(userClientToAuthentication.client.id))
+          .set("authorization", accessTokenAsClient)
+          .set("refreshToken", refreshTokenAsClient)
+          .expect(422);
+
+        expect(response.body).toHaveProperty("errors", response.body.errors);
+        return expect(response.statusCode).toBe(422);
+      }
+    );
+  });
+
+  describe("CHANGE ADDRESS AS MEMBER", () => {
+    const newAddress = {
+      address: {
+        house: "new house create by member",
+        square: "new house create by member",
+      },
+    };
+    test(
+      `When an Member accesses PUT ${basePath}` +
+        " and sends a request body the clientId of member and the address.house and address.square that doesn't exists " +
+        " then the response should have a status code 401 and the message in the body should contain the following message 'User has no permissions'",
+      async () => {
+        const response = await request(app)
+          .put(setBasePath(userMemberToAuthentication.clientId))
+          .set("authorization", accessTokenAsMember)
+          .set("refreshToken", refreshTokenAsMember)
+          .send(newAddress)
+          .expect(401);
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "User has no permissions"
+        );
+      }
+    );
+  });
+
+  describe("CHANGE ADDRESS WITHOUT AUTHENTICATION", () => {
+    const newAddress = {
+      address: {
+        house: "new house create without authorization",
+        square: "new house create without authorization",
+      },
+    };
+
+    test(
+      `When accesses PUT ${basePath} without authentication` +
+        " and sends a request body a client's id existent and the address.house and address.square that doesn't exists " +
+        " then the response should have a status code 401 and the message in the body should contain the following message 'Authorization is missing'",
+      async () => {
+        const response = await request(app)
+          .put(setBasePath(userMemberToAuthentication.clientId))
+          .send(newAddress)
+          .expect(401);
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Authorization is missing"
+        );
+      }
+    );
+
+    test(
+      `When accesses PUT ${basePath} with authentication missing prefix 'Bearer '` +
+        " and sends a request body a client's id existent and the address.house and address.square that doesn't exists " +
+        " then the response should have a status code 401 and the message in the body should contain the following message 'Access token is missing'",
+      async () => {
+        const response = await request(app)
+          .put(setBasePath(userMemberToAuthentication.clientId))
+          .send(newAddress)
+          .set("authorization", accessTokenAsAdmin.split("Bearer ")[1])
+          .expect(401);
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Access token is missing"
+        );
+      }
+    );
+
+    test(
+      `When accesses PUT ${basePath} with authentication invalid ` +
+        " and sends a request body a client's id existent and the address.house and address.square that doesn't exists " +
+        " then the response should have a status code 401 and the message in the body should contain the following message 'jwt malformed'",
+      async () => {
+        const response = await request(app)
+          .put(setBasePath(userMemberToAuthentication.clientId))
+          .send(newAddress)
+          .set("authorization", "Bearer invalid-credentials")
+          .expect(401);
+
+        return expect(response.body).toHaveProperty("message", "jwt malformed");
       }
     );
   });
