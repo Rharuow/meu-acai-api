@@ -109,6 +109,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       name: "Test Topping created as Admin",
       price: 12.99,
       amount: 2,
+      unit: "unidade",
     };
 
     test(
@@ -122,6 +123,8 @@ describe("CRUD TOPPING RESOURCE", () => {
           .set("refreshToken", refreshTokenAsAdmin)
           .send(toppingCreate)
           .expect(200);
+
+        console.log(response.body);
 
         return expect(response.statusCode).toEqual(200);
       }
