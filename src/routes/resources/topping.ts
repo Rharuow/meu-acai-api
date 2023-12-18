@@ -1,10 +1,12 @@
 import { createToppingController } from "@controllers/topping/create";
+import { deleteToppingController } from "@controllers/topping/delete";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { validationParams } from "@middlewares/paramsRouter";
 import { addAdminIdInBody } from "@middlewares/resources/addAdminIdInBody";
 import { Router } from "express";
 import {
   Schema,
+  body,
   checkExact,
   checkSchema,
   param,
@@ -68,6 +70,18 @@ toppingRouter.post(
   validationAdminAccessToken,
   addAdminIdInBody,
   createToppingController
+);
+
+toppingRouter.delete(
+  "/toppings/:id",
+  checkExact([
+    body([], "Body parameters unpermitted"),
+    query([], "Query parameters unpermitted"),
+    param(["id"], "id parameter is required"),
+  ]),
+  validationParams,
+  validationAdminAccessToken,
+  deleteToppingController
 );
 
 export { toppingRouter };

@@ -1,6 +1,5 @@
 import { CreateToppingRequestBody } from "@/types/topping/createRequestBody";
 import { prismaClient } from "@libs/prisma";
-import { Topping } from "@prisma/client";
 
 export const createToppingRepository = async (
   params: CreateToppingRequestBody
@@ -10,4 +9,8 @@ export const createToppingRepository = async (
   });
 
   return topping;
+};
+
+export const deleteToppingRepository = async ({ id }: { id: string }) => {
+  return await prismaClient.topping.delete({ where: { id } });
 };
