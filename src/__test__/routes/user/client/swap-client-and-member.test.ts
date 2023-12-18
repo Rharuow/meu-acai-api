@@ -188,7 +188,7 @@ describe("SWAP BETWEEN CLIENT AND MEMBER", () => {
     test(
       `When an Admin access PUT ${basePathRouter}/:id` +
         " with body content empty" +
-        " then the return status be equal to 422",
+        " then the return status be equal to 422 and a body content with message value 'memberId must be a string and not empty'",
       async () => {
         const response = await request(app)
           .put(basePathRouter + `/${userClientAuthenticated.client.id}`)
@@ -196,9 +196,8 @@ describe("SWAP BETWEEN CLIENT AND MEMBER", () => {
           .set("refreshTojken", refreshTokenAdmin)
           .expect(422);
 
-        expect(response.body).toHaveProperty("errors");
-        expect(response.body.errors[0]).toHaveProperty(
-          "msg",
+        expect(response.body).toHaveProperty(
+          "message",
           "memberId must be a string and not empty"
         );
 

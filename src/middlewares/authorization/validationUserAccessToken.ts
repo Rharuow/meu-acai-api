@@ -59,7 +59,6 @@ export const validationUserAccessToken = async (
 
     return next();
   } catch (error) {
-    console.log(error);
     return unauthorized(res);
   }
 };

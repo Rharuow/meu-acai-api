@@ -132,7 +132,7 @@ describe("Sign in route", () => {
     }
   });
 
-  test("when send unpermitted params in body, return 422", async () => {
+  test("when send unpermitted params in body, return 422 and body message with 'Param(s) not permitted'", async () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
@@ -140,9 +140,7 @@ describe("Sign in route", () => {
         .set("Accept", "application/json")
         .expect(422);
 
-      expect(response.body).toHaveProperty("errors");
-
-      expect(response.body.errors.length).toBeGreaterThan(0);
+      expect(response.body).toHaveProperty("message", "Param(s) not permitted");
 
       return expect(response.statusCode).toBe(422);
     } catch (error) {
@@ -166,7 +164,7 @@ describe("Sign in route", () => {
     );
   });
 
-  test("when send missing params in body, return 422", async () => {
+  test("when send missing params in body, return 422 and body with message 'password must be a string and not empty'", async () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin")
@@ -174,9 +172,10 @@ describe("Sign in route", () => {
         .set("Accept", "application/json")
         .expect(422);
 
-      expect(response.body).toHaveProperty("errors");
-
-      expect(response.body.errors.length).toBeGreaterThan(0);
+      expect(response.body).toHaveProperty(
+        "message",
+        "password must be a string and not empty"
+      );
 
       return expect(response.statusCode).toBe(422);
     } catch (error) {
@@ -184,7 +183,7 @@ describe("Sign in route", () => {
     }
   });
 
-  test("when send query params, return 422", async () => {
+  test("when send query params, return 422 and body message with 'Param(s) not permitted'", async () => {
     try {
       const response = await request(app)
         .post("/api/v1/signin?someParam=true")
@@ -192,9 +191,7 @@ describe("Sign in route", () => {
         .set("Accept", "application/json")
         .expect(422);
 
-      expect(response.body).toHaveProperty("errors");
-
-      expect(response.body.errors.length).toBeGreaterThan(0);
+      expect(response.body).toHaveProperty("message", "Param(s) not permitted");
 
       return expect(response.statusCode).toBe(422);
     } catch (error) {
