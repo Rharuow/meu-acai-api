@@ -314,5 +314,24 @@ describe("CRUD TOPPING RESOURCE", () => {
         }
       );
     });
+
+    describe("DELETE TOPPINGS WITHOUT AUTHENTICATION", () => {
+      test(
+        `When access DELETE ${baseUrl}/:id without authentication` +
+          " sending, in router, the id of topping existing, " +
+          " the response stauts code will be 401 and in the body will be contain the message property with value 'No authorization required'",
+        async () => {
+          const response = await request(app)
+            .delete(setIdInBaseUrl(topping.id))
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "No authorization required"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
   });
 });
