@@ -249,7 +249,29 @@ describe("CRUD TOPPING RESOURCE", () => {
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
 
+          expect(response.body).toHaveProperty("data.id", topping.id);
+          expect(response.body).toHaveProperty("data.name", topping.name);
+          expect(response.body).toHaveProperty("data.adminId", topping.adminId);
           return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an Admin access GET ${baseUrl}/:id` +
+          " sending in router parameter an invalid id " +
+          " the response status code will be 422 and the in body request will be a message property with value ''",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBaseUrl("invalid-id"))
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(422);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Error to retrivier topping: No Topping found"
+          );
+          return expect(response.statusCode).toBe(422);
         }
       );
     });

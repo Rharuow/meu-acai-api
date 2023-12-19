@@ -14,3 +14,11 @@ export const createToppingRepository = async (
 export const deleteToppingRepository = async ({ id }: { id: string }) => {
   return await prismaClient.topping.delete({ where: { id } });
 };
+
+export const getToppingRepository = async ({ id }: { id: string }) => {
+  const topping = await prismaClient.topping.findUniqueOrThrow({
+    where: { id },
+  });
+
+  return topping;
+};
