@@ -236,6 +236,25 @@ describe("CRUD TOPPING RESOURCE", () => {
     });
   });
 
+  describe("GET TESTS", () => {
+    describe("GET TOPPING AS ADMIN", () => {
+      test(
+        `When an Admin access GET ${baseUrl}/:id` +
+          " sending in router parameter id that is a existing topping " +
+          " the response status code will be 200 and the topping belongs to the id.",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBaseUrl(topping.id))
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          return expect(response.statusCode).toBe(200);
+        }
+      );
+    });
+  });
+
   describe("DELETE TESTS", () => {
     describe("DELETE TOPPINGS AS ADMIN", () => {
       test(
