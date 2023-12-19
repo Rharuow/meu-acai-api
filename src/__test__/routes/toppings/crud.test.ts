@@ -259,12 +259,51 @@ describe("CRUD TOPPING RESOURCE", () => {
       test(
         `When an Admin access GET ${baseUrl}/:id` +
           " sending in router parameter an invalid id " +
-          " the response status code will be 422 and the in body request will be a message property with value ''",
+          " the response status code will be 422 and the in body request will be a message property with value 'Error to retrivier topping: No Topping found'",
         async () => {
           const response = await request(app)
             .get(setIdInBaseUrl("invalid-id"))
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
+            .expect(422);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Error to retrivier topping: No Topping found"
+          );
+          return expect(response.statusCode).toBe(422);
+        }
+      );
+    });
+
+    describe("GET TOPPING AS CLIENT", () => {
+      test(
+        `When an Client access GET ${baseUrl}/:id` +
+          " sending in router parameter id that is a existing topping " +
+          " the response status code will be 200 and the topping belongs to the id.",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBaseUrl(topping.id))
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data.id", topping.id);
+          expect(response.body).toHaveProperty("data.name", topping.name);
+          expect(response.body).toHaveProperty("data.adminId", topping.adminId);
+          return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an Client access GET ${baseUrl}/:id` +
+          " sending in router parameter an invalid id " +
+          " the response status code will be 422 and the in body request will be a message property with value 'Error to retrivier topping: No Topping found'",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBaseUrl("invalid-id"))
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
             .expect(422);
 
           expect(response.body).toHaveProperty(

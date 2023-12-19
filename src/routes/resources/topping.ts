@@ -55,6 +55,18 @@ export const validationCreateToppingBodySchema: Schema = {
 
 const toppingRouter = Router();
 
+toppingRouter.get(
+  "/toppings/:id",
+  validationUserAccessToken,
+  checkExact([
+    body([], "Body parameters unpermitted"),
+    query([], "Query parameters unpermitted"),
+    param(["id"], "id parameter is required"),
+  ]),
+  validationParams,
+  getToppingController
+);
+
 toppingRouter.post(
   "/toppings",
   validationAdminAccessToken,
@@ -84,18 +96,6 @@ toppingRouter.delete(
   validationParams,
   validationAdminAccessToken,
   deleteToppingController
-);
-
-toppingRouter.get(
-  "/toppings/:id",
-  validationUserAccessToken,
-  checkExact([
-    body([], "Body parameters unpermitted"),
-    query([], "Query parameters unpermitted"),
-    param(["id"], "id parameter is required"),
-  ]),
-  validationParams,
-  getToppingController
 );
 
 export { toppingRouter };
