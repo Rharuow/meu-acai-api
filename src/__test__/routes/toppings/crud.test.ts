@@ -272,5 +272,26 @@ describe("CRUD TOPPING RESOURCE", () => {
         }
       );
     });
+
+    describe("DELETE TOPPINGS AS MEMBER", () => {
+      test(
+        `When a Member access DELETE ${baseUrl}/:id` +
+          " sending, in router, the id of topping existing, " +
+          " the response stauts code will be 401 and in the body will be contain the message property with value 'User haven't permission'",
+        async () => {
+          const response = await request(app)
+            .delete(setIdInBaseUrl(topping.id))
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
   });
 });
