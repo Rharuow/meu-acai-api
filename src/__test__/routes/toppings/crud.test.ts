@@ -252,6 +252,25 @@ describe("CRUD TOPPING RESOURCE", () => {
           return expect(response.statusCode).toBe(204);
         }
       );
+
+      test(
+        `When an Admin access DELETE ${baseUrl}/invalid-id` +
+          " the response will be 422 and in the body response has a message property with 'Record to delete does not exist.'",
+        async () => {
+          const response = await request(app)
+            .delete(baseUrl + "/invalid-id")
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(422);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Record to delete does not exist."
+          );
+
+          return expect(response.statusCode).toBe(422);
+        }
+      );
     });
   });
 });

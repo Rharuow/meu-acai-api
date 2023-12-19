@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { deleteToppingRepository } from "@repositories/topping";
 import { unprocessableEntity } from "@serializer/erros/422";
 import { Request, Response } from "express";
@@ -13,6 +14,9 @@ export const deleteToppingController = async (
 
     return res.status(204).send();
   } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError)
+      return unprocessableEntity(res, error.meta.cause);
+
     return unprocessableEntity(res, error.message);
   }
 };
