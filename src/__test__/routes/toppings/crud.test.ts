@@ -353,6 +353,25 @@ describe("CRUD TOPPING RESOURCE", () => {
         }
       );
     });
+
+    describe("GET TOPPING WITHOUT AUTHENTTICATION", () => {
+      test(
+        `When access GET ${baseUrl}/:id without authentication` +
+          " sending in router parameter id that is a existing topping " +
+          " the response status code will be 401 and in the response body there will be an attribute 'message' with text 'Unauthorized: No access token provided'.",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBaseUrl(topping.id))
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Unauthorized: No access token provided"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
   });
 
   describe("DELETE TESTS", () => {
