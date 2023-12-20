@@ -1,5 +1,6 @@
 import { Topping } from "@prisma/client";
 import { Response } from "express";
+import { list } from ".";
 
 export const createToppingSerializer = ({
   res,
@@ -21,4 +22,19 @@ export const getToppingSerializer = ({
   topping: Topping;
 }) => {
   return res.json({ message: "Topping retrieved successfully", data: topping });
+};
+
+type Params = {
+  toppings: Array<Topping>;
+  totalPages: number;
+  page: number;
+};
+
+export const listToppingsSerializer = ({
+  toppings,
+  totalPages,
+  page,
+  res,
+}: Params & { res: Response }) => {
+  return res.json(list({ data: toppings, page, totalPages }));
 };

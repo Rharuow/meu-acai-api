@@ -22,6 +22,7 @@ import {
   deleteManyCreamsController,
 } from "@controllers/cream/delete";
 import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
+import { validationListQueryParamsSchema } from "./list/schema";
 
 export const validationCreateCreamBodySchema: Schema = {
   name: {
@@ -107,42 +108,15 @@ export const orderCreamByOptions = [
   "createdAt:desc",
 ] as const;
 
-export const validationListCreamQueryParamsSchema: Schema = {
-  page: {
-    optional: true,
-    isNumeric: true,
-    errorMessage: "page must be a number",
-  },
-  perPage: {
-    optional: true,
-    isNumeric: true,
-    errorMessage: "perPage must be a number",
-  },
-  orderBy: {
-    optional: true,
-    isString: true,
-    notEmpty: false,
-    custom: {
-      options: (value) => orderCreamByOptions.includes(value),
-      errorMessage: "Invalid value for orderBy",
-    },
-    errorMessage: "the format of the order field is field:asc or field:desc",
-  },
-  filter: {
-    optional: true,
-    isString: true,
-    errorMessage:
-      "the format of the filter field is field:value or field:operator:value",
-  },
-};
-
 const creamRouter = Router();
 
 creamRouter.get(
   "/creams",
   checkExact(
     [
-      checkSchema(validationListCreamQueryParamsSchema, ["query"]),
+      checkSchema(validationListQueryParamsSchema(orderCreamByOptions), [
+        "query",
+      ]),
       body([], "Query parameters unpermitted"), // check if has any query parameters
       param([], "Query parameters unpermitted"), // check if has any router parameters
     ],

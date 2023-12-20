@@ -3,7 +3,10 @@ import { deleteToppingController } from "@controllers/topping/delete";
 import { getToppingController } from "@controllers/topping/get";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
-import { validationParams } from "@middlewares/paramsRouter";
+import {
+  validationParams,
+  validationQueryParams,
+} from "@middlewares/paramsRouter";
 import { addAdminIdInBody } from "@middlewares/resources/addAdminIdInBody";
 import { Router } from "express";
 import {
@@ -14,6 +17,8 @@ import {
   param,
   query,
 } from "express-validator";
+import { validationListQueryParamsSchema } from "./list/schema";
+import { listToppingsController } from "@controllers/topping/list";
 
 export const validationCreateToppingBodySchema: Schema = {
   name: {
@@ -54,6 +59,33 @@ export const validationCreateToppingBodySchema: Schema = {
 };
 
 const toppingRouter = Router();
+
+export const orderToppingByOptions = [
+  "id:asc",
+  "id:desc",
+  "name:asc",
+  "name:desc",
+  "price:asc",
+  "price:desc",
+  "amount:asc",
+  "amount:desc",
+  "createdAt:asc",
+  "createdAt:desc",
+] as const;
+
+toppingRouter.get(
+  "/toppings",
+  validationUserAccessToken,
+  checkExact([
+    body([], "Body parameters unpermitted"),
+    checkSchema(validationListQueryParamsSchema(orderToppingByOptions), [
+      "query",
+    ]),
+    param([], "Router parameters unpermitted"),
+  ]),
+  validationQueryParams,
+  listToppingsController
+);
 
 toppingRouter.get(
   "/toppings/:id",

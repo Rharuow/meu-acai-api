@@ -1,5 +1,3 @@
-import { ROLE } from "@prisma/client";
-
 export type Params = {
   page: number;
   perPage: number;

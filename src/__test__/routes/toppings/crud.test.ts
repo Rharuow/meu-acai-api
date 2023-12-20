@@ -112,7 +112,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       amount: 2,
       unit: "unidade",
     };
-    describe("CREATE TOPPING AS ADMIN", () => {
+    describe("CREATING TOPPING AS ADMIN", () => {
       test(
         `When an Admin access POST ${baseUrl}` +
           " sending name, price and amount in the request body" +
@@ -174,7 +174,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("CREATE TOPPING AS CLIENT", () => {
+    describe("CREATING TOPPING AS CLIENT", () => {
       test(
         `When a Client access POST ${baseUrl}` +
           " sending name, price and amount in the request body" +
@@ -195,7 +195,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("CREATE TOPPING AS MEMBER", () => {
+    describe("CREATING TOPPING AS MEMBER", () => {
       test(
         `When a Member access POST ${baseUrl}` +
           " sending name, price and amount in the request body" +
@@ -216,7 +216,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("CREATE TOPPING WITHOUT AUTHENTICATION", () => {
+    describe("CREATING TOPPING WITHOUT AUTHENTICATION", () => {
       test(
         `When access POST ${baseUrl} without authentication ` +
           " sending name, price and amount in the request body" +
@@ -237,7 +237,7 @@ describe("CRUD TOPPING RESOURCE", () => {
   });
 
   describe("GET TESTS", () => {
-    describe("GET TOPPING AS ADMIN", () => {
+    describe("GETTING TOPPING AS ADMIN", () => {
       test(
         `When an Admin access GET ${baseUrl}/:id` +
           " sending in router parameter id that is a existing topping " +
@@ -276,7 +276,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("GET TOPPING AS CLIENT", () => {
+    describe("GETTING TOPPING AS CLIENT", () => {
       test(
         `When an Client access GET ${baseUrl}/:id` +
           " sending in router parameter id that is a existing topping " +
@@ -315,7 +315,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("GET TOPPING AS MEMBER", () => {
+    describe("GETTING TOPPING AS MEMBER", () => {
       test(
         `When an Member access GET ${baseUrl}/:id` +
           " sending in router parameter id that is a existing topping " +
@@ -354,7 +354,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("GET TOPPING WITHOUT AUTHENTTICATION", () => {
+    describe("GETTING TOPPING WITHOUT AUTHENTTICATION", () => {
       test(
         `When access GET ${baseUrl}/:id without authentication` +
           " sending in router parameter id that is a existing topping " +
@@ -374,8 +374,33 @@ describe("CRUD TOPPING RESOURCE", () => {
     });
   });
 
+  describe("LIST TESTS", () => {
+    describe("LISTING TOPPINGS AS AN ADMIN", () => {
+      test(
+        `When an Admin access GET ${baseUrl}` +
+          " without any query parameters" +
+          " the response status code will be 200 and in the response body there will be a list of first teen toppings",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl)
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          console.log(response.body);
+
+          expect(response.body).toHaveProperty("data");
+          expect(response.body).toHaveProperty("hasNextPage");
+          expect(response.body).toHaveProperty("page", 1);
+          expect(response.body).toHaveProperty("totalPages");
+          return expect(response.statusCode).toBe(200);
+        }
+      );
+    });
+  });
+
   describe("DELETE TESTS", () => {
-    describe("DELETE TOPPINGS AS ADMIN", () => {
+    describe("DELETING TOPPING AS ADMIN", () => {
       test(
         `When an Admin access DELETE ${baseUrl}/:id` +
           " sending, in router, the id of topping existing, " +
@@ -411,7 +436,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("DELETE TOPPINGS AS CLIENT", () => {
+    describe("DELETING TOPPING AS CLIENT", () => {
       test(
         `When a Client access DELETE ${baseUrl}/:id` +
           " sending, in router, the id of topping existing, " +
@@ -432,7 +457,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("DELETE TOPPINGS AS MEMBER", () => {
+    describe("DELETING TOPPING AS MEMBER", () => {
       test(
         `When a Member access DELETE ${baseUrl}/:id` +
           " sending, in router, the id of topping existing, " +
@@ -453,7 +478,7 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("DELETE TOPPINGS WITHOUT AUTHENTICATION", () => {
+    describe("DELETING TOPPING WITHOUT AUTHENTICATION", () => {
       test(
         `When access DELETE ${baseUrl}/:id without authentication` +
           " sending, in router, the id of topping existing, " +
