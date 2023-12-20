@@ -435,13 +435,112 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
 
       test(
-        `When an Admin access GET ${baseUrl}?filter=name:even&perPage=5` +
+        `When an Admin access GET ${baseUrl}?filter=name:like:even&perPage=5` +
           " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
         async () => {
           const response = await request(app)
             .get(baseUrl + "?filter=name:like:even&perPage=5")
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((topping: Topping) =>
+              topping.name.includes("even")
+            )
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Admin access GET ${baseUrl}?filter=available:true&perPage=5` +
+          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((topping: Topping) =>
+              topping.name.includes("even")
+            )
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+    });
+
+    describe("LISTING TOPPINGS AS A CLIENT", () => {
+      test(
+        `When an Client access GET ${baseUrl}` +
+          " without any query parameters" +
+          " the response status code will be 200 and in the response body there will be a list of first teen toppings",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl)
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(response.body).toHaveProperty("hasNextPage", true);
+          expect(response.body).toHaveProperty("page", 1);
+          expect(response.body).toHaveProperty("totalPages", 3);
+          return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an Client access GET ${baseUrl}?filter=price:gte:100&perPage=5` +
+          " the response status will be 200 and the body will contain data property with toppings values greater than or equals to 100",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=price:gte:100&perPage=5")
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((topping: Topping) => topping.price >= 100)
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Client access GET ${baseUrl}?filter=name:like:even&perPage=5` +
+          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((topping: Topping) =>
+              topping.name.includes("even")
+            )
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Client access GET ${baseUrl}?filter=available:true&perPage=5` +
+          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
