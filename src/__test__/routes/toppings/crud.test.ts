@@ -553,6 +553,85 @@ describe("CRUD TOPPING RESOURCE", () => {
         }
       );
     });
+
+    describe("LISTING TOPPINGS AS A MEMBER", () => {
+      test(
+        `When an Member access GET ${baseUrl}` +
+          " without any query parameters" +
+          " the response status code will be 200 and in the response body there will be a list of first teen toppings",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl)
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(response.body).toHaveProperty("hasNextPage", true);
+          expect(response.body).toHaveProperty("page", 1);
+          expect(response.body).toHaveProperty("totalPages", 3);
+          return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an Member access GET ${baseUrl}?filter=price:gte:100&perPage=5` +
+          " the response status will be 200 and the body will contain data property with toppings values greater than or equals to 100",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=price:gte:100&perPage=5")
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((topping: Topping) => topping.price >= 100)
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Member access GET ${baseUrl}?filter=name:like:even&perPage=5` +
+          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((topping: Topping) =>
+              topping.name.includes("even")
+            )
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Member access GET ${baseUrl}?filter=available:true&perPage=5` +
+          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((topping: Topping) =>
+              topping.name.includes("even")
+            )
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+    });
   });
 
   describe("DELETE TESTS", () => {
