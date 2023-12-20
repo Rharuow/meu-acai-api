@@ -473,6 +473,23 @@ describe("CRUD TOPPING RESOURCE", () => {
           return expect(response.body).toHaveProperty("data.length", 5);
         }
       );
+
+      test(
+        `When an Admin access GET ${baseUrl}?filter=available:true&perPage=5` +
+          " sending parameters in body request" +
+          " the response status will be 422 and in the body response will contain the message property with text 'Unknown field(s)'",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .send({ parameter: { something: "invalid parameter" } })
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(422);
+
+          expect(response.body).toHaveProperty("message", "Unknown field(s)");
+          return expect(response.statusCode).toBe(422);
+        }
+      );
     });
 
     describe("LISTING TOPPINGS AS A CLIENT", () => {
@@ -632,6 +649,42 @@ describe("CRUD TOPPING RESOURCE", () => {
         }
       );
     });
+
+    describe("LISTING TOPPINGS WITHOUT AUTHENTICATION", () => {
+      test(
+        `When access GET ${baseUrl} without authentication` +
+          " without any query parameters" +
+          " the response status code will be 401",
+        async () => {
+          const response = await request(app).get(baseUrl).expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Unauthorized: No access token provided"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+
+      test(
+        `When access GET ${baseUrl} with invalid authentication` +
+          " without any query parameters" +
+          " the response status code will be 401",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl)
+            .set("authorization", "Bearer invalid-token")
+            .set("refreshToken", "Bearer invalid-token")
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Unauthorized: No access token provided"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
   });
 
   describe("DELETE TESTS", () => {
@@ -732,4 +785,6 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
   });
+
+  describe("DELETE MANY TEST", () => {});
 });

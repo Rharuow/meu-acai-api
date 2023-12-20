@@ -96,16 +96,11 @@ export const validationUpdateCreamBodySchema: Schema = {
 };
 
 export const orderCreamByOptions = [
-  "id:asc",
-  "id:desc",
-  "name:asc",
-  "name:desc",
-  "price:asc",
-  "price:desc",
-  "amount:asc",
-  "amount:desc",
-  "createdAt:asc",
-  "createdAt:desc",
+  "id",
+  "name",
+  "price",
+  "amount",
+  "createdAt",
 ] as const;
 
 const creamRouter = Router();
