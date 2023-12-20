@@ -2,6 +2,7 @@ import { createAdminRoleIfNotExist } from "@/__test__/presets/createAdminRoleIfN
 import { createClientRoleIfNotExist } from "@/__test__/presets/createClientRoleIfNotExists";
 import { createMemberRoleIfNotExist } from "@/__test__/presets/createMemberRoleIfNotExists";
 import { app } from "@/app";
+import { CreateToppingRequestBody } from "@/types/topping/createRequestBody";
 import { prismaClient } from "@libs/prisma";
 import { Admin, Client, Member, Role, Topping, User } from "@prisma/client";
 import { createAdmin } from "@repositories/user/admin";
@@ -85,10 +86,11 @@ beforeAll(async () => {
 
   accessTokenAsMember = "Bearer " + responseSignInAsMember.body.accessToken;
   refreshTokenAsMember = "Bearer " + responseSignInAsMember.body.refreshToken;
+  return;
 });
 
 afterAll(async () => {
-  await prismaClient.user.deleteMany({
+  return await prismaClient.user.deleteMany({
     where: {
       id: {
         in: [
@@ -375,25 +377,80 @@ describe("CRUD TOPPING RESOURCE", () => {
   });
 
   describe("LIST TESTS", () => {
+    let toppingsCreated: Array<CreateToppingRequestBody>;
     describe("LISTING TOPPINGS AS AN ADMIN", () => {
       test(
         `When an Admin access GET ${baseUrl}` +
           " without any query parameters" +
           " the response status code will be 200 and in the response body there will be a list of first teen toppings",
         async () => {
+          toppingsCreated = Array(20)
+            .fill(null)
+            .map((_, index) => ({
+              adminId: adminAuthenticated.admin.id,
+              name: `Test topping creating ${
+                index % 2 === 0 ? "even" : "odd"
+              } many ${index}`,
+              amount: index % 2 === 0 ? index + 20 : index,
+              available: index % 2 === 0,
+              isSpecial: index % 2 === 0,
+              unit: index % 2 === 0 ? "bag" : "litros",
+              price: index % 2 === 0 ? 100 + index : index,
+            }));
+
+          await prismaClient.topping.createMany({
+            data: toppingsCreated,
+          });
+
           const response = await request(app)
             .get(baseUrl)
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
 
-          console.log(response.body);
+          expect(response.body).toHaveProperty("data");
+          expect(response.body).toHaveProperty("hasNextPage", true);
+          expect(response.body).toHaveProperty("page", 1);
+          expect(response.body).toHaveProperty("totalPages", 3);
+          return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an Admin access GET ${baseUrl}?filter=price:gte:100&perPage=5` +
+          " the response status will be 200 and the body will contain data property with toppings values greater than or equals to 100",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=price:gte:100&perPage=5")
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
 
           expect(response.body).toHaveProperty("data");
-          expect(response.body).toHaveProperty("hasNextPage");
-          expect(response.body).toHaveProperty("page", 1);
-          expect(response.body).toHaveProperty("totalPages");
-          return expect(response.statusCode).toBe(200);
+          expect(
+            response.body.data.every((topping: Topping) => topping.price >= 100)
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Admin access GET ${baseUrl}?filter=name:even&perPage=5` +
+          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        async () => {
+          const response = await request(app)
+            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((topping: Topping) =>
+              topping.name.includes("even")
+            )
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
         }
       );
     });

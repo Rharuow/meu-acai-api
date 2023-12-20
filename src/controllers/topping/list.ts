@@ -21,6 +21,9 @@ export const listToppingsController = async (
 
     return listToppingsSerializer({ page, res, toppings, totalPages });
   } catch (error) {
-    return unprocessableEntity(res);
+    return unprocessableEntity(
+      res,
+      "error listing toppings = " + error.message
+    );
   }
 };
