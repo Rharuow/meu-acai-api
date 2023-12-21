@@ -290,28 +290,28 @@ To get started with the Meu Açai API, follow these steps:
 
       - **PRODUCT**
         - **IMPROVEMENTS:**
-          - [x] Product Model in Schema (Product have one Size)
-          - [x] Size Model in Schema (Size belongs to many Prodcut)
-          - [x] Router to create Product ( POST "/api/v1/resources/products" )
+          - [ ] Product Model in Schema
+          - [ ] Router to create Product ( POST "/api/v1/resources/products" )
                 {
                 name?: string,
                 price: float,
-                amount: number,
-                isSpecial?: boolean,
+                size: string,
+                maxCreamsAllowed: number,
+                maxToppingsAllowed: number,
                 available?: boolean,
                 photo?: string,
                 }
-          - [x] Router to update Product ( PUT "/api/v1/resources/products/:id" )
+          - [ ] Router to update Product ( PUT "/api/v1/resources/products/:id" )
                 {
                 name?: string,
-                price?: float,
-                amount?: number,
-                unit?: string,
-                isSpecial?: boolean,
+                price: float,
+                size: string,
+                maxCreamsAllowed: number,
+                maxToppingsAllowed: number,
                 available?: boolean,
                 photo?: string,
                 }
-          - [x] Router to get Product ( GET "/api/v1/resources/products/:id" )
-          - [x] Router to list with pagination and filters Product ( GET "/api/v1/resources/products" )
-          - [x] Router to delete Product ( DELETE "/api/v1/resources/products/:id" )
-          - [x] Router to delete many Product ( DELETE "/api/v1/resources/products/delteMany?ids=id1&id2" )
+          - [ ] Router to get Product ( GET "/api/v1/resources/products/:id" )
+          - [ ] Router to list with pagination and filters Product ( GET "/api/v1/resources/products" )
+          - [ ] Router to delete Product ( DELETE "/api/v1/resources/products/:id" )
+          - [ ] Router to delete many Product ( DELETE "/api/v1/resources/products/delteMany?ids=id1&id2" )
