@@ -35,6 +35,20 @@ export const deleteToppingRepository = async ({ id }: { id: string }) => {
   return await prismaClient.topping.delete({ where: { id } });
 };
 
+export const deleteManyToppingsRepository = async ({
+  ids,
+}: {
+  ids: Array<string>;
+}) => {
+  await prismaClient.topping.deleteMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+};
+
 export const getToppingRepository = async ({ id }: { id: string }) => {
   if (!toppingInMemory.hasItem(id)) {
     toppingInMemory.storeExpiringItem(

@@ -1,5 +1,8 @@
 import { createToppingController } from "@controllers/topping/create";
-import { deleteToppingController } from "@controllers/topping/delete";
+import {
+  deleteManyToppingsController,
+  deleteToppingController,
+} from "@controllers/topping/delete";
 import { getToppingController } from "@controllers/topping/get";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
@@ -19,6 +22,7 @@ import {
 } from "express-validator";
 import { validationListQueryParamsSchema } from "./list/schema";
 import { listToppingsController } from "@controllers/topping/list";
+import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
 
 export const validationCreateToppingBodySchema: Schema = {
   name: {
@@ -116,6 +120,13 @@ toppingRouter.post(
   validationAdminAccessToken,
   addAdminIdInBody,
   createToppingController
+);
+
+toppingRouter.delete(
+  "/toppings/deleteMany",
+  idsInQueryParams,
+  validationAdminAccessToken,
+  deleteManyToppingsController
 );
 
 toppingRouter.delete(

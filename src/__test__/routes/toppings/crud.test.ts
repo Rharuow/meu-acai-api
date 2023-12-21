@@ -107,6 +107,8 @@ describe("CRUD TOPPING RESOURCE", () => {
   const baseUrl = "/api/v1/resources/toppings";
   const setIdInBaseUrl = (id: string) => `${baseUrl}/${id}`;
   let topping: Topping;
+  let toppingsCreated: Array<CreateToppingRequestBody>;
+  let toppings: Array<Topping>;
   describe("CREATE TESTS", () => {
     const toppingCreate = {
       name: "Test Topping created as Admin",
@@ -377,7 +379,6 @@ describe("CRUD TOPPING RESOURCE", () => {
   });
 
   describe("LIST TESTS", () => {
-    let toppingsCreated: Array<CreateToppingRequestBody>;
     describe("LISTING TOPPINGS AS AN ADMIN", () => {
       test(
         `When an Admin access GET ${baseUrl}` +
@@ -400,6 +401,14 @@ describe("CRUD TOPPING RESOURCE", () => {
 
           await prismaClient.topping.createMany({
             data: toppingsCreated,
+          });
+
+          toppings = await prismaClient.topping.findMany({
+            where: {
+              name: {
+                in: toppingsCreated.map((tpg) => tpg.name),
+              },
+            },
           });
 
           const response = await request(app)
@@ -786,5 +795,26 @@ describe("CRUD TOPPING RESOURCE", () => {
     });
   });
 
-  describe("DELETE MANY TEST", () => {});
+  describe("DELETE MANY TEST", () => {
+    const baseUrlToDeleteMany = baseUrl + "/deleteMany";
+    describe("DELETING MANY AS AN ADMIN", () => {
+      test(
+        `When an Admin access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
+          " sending in query parameters the ids of the topping that were deleted" +
+          " the response status will be 204",
+        async () => {
+          const response = await request(app)
+            .delete(
+              baseUrlToDeleteMany +
+                `?ids=${toppings.map((topping) => topping.id).join(",")}`
+            )
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(204);
+
+          return expect(response.statusCode).toBe(204);
+        }
+      );
+    });
+  });
 });
