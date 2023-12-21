@@ -262,7 +262,7 @@ To get started with the Meu Açai API, follow these steps:
       - **TOPPINGS**
         - **IMPROVEMENTS:**
           - [x] Topping Model in Schema
-          - [ ] Router to create Topping ( POST "/api/v1/resources/toppings" )
+          - [x] Router to create Topping ( POST "/api/v1/resources/toppings" )
                 {
                 name: string,
                 price: float,
@@ -272,7 +272,7 @@ To get started with the Meu Açai API, follow these steps:
                 available?: boolean,
                 photo?: string,
                 }
-          - [ ] Router to update Topping ( PUT "/api/v1/resources/toppings/:id" )
+          - [x] Router to update Topping ( PUT "/api/v1/resources/toppings/:id" )
                 {
                 name?: string,
                 price?: float,
@@ -282,7 +282,7 @@ To get started with the Meu Açai API, follow these steps:
                 available?: boolean,
                 photo?: string,
                 }
-          - [ ] Router to get Topping ( GET "/api/v1/resources/toppings/:id" )
-          - [ ] Router to list with pagination and filters Topping ( GET "/api/v1/resources/toppings" )
-          - [ ] Router to delete Topping ( DELETE "/api/v1/resources/toppings/:id" )
-          - [ ] Router to delete many Topping ( DELETE "/api/v1/resources/toppings/delteMany?ids=id1&id2" )
+          - [x] Router to get Topping ( GET "/api/v1/resources/toppings/:id" )
+          - [x] Router to list with pagination and filters Topping ( GET "/api/v1/resources/toppings" )
+          - [x] Router to delete Topping ( DELETE "/api/v1/resources/toppings/:id" )
+          - [x] Router to delete many Topping ( DELETE "/api/v1/resources/toppings/delteMany?ids=id1&id2" )
