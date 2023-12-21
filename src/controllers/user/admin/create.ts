@@ -20,9 +20,6 @@ export const createAdminController = async (
 
     return createAdminSerializer({ res, user: admin });
   } catch (error) {
-    console.log("error =", error);
-    return unprocessableEntity(res, {
-      message: "Error creating admin = " + error.message,
-    });
+    return unprocessableEntity(res, "Error creating admin = " + error.message);
   }
 };

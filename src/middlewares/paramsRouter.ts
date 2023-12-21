@@ -12,7 +12,8 @@ export const validationParams = (
 
   // If errors return 422, client didn't provide required or unpermitted values at query parameters
   if (!errors.isEmpty()) {
-    return unprocessableEntity(res, errors);
+    const error = errors.array().shift().msg;
+    return unprocessableEntity(res, error);
   }
   return next();
 };
@@ -22,6 +23,14 @@ export const validationQueryParams = (
   res: Response,
   next: NextFunction
 ) => {
+  const errors = validationResult(req);
+
+  // If errors return 422, client didn't provide required or unpermitted values at query parameters
+  if (!errors.isEmpty()) {
+    const error = errors.array().shift().msg;
+    return unprocessableEntity(res, error);
+  }
+
   const { page, perPage, orderBy } = req.query;
 
   // Set default values if not provided

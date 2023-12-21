@@ -41,13 +41,13 @@ export const listCreams: (
   });
   if (!creamsInMemory.hasItem(reference)) {
     const [creams, totalCreams] = await Promise.all([
-      await prismaClient.cream.findMany({
+      prismaClient.cream.findMany({
         skip: (page - 1) * perPage,
         take: perPage,
         orderBy: createOrder({ fieldOrderBy, order }),
         where,
       }),
-      await prismaClient.cream.count({ where }),
+      prismaClient.cream.count({ where }),
     ]);
 
     creamsInMemory.storeExpiringItem(

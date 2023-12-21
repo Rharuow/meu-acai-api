@@ -107,7 +107,7 @@ model Topping {
   available     Boolean     @default(false)
   price         Float
   amount        Int
-  unit          String
+  unit          String      @default("Unidades")
   adminId       String
   createdBy     Admin       @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
@@ -120,7 +120,7 @@ model Cream {
   available     Boolean       @default(false)
   price         Float
   amount        Int
-  unit          String
+  unit          String        @default("Unidades")
   createdAt     DateTime      @default(now())
   deletedAt     DateTime?   
   updatedAt     DateTime      @updatedAt

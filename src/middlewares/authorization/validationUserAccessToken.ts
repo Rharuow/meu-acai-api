@@ -36,30 +36,8 @@ export const validationUserAccessToken = async (
 
     if (!user) return unauthorized(res);
 
-    if (user.role.name === "CLIENT") {
-      const userWithMember = await prismaClient.user.findUnique({
-        where: {
-          id: user.id,
-        },
-        include: {
-          client: {
-            include: {
-              members: true,
-            },
-          },
-        },
-      });
-
-      req.query.customFilter = {
-        id: {
-          in: userWithMember.client.members.map((member) => member.userId),
-        },
-      };
-    }
-
     return next();
   } catch (error) {
-    console.log(error);
     return unauthorized(res);
   }
 };

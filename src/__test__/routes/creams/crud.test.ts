@@ -270,6 +270,11 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
           .expect(422);
 
+        expect(response.body).toHaveProperty(
+          "message",
+          "At least one property must exist in the request body"
+        );
+
         return expect(response.statusCode).toBe(422);
       });
     });

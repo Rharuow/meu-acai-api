@@ -22,10 +22,10 @@ export const createCreamController = async (req: Request, res: Response) => {
     ) {
       const { clientVersion, ...errorSanitized } = error;
       // Handle the unique constraint violation error here
-      return unprocessableEntity(res, {
-        errorSanitized,
-        message: `Unique constraint failed on the fields: ${errorSanitized.meta.target}`,
-      });
+      return unprocessableEntity(
+        res,
+        `Unique constraint failed on the fields: ${errorSanitized.meta.target}`
+      );
     } else {
       // Handle other errors
       return unprocessableEntity(res, { message: error.message });

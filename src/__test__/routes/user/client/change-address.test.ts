@@ -197,7 +197,7 @@ describe("CHANGE ADDRESS", () => {
     test(
       `When an Admin accesses PUT ${basePath}` +
         " and not sends a request body " +
-        " then the response should have a status code 422",
+        " then the response should have a status code 422 and a body message with value 'Address house must be a string and not empty'",
       async () => {
         const response = await request(app)
           .put(setBasePath(userClientToAuthentication.client.id))
@@ -205,7 +205,10 @@ describe("CHANGE ADDRESS", () => {
           .set("refreshToken", refreshTokenAsAdmin)
           .expect(422);
 
-        expect(response.body).toHaveProperty("errors", response.body.errors);
+        expect(response.body).toHaveProperty(
+          "message",
+          "Address house must be a string and not empty"
+        );
         return expect(response.statusCode).toBe(422);
       }
     );
@@ -319,7 +322,7 @@ describe("CHANGE ADDRESS", () => {
     test(
       `When an Client accesses PUT ${basePath}` +
         " and not sends a request body " +
-        " then the response should have a status code 422",
+        " then the response should have a status code 422 and body message with 'Address house must be a string and not empty'",
       async () => {
         const response = await request(app)
           .put(setBasePath(userClientToAuthentication.client.id))
@@ -327,7 +330,10 @@ describe("CHANGE ADDRESS", () => {
           .set("refreshToken", refreshTokenAsClient)
           .expect(422);
 
-        expect(response.body).toHaveProperty("errors", response.body.errors);
+        expect(response.body).toHaveProperty(
+          "message",
+          "Address house must be a string and not empty"
+        );
         return expect(response.statusCode).toBe(422);
       }
     );

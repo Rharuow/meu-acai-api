@@ -161,14 +161,20 @@ afterAll(async () => {
   await cleanMemberTestDatabase();
   await prismaClient.user.deleteMany({
     where: {
-      OR: [
-        { name: "Test Member Created For Client" },
-        {
-          name: {
-            contains: "Test client reference to member created by",
-          },
-        },
-      ],
+      id: {
+        in: [
+          userMemberAdmin.id,
+          userMemberClient.id,
+          usersWithClientAndMember.id,
+          clientAuthenticated.id,
+          memberAuthenticated.id,
+          userAdmin.id,
+          userClient.id,
+          userMember.id,
+          clientReferenceToMemberAsAdmin.id,
+          clientReferenceToMemberAsClient.id,
+        ],
+      },
     },
   });
 });

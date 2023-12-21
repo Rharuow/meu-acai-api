@@ -193,7 +193,7 @@ To get started with the Meu Açai API, follow these steps:
           - **IMPROVEMENTS:**
             - [x] CLIENT Model in Schema
             - [x] Router to swap Client and Member entities (constrain PERMITION ADMIN )
-            - [ ] Router to change address
+            - [x] Router to change address
             - [x] Router to create CLIENT ( POST "/api/v1/resources/users/clients" )
                   {
                   name: string;
@@ -218,7 +218,6 @@ To get started with the Meu Açai API, follow these steps:
             - [x] The member should only delete their own account.
           - **IMPROVEMENTS:**
             - [x] Member Model in Schema
-            - [ ] Router to change CLIENT reference (constrain PERMITION ADMIN )
             - [x] Router to create Member ( POST "/api/v1/resources/users/members" )
                   {
                   name: string;
@@ -238,6 +237,7 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Router to delete many Member ( DELETE "/api/v1/resources/users/members/deleteMany?ids=id1&id2" )
 
       - **CREAM:**
+
         - **IMPROVEMENTS:**
           - [x] Cream Model in Schema
           - [x] Router to create Cream ( POST "/api/v1/resources/creams" )
@@ -258,3 +258,31 @@ To get started with the Meu Açai API, follow these steps:
           - [x] Router to list with pagination and filters Cream ( GET "/api/v1/resources/creams" )
           - [x] Router to delete Cream ( DELETE "/api/v1/resources/creams/:id" )
           - [x] Router to delete many Cream ( DELETE "/api/v1/resources/creams/delteMany?ids=id1&id2" )
+
+      - **TOPPINGS**
+        - **IMPROVEMENTS:**
+          - [x] Topping Model in Schema
+          - [x] Router to create Topping ( POST "/api/v1/resources/toppings" )
+                {
+                name: string,
+                price: float,
+                amount: number,
+                unit?: string,
+                isSpeacial?: boolean,
+                available?: boolean,
+                photo?: string,
+                }
+          - [x] Router to update Topping ( PUT "/api/v1/resources/toppings/:id" )
+                {
+                name?: string,
+                price?: float,
+                amount?: number,
+                unit?: string,
+                isSpeacial?: boolean,
+                available?: boolean,
+                photo?: string,
+                }
+          - [x] Router to get Topping ( GET "/api/v1/resources/toppings/:id" )
+          - [x] Router to list with pagination and filters Topping ( GET "/api/v1/resources/toppings" )
+          - [x] Router to delete Topping ( DELETE "/api/v1/resources/toppings/:id" )
+          - [x] Router to delete many Topping ( DELETE "/api/v1/resources/toppings/delteMany?ids=id1&id2" )
