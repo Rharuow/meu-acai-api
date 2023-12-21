@@ -800,6 +800,23 @@ describe("CRUD TOPPING RESOURCE", () => {
     describe("DELETING MANY AS AN ADMIN", () => {
       test(
         `When an Admin access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
+          " sending, in query parameters, invalids ids" +
+          " the response status will be 204",
+        async () => {
+          const toppingsWithInvalidIds = toppings.map((topping) => topping.id);
+          toppingsWithInvalidIds.push("invalid-id");
+          const response = await request(app)
+            .delete(baseUrlToDeleteMany + `?ids=invalid-id`)
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(204);
+
+          return expect(response.statusCode).toBe(204);
+        }
+      );
+
+      test(
+        `When an Admin access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
           " sending in query parameters the ids of the topping that were deleted" +
           " the response status will be 204",
         async () => {
@@ -813,6 +830,137 @@ describe("CRUD TOPPING RESOURCE", () => {
             .expect(204);
 
           return expect(response.statusCode).toBe(204);
+        }
+      );
+    });
+
+    describe("DELETING MANY AS A CLIENT", () => {
+      test(
+        `When an Client access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
+          " sending, in query parameters, invalids ids" +
+          " the response status will be 401 and in the response body will have message property with 'User haven't permission'",
+        async () => {
+          const toppingsWithInvalidIds = toppings.map((topping) => topping.id);
+          toppingsWithInvalidIds.push("invalid-id");
+          const response = await request(app)
+            .delete(baseUrlToDeleteMany + `?ids=invalid-id`)
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+
+      test(
+        `When an Client access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
+          " sending in query parameters the ids of the topping that were deleted" +
+          " the response status will be 401 and in the response body will have message property with 'User haven't permission'",
+        async () => {
+          const response = await request(app)
+            .delete(
+              baseUrlToDeleteMany +
+                `?ids=${toppings.map((topping) => topping.id).join(",")}`
+            )
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
+
+    describe("DELETING MANY AS A MEMBER", () => {
+      test(
+        `When an Member access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
+          " sending, in query parameters, invalids ids" +
+          " the response status will be 401 and in the response body will have message property with 'User haven't permission'",
+        async () => {
+          const toppingsWithInvalidIds = toppings.map((topping) => topping.id);
+          toppingsWithInvalidIds.push("invalid-id");
+          const response = await request(app)
+            .delete(baseUrlToDeleteMany + `?ids=invalid-id`)
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+
+      test(
+        `When an Member access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
+          " sending in query parameters the ids of the topping that were deleted" +
+          " the response status will be 401 and in the response body will have message property with 'User haven't permission'",
+        async () => {
+          const response = await request(app)
+            .delete(
+              baseUrlToDeleteMany +
+                `?ids=${toppings.map((topping) => topping.id).join(",")}`
+            )
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
+
+    describe("DELETING MANY WITHOUT AUTHENTICATION", () => {
+      test(
+        `When access DELETE ${baseUrlToDeleteMany}?ids=id1,id2 without authentication` +
+          " sending, in query parameters, invalids ids" +
+          " the response status will be 401 and in the response body will have message property with 'No authorization required'",
+        async () => {
+          const toppingsWithInvalidIds = toppings.map((topping) => topping.id);
+          toppingsWithInvalidIds.push("invalid-id");
+          const response = await request(app)
+            .delete(baseUrlToDeleteMany + `?ids=invalid-id`)
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "No authorization required"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+
+      test(
+        `When access DELETE ${baseUrlToDeleteMany}?ids=id1,id2 without authentication` +
+          " sending in query parameters the ids of the topping that were deleted" +
+          " the response status will be 401 and in the response body will have message property with 'No authorization required'",
+        async () => {
+          const response = await request(app)
+            .delete(
+              baseUrlToDeleteMany +
+                `?ids=${toppings.map((topping) => topping.id).join(",")}`
+            )
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "No authorization required"
+          );
+          return expect(response.statusCode).toBe(401);
         }
       );
     });

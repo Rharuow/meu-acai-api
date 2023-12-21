@@ -40,7 +40,7 @@ export const deleteManyToppingsRepository = async ({
 }: {
   ids: Array<string>;
 }) => {
-  await prismaClient.topping.deleteMany({
+  return await prismaClient.topping.deleteMany({
     where: {
       id: {
         in: ids,
