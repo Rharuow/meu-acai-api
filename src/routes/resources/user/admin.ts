@@ -14,7 +14,6 @@ import { updateBodyUser } from "@middlewares/resources/user/updateBody";
 import { Router } from "express";
 import {
   Schema,
-  check,
   checkExact,
   checkSchema,
   param,
@@ -38,6 +37,11 @@ export const validationCreateAdminBodySchema: Schema = {
     notEmpty: true,
     isString: true,
     errorMessage: "role must be a string and not empty",
+  },
+  adminId: {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "adminId must be a string and not empty",
   },
 };
 
@@ -71,6 +75,11 @@ export const validationUpdateAdminBodySchema: Schema = {
     optional: true,
     isString: true,
     errorMessage: "phone must be a string",
+  },
+  adminId: {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "adminId must be a string and not empty",
   },
 };
 

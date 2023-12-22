@@ -15,7 +15,7 @@ export const clientBelongsToUser = async (
     includes: ["Client"],
   })) as User & { client: Client };
 
-  if (userClient.client.id !== id)
+  if (userClient && userClient.client.id !== id)
     return unprocessableEntity(res, "Client not belongs to user");
 
   return next();

@@ -10,7 +10,6 @@ import {
   validationParams,
   validationQueryParams,
 } from "@middlewares/paramsRouter";
-import { addAdminIdInBody } from "@middlewares/resources/addAdminIdInBody";
 import { Router } from "express";
 import {
   Schema,
@@ -105,7 +104,6 @@ toppingRouter.get(
 
 toppingRouter.post(
   "/toppings",
-  validationAdminAccessToken,
   checkExact(
     [
       checkSchema(validationCreateToppingBodySchema, ["body"]),
@@ -116,9 +114,8 @@ toppingRouter.post(
       message: "Param(s) not permitted",
     }
   ),
-  validationParams,
   validationAdminAccessToken,
-  addAdminIdInBody,
+  validationParams,
   createToppingController
 );
 

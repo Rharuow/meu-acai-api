@@ -5,13 +5,12 @@ import { createCream } from "@repositories/creams";
 import { Request, Response } from "express";
 import { CreateCreamRequestBody } from "@/types/creams/createRequestbody";
 
-export const createCreamController = async (req: Request, res: Response) => {
-  const fields = req.body as CreateCreamRequestBody;
-
-  const { adminId } = res.locals as { adminId: string };
-
+export const createCreamController = async (
+  req: Request<{}, {}, CreateCreamRequestBody, {}>,
+  res: Response
+) => {
   try {
-    const cream = await createCream({ ...fields, adminId: adminId });
+    const cream = await createCream(req.body);
 
     return res.json(createCreamSerializer(cream));
   } catch (error) {

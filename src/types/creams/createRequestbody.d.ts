@@ -3,5 +3,6 @@ export type CreateCreamRequestBody = {
   amount: number;
   price: number;
   unit: string;
+  adminId: string;
   photo?: string;
 };

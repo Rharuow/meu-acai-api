@@ -1,9 +1,11 @@
 import { createProductController } from "@controllers/product/create";
+import { deleteProductController } from "@controllers/product/delete";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { validationParams } from "@middlewares/paramsRouter";
 import { Router } from "express";
 import {
   Schema,
+  body,
   checkExact,
   checkSchema,
   param,
@@ -65,6 +67,22 @@ productRouter.post(
   validationAdminAccessToken,
   validationParams,
   createProductController
+);
+
+productRouter.delete(
+  "/products/:id",
+  validationAdminAccessToken,
+  checkExact(
+    [
+      body([], "Body parameters not permitted"),
+      query([], "Query parameters unpermitted"),
+      param(["id"], "Param(s) not permitted"),
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
+  deleteProductController
 );
 
 export { productRouter };
