@@ -12,6 +12,7 @@ import {
   createReferenceMemoryCacheQuery,
 } from "./utils/queryBuilder";
 import { Topping } from "@prisma/client";
+import { UpdateToppingRequestBody } from "@/types/topping/updateRequestBody";
 
 const TIMETOEXPIRE = process.env.NODE_ENV === "test" ? 5 : 3600; // if test env expire in 5 miliseconds else 1 hour
 
@@ -95,4 +96,19 @@ export const listToppingRepository: (
     toppingsInMemory.retrieveItemValue(memoryReference),
     totalToppingsInMemory.retrieveItemValue(`total-${memoryReference}`),
   ];
+};
+
+export const updateToppingRepository = async ({
+  data,
+  id,
+}: {
+  data: UpdateToppingRequestBody;
+  id: string;
+}) => {
+  return await prismaClient.topping.update({
+    where: {
+      id,
+    },
+    data,
+  });
 };

@@ -3,6 +3,7 @@ import { createClientRoleIfNotExist } from "@/__test__/presets/createClientRoleI
 import { createMemberRoleIfNotExist } from "@/__test__/presets/createMemberRoleIfNotExists";
 import { app } from "@/app";
 import { CreateToppingRequestBody } from "@/types/topping/createRequestBody";
+import { UpdateToppingRequestBody } from "@/types/topping/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
 import { Admin, Client, Member, Role, Topping, User } from "@prisma/client";
 import { createAdmin } from "@repositories/user/admin";
@@ -696,11 +697,165 @@ describe("CRUD TOPPING RESOURCE", () => {
     });
   });
 
-  // describe("UPDATE TESTS", () => {
-  //   describe("UPDATING TOPPING AS AN ADMIN", () => {
-  //     test(`When an Admin access PUT ${baseUrl}/:id` + " sending in body the parameters ")
-  //   })
-  // })
+  describe("UPDATE TESTS", () => {
+    let toppingsUpdated: UpdateToppingRequestBody;
+    describe("UPDATING TOPPING AS AN ADMIN", () => {
+      test(
+        `When an Admin access PUT ${baseUrl}/:id` +
+          " sending in body the parameters at least one of the parameters to update the toppings belongs to id sending in router params" +
+          " then the response status code will be 200 and the body will return the topping updated into data property",
+        async () => {
+          toppingsUpdated = {
+            name: "Test Topping updated as Admin",
+            amount: 2,
+            available: false,
+            isSpecial: true,
+            photo: "some-photo.jpg",
+            price: 12.5,
+            unit: "unit",
+          };
+
+          const response = await request(app)
+            .put(setIdInBaseUrl(topping.id))
+            .send(toppingsUpdated)
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Topping updated successfully"
+          );
+          expect(response.body).toHaveProperty(
+            "data.amount",
+            toppingsUpdated.amount
+          );
+          expect(response.body).toHaveProperty(
+            "data.available",
+            toppingsUpdated.available
+          );
+          expect(response.body).toHaveProperty(
+            "data.isSpecial",
+            toppingsUpdated.isSpecial
+          );
+          expect(response.body).toHaveProperty(
+            "data.photo",
+            toppingsUpdated.photo
+          );
+          expect(response.body).toHaveProperty(
+            "data.price",
+            toppingsUpdated.price
+          );
+          expect(response.body).toHaveProperty(
+            "data.unit",
+            toppingsUpdated.unit
+          );
+          return expect(response.body).toHaveProperty(
+            "data.name",
+            "Test Topping updated as Admin"
+          );
+        }
+      );
+
+      test(
+        `When an Admin access PUT ${baseUrl}/:id` +
+          " with the body request empty" +
+          " the response status code will be 400 and the body will contain the message 'At least one body'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBaseUrl(topping.id))
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(400);
+
+          return expect(response.body).toHaveProperty(
+            "message",
+            "At least one body"
+          );
+        }
+      );
+
+      test(
+        `When an Admin access PUT ${baseUrl}/:id` +
+          " sending in body the parameters at least one of the parameters to update the toppings doesn't belongs to id sending in router params" +
+          " the response status code will be 400 and the body will contain the message 'At least one body'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBaseUrl("invalid-id"))
+            .send(toppingsUpdated)
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(400);
+
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain(
+            "Error updating topping"
+          );
+        }
+      );
+    });
+
+    describe("UPDATING TOPPING AS A CLIENT", () => {
+      test(
+        `When a Client access PUT ${baseUrl}/:id` +
+          " sending in request body the object with properties to update toppings and the id in router parameters belongs to topping" +
+          " then the response status code is 401 and the request body contains message property with value 'User haven't permission'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBaseUrl(topping.id))
+            .send(toppingsUpdated)
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(401);
+
+          return expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
+        }
+      );
+    });
+
+    describe("UPDATING TOPPING AS A MEMBER", () => {
+      test(
+        `When a Member access PUT ${baseUrl}/:id` +
+          " sending in request body the object with properties to update toppings and the id in router parameters belongs to topping" +
+          " then the response status code is 401 and the request body contains message property with value 'User haven't permission'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBaseUrl(topping.id))
+            .send(toppingsUpdated)
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(401);
+
+          return expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
+        }
+      );
+    });
+
+    describe("UPDATING TOPPING WITHOUT AUTHENTICATION", () => {
+      test(
+        `When access PUT ${baseUrl}/:id without authentitcation` +
+          " sending in request body the object with properties to update toppings and the id in router parameters belongs to topping" +
+          " then the response status code is 401 and the request body contains message property with value 'No authorization required'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBaseUrl(topping.id))
+            .send(toppingsUpdated)
+            .expect(401);
+
+          return expect(response.body).toHaveProperty(
+            "message",
+            "No authorization required"
+          );
+        }
+      );
+    });
+  });
 
   describe("DELETE TESTS", () => {
     describe("DELETING TOPPING AS ADMIN", () => {

@@ -38,3 +38,16 @@ export const listToppingsSerializer = ({
 }: Params & { res: Response }) => {
   return res.json(list({ data: toppings, page, totalPages }));
 };
+
+export const updateToppingSerializer = ({
+  res,
+  topping,
+}: {
+  res: Response;
+  topping: Topping;
+}) => {
+  return res.json({
+    message: "Topping updated successfully",
+    data: topping,
+  });
+};
