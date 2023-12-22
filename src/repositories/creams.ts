@@ -69,7 +69,7 @@ export const listCreams: (
 };
 
 export const createCream: (
-  fields: CreateCreamRequestBody & { adminId: string }
+  fields: CreateCreamRequestBody
 ) => Promise<Cream> = async ({ amount, name, price, unit, photo, adminId }) => {
   creamsInMemory.clear();
   creamInMemory.clear();

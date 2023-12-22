@@ -696,6 +696,12 @@ describe("CRUD TOPPING RESOURCE", () => {
     });
   });
 
+  // describe("UPDATE TESTS", () => {
+  //   describe("UPDATING TOPPING AS AN ADMIN", () => {
+  //     test(`When an Admin access PUT ${baseUrl}/:id` + " sending in body the parameters ")
+  //   })
+  // })
+
   describe("DELETE TESTS", () => {
     describe("DELETING TOPPING AS ADMIN", () => {
       test(

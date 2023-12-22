@@ -1,8 +1,7 @@
-export type CreateCreamRequestBody = {
-  name: string;
-  amount: number;
-  price: number;
-  unit: string;
-  adminId: string;
-  photo?: string;
-};
+import { Cream } from "@prisma/client";
+
+export type CreateCreamRequestBody = Pick<
+  Cream,
+  "name" | "amount" | "price" | "unit" | "adminId"
+> &
+  Partial<Pick<Cream, "photo">>;
