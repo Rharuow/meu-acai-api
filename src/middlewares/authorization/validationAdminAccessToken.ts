@@ -42,7 +42,7 @@ export const validationAdminAccessToken = async (
       where: { userId: user.id },
     });
 
-    res.locals.adminId = admin.id;
+    req.body.adminId = admin.id;
     return next();
   } catch (error) {
     return unauthorized(res);

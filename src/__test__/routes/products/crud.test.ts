@@ -110,13 +110,11 @@ describe("CRUD PRODCUT RESOURCE", () => {
   let products: Array<Product>;
 
   describe("CREATE PRODUCT TEST", () => {
-    let createRequestBody: CreateProductRequestBody = {
-      adminId: "",
+    let createRequestBody: Omit<CreateProductRequestBody, "adminId"> = {
       maxCreamsAllowed: 1,
       maxToppingsAllowed: 1,
       price: 1.99,
       size: "small",
-      available: true,
       name: "TEST PRODUCT NAME CREATED",
     };
     describe("CREATING AS AN ADMIN", () => {
@@ -125,8 +123,6 @@ describe("CRUD PRODCUT RESOURCE", () => {
           ` sending in body ${Object.keys(createRequestBody).join(", ")} ` +
           " then the response status will be 200 and the body will contain a created product",
         async () => {
-          createRequestBody.adminId = adminAuthenticated.admin.id;
-
           const response = await request(app)
             .post(basePath)
             .send(createRequestBody)
@@ -151,7 +147,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
           );
           expect(response.body.data).toHaveProperty(
             "adminId",
-            createRequestBody.adminId
+            adminAuthenticated.admin.id
           );
           expect(response.body.data).toHaveProperty(
             "maxCreamsAllowed",
