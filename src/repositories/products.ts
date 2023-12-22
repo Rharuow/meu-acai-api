@@ -8,3 +8,11 @@ export const createProductRepository = async (
     data,
   });
 };
+
+export const deleteProductRepository = async ({ id }: { id: string }) => {
+  return await prismaClient.product.delete({
+    where: {
+      id,
+    },
+  });
+};
