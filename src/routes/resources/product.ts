@@ -18,6 +18,8 @@ import {
 } from "express-validator";
 import { validationListQueryParamsSchema } from "./list/schema";
 import { listProductsController } from "@controllers/product/list";
+import { notEmptyRequestBody } from "@middlewares/notEmptyRequestBody";
+import { updateProductController } from "@controllers/product/update";
 
 const productRouter = Router();
 
@@ -70,6 +72,44 @@ const validationCreateSchema: Schema = {
   },
 };
 
+const validationUpdateSchema: Schema = {
+  name: {
+    optional: true,
+    isString: true,
+    errorMessage: "name must be a string",
+  },
+  price: {
+    optional: true,
+    isFloat: true,
+    errorMessage: "price must be a float number and not empty",
+  },
+  size: {
+    optional: true,
+    isString: true,
+    errorMessage: "size must be a string and not empty",
+  },
+  photo: {
+    isString: true,
+    optional: true,
+    errorMessage: "photo must be a string",
+  },
+  available: {
+    isBoolean: true,
+    optional: true,
+    errorMessage: "available must be a boolean",
+  },
+  maxCreamsAllowed: {
+    optional: true,
+    isNumeric: true,
+    errorMessage: "maxCreamsAllowed must be a number and not empty",
+  },
+  maxToppingsAllowed: {
+    optional: true,
+    isNumeric: true,
+    errorMessage: "maxToppingsAllowed must be a number and not empty",
+  },
+};
+
 productRouter.post(
   "/products",
   checkExact(
@@ -85,6 +125,24 @@ productRouter.post(
   validationAdminAccessToken,
   validationParams,
   createProductController
+);
+
+productRouter.put(
+  "/products/:id",
+  notEmptyRequestBody,
+  checkExact(
+    [
+      checkSchema(validationUpdateSchema, ["body"]),
+      query([], "Query parameters unpermitted"),
+      param(["id"], "id parameter is required"),
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
+  validationAdminAccessToken,
+  validationParams,
+  updateProductController
 );
 
 productRouter.get(

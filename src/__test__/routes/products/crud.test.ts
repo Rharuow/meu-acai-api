@@ -3,6 +3,7 @@ import { createClientRoleIfNotExist } from "@/__test__/presets/createClientRoleI
 import { createMemberRoleIfNotExist } from "@/__test__/presets/createMemberRoleIfNotExists";
 import { app } from "@/app";
 import { CreateProductRequestBody } from "@/types/product/createRequestBody";
+import { UpdateProductRequestBody } from "@/types/product/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
 import { Admin, Client, Member, Product, Role, User } from "@prisma/client";
 import { createAdmin } from "@repositories/user/admin";
@@ -432,7 +433,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
     });
   });
 
-  describe("LIST TESTS", () => {
+  describe("LIST PRODUCT TESTS", () => {
     describe("LISTING PRODUCTS AS AN ADMIN", () => {
       test(
         `When an Admin access GET ${basePath}` +
@@ -743,6 +744,152 @@ describe("CRUD PRODCUT RESOURCE", () => {
       );
     });
   });
+
+  describe("UPDATE TESTS", () => {
+    let productsUpdated: UpdateProductRequestBody;
+    describe("UPDATING PRODUCT AS AN ADMIN", () => {
+      test(
+        `When an Admin access PUT ${basePath}/:id` +
+          " sending in body the parameters at least one of the parameters to update the product belongs to id sending in router params" +
+          " then the response status code will be 200 and the body will return the product updated into data property",
+        async () => {
+          productsUpdated = {
+            name: "Test Product updated as Admin",
+            available: false,
+            photo: "some-photo.jpg",
+            price: 12.5,
+          };
+
+          const response = await request(app)
+            .put(setIdInBasePath(productCreated.id))
+            .send(productsUpdated)
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Product updated successfully"
+          );
+          expect(response.body).toHaveProperty(
+            "data.available",
+            productsUpdated.available
+          );
+          expect(response.body).toHaveProperty(
+            "data.photo",
+            productsUpdated.photo
+          );
+          expect(response.body).toHaveProperty(
+            "data.price",
+            productsUpdated.price
+          );
+          return expect(response.body).toHaveProperty(
+            "data.name",
+            "Test Product updated as Admin"
+          );
+        }
+      );
+
+      test(
+        `When an Admin access PUT ${basePath}/:id` +
+          " with the body request empty" +
+          " the response status code will be 400 and the body will contain the message 'At least one body'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBasePath(productCreated.id))
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(400);
+
+          return expect(response.body).toHaveProperty(
+            "message",
+            "At least one body"
+          );
+        }
+      );
+
+      test(
+        `When an Admin access PUT ${basePath}/:id` +
+          " sending in body the parameters at least one of the parameters to update the product doesn't belongs to id sending in router params" +
+          " the response status code will be 400 and the body will contain the message 'At least one body'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBasePath("invalid-id"))
+            .send(productsUpdated)
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(400);
+
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain(
+            "Error updating product"
+          );
+        }
+      );
+    });
+
+    describe("UPDATING PRODUCT AS A CLIENT", () => {
+      test(
+        `When a Client access PUT ${basePath}/:id` +
+          " sending in request body the object with properties to update products and the id in router parameters belongs to product" +
+          " then the response status code is 401 and the request body contains message property with value 'User haven't permission'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBasePath(productCreated.id))
+            .send(productsUpdated)
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(401);
+
+          return expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
+        }
+      );
+    });
+
+    describe("UPDATING PRODUCT AS A MEMBER", () => {
+      test(
+        `When a Member access PUT ${basePath}/:id` +
+          " sending in request body the object with properties to update products and the id in router parameters belongs to product" +
+          " then the response status code is 401 and the request body contains message property with value 'User haven't permission'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBasePath(productCreated.id))
+            .send(productsUpdated)
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(401);
+
+          return expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
+        }
+      );
+    });
+
+    describe("UPDATING PRODUCT WITHOUT AUTHENTICATION", () => {
+      test(
+        `When access PUT ${basePath}/:id without authentitcation` +
+          " sending in request body the object with properties to update products and the id in router parameters belongs to product" +
+          " then the response status code is 401 and the request body contains message property with value 'No authorization required'",
+        async () => {
+          const response = await request(app)
+            .put(setIdInBasePath(productCreated.id))
+            .send(productsUpdated)
+            .expect(401);
+
+          return expect(response.body).toHaveProperty(
+            "message",
+            "No authorization required"
+          );
+        }
+      );
+    });
+  });
+
   describe("DELETE PRODUCT TEST", () => {
     describe("DELETING AS AN ADMIN", () => {
       test(
