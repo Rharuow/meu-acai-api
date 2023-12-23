@@ -3,7 +3,10 @@ import { deleteProductController } from "@controllers/product/delete";
 import { getProductController } from "@controllers/product/get";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
-import { validationParams } from "@middlewares/paramsRouter";
+import {
+  validationParams,
+  validationQueryParams,
+} from "@middlewares/paramsRouter";
 import { Router } from "express";
 import {
   Schema,
@@ -13,6 +16,8 @@ import {
   param,
   query,
 } from "express-validator";
+import { validationListQueryParamsSchema } from "./list/schema";
+import { listProductsController } from "@controllers/product/list";
 
 const productRouter = Router();
 
@@ -80,6 +85,20 @@ productRouter.post(
   validationAdminAccessToken,
   validationParams,
   createProductController
+);
+
+productRouter.get(
+  "/products",
+  validationUserAccessToken,
+  checkExact([
+    body([], "Body parameters unpermitted"),
+    checkSchema(validationListQueryParamsSchema(orderProductByOptions), [
+      "query",
+    ]),
+    param([], "Router parameters unpermitted"),
+  ]),
+  validationQueryParams,
+  listProductsController
 );
 
 productRouter.get(

@@ -43,7 +43,7 @@ export type ParamsProduct = Params & {
 };
 
 export const listProductsRepository: (
-  params: ParamsProduct
+  params: Params
 ) => Promise<[Array<Product>, number]> = async ({
   page,
   perPage,
