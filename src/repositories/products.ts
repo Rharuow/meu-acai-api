@@ -126,7 +126,7 @@ export const deleteManyProductsRepository = async ({
 }: {
   ids: Array<string>;
 }) => {
-  await prismaClient.product.deleteMany({
+  const product = await prismaClient.product.deleteMany({
     where: {
       id: {
         in: ids,
@@ -135,4 +135,5 @@ export const deleteManyProductsRepository = async ({
   });
   productsInMemory.clear();
   productInMemory.clear();
+  return product;
 };

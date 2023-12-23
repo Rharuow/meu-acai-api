@@ -155,9 +155,6 @@ export const swapClient = async ({
   memberId: string;
   id: string;
 }) => {
-  userInMemory.clear();
-  usersInMemory.clear();
-
   const [client, member] = await Promise.all([
     prismaClient.client.findUnique({
       where: {
@@ -231,7 +228,8 @@ export const swapClient = async ({
       },
     },
   });
-
+  userInMemory.clear();
+  usersInMemory.clear();
   return newUserClient;
 };
 
@@ -263,6 +261,7 @@ export const updateAddress = async ({
       address: true,
     },
   });
-
+  userInMemory.clear();
+  usersInMemory.clear();
   return { ...client.user, client };
 };

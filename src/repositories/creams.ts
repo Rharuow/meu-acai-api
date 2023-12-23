@@ -134,4 +134,5 @@ export const deleteManyCreams = async ({ ids }: { ids: Array<string> }) => {
   });
   creamsInMemory.clear();
   creamInMemory.clear();
+  return;
 };
