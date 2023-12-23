@@ -466,19 +466,17 @@ describe("CRUD TOPPING RESOURCE", () => {
 
       test(
         `When an Admin access GET ${baseUrl}?filter=available:true&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+          " the response status will be 200 and the body will contain data property with toppings that is available true.",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .get(baseUrl + "?filter=available:true&perPage=5")
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) =>
-              topping.name.includes("even")
-            )
+            response.body.data.every((topping: Topping) => topping.available)
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
         }

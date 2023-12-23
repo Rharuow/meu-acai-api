@@ -108,6 +108,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
   const setIdInBasePath = (id: string) => basePath + "/" + id;
   let productCreated: Product;
   let products: Array<Product>;
+  let productsCreated: Array<CreateProductRequestBody>;
 
   describe("CREATE PRODUCT TEST", () => {
     let createRequestBody: Omit<CreateProductRequestBody, "adminId"> = {
@@ -164,7 +165,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When an Admin access POST ${basePath}` +
           ` without body ` +
-          " then the response status will be 422 and the body will contain a message property with ''",
+          " then the response status will be 422 and the body will contain a message property with 'price must be a float number and not empty'",
         async () => {
           const response = await request(app)
             .post(basePath)
@@ -173,14 +174,16 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .expect(422);
 
           expect(response.body).toHaveProperty("message");
-          return expect(response.statusCode).toBe(422);
+          return expect(response.body.message).toContain(
+            "price must be a float number and not empty"
+          );
         }
       );
 
       test(
         `When an Admin access POST ${basePath}` +
           ` missing some required params in body ` +
-          " then the response status will be 422 and the body will contain a message property with ''",
+          " then the response status will be 422 and the body will contain a message property with 'size must be a string and not empty'",
         async () => {
           const { size, ...createRequestBodyMissingParam } = createRequestBody;
           const response = await request(app)
@@ -191,7 +194,9 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .expect(422);
 
           expect(response.body).toHaveProperty("message");
-          return expect(response.statusCode).toBe(422);
+          return expect(response.body.message).toContain(
+            "size must be a string and not empty"
+          );
         }
       );
     });
@@ -200,7 +205,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When a Client access POST ${basePath} ` +
           " sending all required parameters in body " +
-          " then the response status will be 401 and the body will contain a message property with ''",
+          " then the response status will be 401 and the body will contain a message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
             .post(basePath)
@@ -209,7 +214,10 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("refreshToken", refreshTokenAsClient)
             .expect(401);
 
-          return expect(response.body).toHaveProperty("message");
+          return expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
         }
       );
     });
@@ -218,7 +226,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When a Member access POST ${basePath} ` +
           " sending all required parameters in body " +
-          " then the response status will be 401 and the body will contain a message property with ''",
+          " then the response status will be 401 and the body will contain a message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
             .post(basePath)
@@ -227,7 +235,10 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("refreshToken", refreshTokenAsMember)
             .expect(401);
 
-          return expect(response.body).toHaveProperty("message");
+          return expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
         }
       );
     });
@@ -236,14 +247,17 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When access POST ${basePath} without authentication` +
           " sending all required parameters in body " +
-          " then the response status will be 401 and the body will contain a message property with ''",
+          " then the response status will be 401 and the body will contain a message property with 'No authorization required'",
         async () => {
           const response = await request(app)
             .post(basePath)
             .send(createRequestBody)
             .expect(401);
 
-          return expect(response.body).toHaveProperty("message");
+          return expect(response.body).toHaveProperty(
+            "message",
+            "No authorization required"
+          );
         }
       );
     });
@@ -286,7 +300,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When an Admin access GET ${basePath}/:id` +
           " sendding invalid id in router" +
-          " then the response status will be 400 and the body will contain a message property with the value ''",
+          " then the response status will be 400 and the body will contain a message property with the value 'No Product found'",
         async () => {
           const response = await request(app)
             .get(setIdInBasePath("invalid-id"))
@@ -294,9 +308,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(400);
 
-          console.log(response.body);
-
-          return expect(response.body.data).toHaveProperty("message");
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain("No Product found");
         }
       );
     });
@@ -337,17 +350,15 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When an Client access GET ${basePath}/:id` +
           " sendding invalid id in router" +
-          " then the response status will be 400 and the body will contain a message property with the value ''",
+          " then the response status will be 400 and the body will contain a message property with the value 'No Product found'",
         async () => {
           const response = await request(app)
             .get(setIdInBasePath("invalid-id"))
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
             .expect(400);
-
-          console.log(response.body);
-
-          return expect(response.body.data).toHaveProperty("message");
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain("No Product found");
         }
       );
     });
@@ -388,7 +399,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When an Member access GET ${basePath}/:id` +
           " sendding invalid id in router" +
-          " then the response status will be 400 and the body will contain a message property with the value ''",
+          " then the response status will be 400 and the body will contain a message property with the value 'No Product found'",
         async () => {
           const response = await request(app)
             .get(setIdInBasePath("invalid-id"))
@@ -396,9 +407,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("refreshToken", refreshTokenAsMember)
             .expect(400);
 
-          console.log(response.body);
-
-          return expect(response.body.data).toHaveProperty("message");
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain("No Product found");
         }
       );
     });
@@ -407,20 +417,332 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When access GET ${basePath}/:id without authentication` +
           " sendding id belongs to the product in router" +
-          " then the response status will be 401 and the body will contain a message property with the value ''",
+          " then the response status will be 401 and the body will contain a message property with the value 'No access token provided'",
         async () => {
           const response = await request(app)
             .get(setIdInBasePath(productCreated.id))
             .expect(401);
 
-          console.log(response.body);
-
-          return expect(response.body.data).toHaveProperty("message");
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain(
+            "No access token provided"
+          );
         }
       );
     });
   });
 
+  describe("LIST TESTS", () => {
+    describe("LISTING PRODUCTS AS AN ADMIN", () => {
+      test(
+        `When an Admin access GET ${basePath}` +
+          " without any query parameters" +
+          " the response status code will be 200 and in the response body there will be a list of first teen products",
+        async () => {
+          productsCreated = Array(20)
+            .fill(null)
+            .map((_, index) => ({
+              adminId: adminAuthenticated.admin.id,
+              name: `Test product creating ${
+                index % 2 === 0 ? "even" : "odd"
+              } many ${index}`,
+              size: `10${index}`,
+              maxCreamsAllowed: index % 2 === 0 ? 2 : 1,
+              maxToppingsAllowed: index % 2 === 0 ? 2 : 1,
+              available: index % 2 === 0,
+              price: index % 2 === 0 ? 100 + index : index,
+            }));
+
+          await prismaClient.product.createMany({
+            data: productsCreated,
+          });
+
+          products = await prismaClient.product.findMany({
+            where: {
+              name: {
+                in: productsCreated.map((tpg) => tpg.name),
+              },
+            },
+          });
+
+          const response = await request(app)
+            .get(basePath)
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(response.body).toHaveProperty("hasNextPage", true);
+          expect(response.body).toHaveProperty("page", 1);
+          expect(response.body).toHaveProperty("totalPages", 3);
+          return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an Admin access GET ${basePath}?filter=price:gte:100&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products values greater than or equals to 100",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=price:gte:100&perPage=5")
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((product: Product) => product.price >= 100)
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Admin access GET ${basePath}?filter=name:like:even&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products name containing 'even' in name field.",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=name:like:even&perPage=5")
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((product: Product) =>
+              product.name.includes("even")
+            )
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Admin access GET ${basePath}?filter=available:true&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products available true.",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=available:true&perPage=5")
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((product: Product) => product.available)
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Admin access GET ${basePath}?filter=available:true&perPage=5` +
+          " sending parameters in body request" +
+          " the response status will be 422 and in the body response will contain the message property with text 'Unknown field(s)'",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=name:like:even&perPage=5")
+            .send({ parameter: { something: "invalid parameter" } })
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(422);
+
+          expect(response.body).toHaveProperty("message", "Unknown field(s)");
+          return expect(response.statusCode).toBe(422);
+        }
+      );
+    });
+
+    describe("LISTING PRODUCTS AS A CLIENT", () => {
+      test(
+        `When an Client access GET ${basePath}` +
+          " without any query parameters" +
+          " the response status code will be 200 and in the response body there will be a list of first teen products",
+        async () => {
+          const response = await request(app)
+            .get(basePath)
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(response.body).toHaveProperty("hasNextPage", true);
+          expect(response.body).toHaveProperty("page", 1);
+          expect(response.body).toHaveProperty("totalPages", 3);
+          return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an Client access GET ${basePath}?filter=price:gte:100&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products values greater than or equals to 100",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=price:gte:100&perPage=5")
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((product: Product) => product.price >= 100)
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Client access GET ${basePath}?filter=name:like:even&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products name containing 'even' in name field.",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=name:like:even&perPage=5")
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((product: Product) =>
+              product.name.includes("even")
+            )
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Client access GET ${basePath}?filter=available:true&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products available true.",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=available:true&perPage=5")
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((product: Product) => product.available)
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+    });
+
+    describe("LISTING PRODUCTS AS A MEMBER", () => {
+      test(
+        `When an Member access GET ${basePath}` +
+          " without any query parameters" +
+          " the response status code will be 200 and in the response body there will be a list of first teen products",
+        async () => {
+          const response = await request(app)
+            .get(basePath)
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(response.body).toHaveProperty("hasNextPage", true);
+          expect(response.body).toHaveProperty("page", 1);
+          expect(response.body).toHaveProperty("totalPages", 3);
+          return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an Member access GET ${basePath}?filter=price:gte:100&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products values greater than or equals to 100",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=price:gte:100&perPage=5")
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((product: Product) => product.price >= 100)
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Member access GET ${basePath}?filter=name:like:even&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products name containing 'even' in name field.",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=name:like:even&perPage=5")
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((product: Product) =>
+              product.name.includes("even")
+            )
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+
+      test(
+        `When an Member access GET ${basePath}?filter=available:true&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products available true.",
+        async () => {
+          const response = await request(app)
+            .get(basePath + "?filter=available:true&perPage=5")
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(
+            response.body.data.every((product: Product) => product.available)
+          ).toBeTruthy();
+          return expect(response.body).toHaveProperty("data.length", 5);
+        }
+      );
+    });
+
+    describe("LISTING PRODUCTS WITHOUT AUTHENTICATION", () => {
+      test(
+        `When access GET ${basePath} without authentication` +
+          " without any query parameters" +
+          " the response status code will be 401",
+        async () => {
+          const response = await request(app).get(basePath).expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Unauthorized: No access token provided"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+
+      test(
+        `When access GET ${basePath} with invalid authentication` +
+          " without any query parameters" +
+          " the response status code will be 401",
+        async () => {
+          const response = await request(app)
+            .get(basePath)
+            .set("authorization", "Bearer invalid-token")
+            .set("refreshToken", "Bearer invalid-token")
+            .expect(401);
+
+          expect(response.body).toHaveProperty(
+            "message",
+            "Unauthorized: No access token provided"
+          );
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
+  });
   describe("DELETE PRODUCT TEST", () => {
     describe("DELETING AS AN ADMIN", () => {
       test(
@@ -462,7 +784,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When an Client access delete ${basePath}/:id` +
           " in which the id in router parameter is the a valid product" +
-          " the response status code will be 401 and in body response will contain the message property with ''",
+          " the response status code will be 401 and in body response will contain the message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
             .delete(setIdInBasePath(productCreated.id))
@@ -470,7 +792,10 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("refreshToken", refreshTokenAsClient)
             .expect(401);
 
-          expect(response.body).toHaveProperty("message");
+          expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
           return expect(response.statusCode).toBe(401);
         }
       );
@@ -480,7 +805,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When an Member access delete ${basePath}/:id` +
           " in which the id in router parameter is the a valid product" +
-          " the response status code will be 401 and in body response will contain the message property with ''",
+          " the response status code will be 401 and in body response will contain the message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
             .delete(setIdInBasePath(productCreated.id))
@@ -488,7 +813,10 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("refreshToken", refreshTokenAsMember)
             .expect(401);
 
-          expect(response.body).toHaveProperty("message");
+          expect(response.body).toHaveProperty(
+            "message",
+            "User haven't permission"
+          );
           return expect(response.statusCode).toBe(401);
         }
       );
@@ -498,13 +826,16 @@ describe("CRUD PRODCUT RESOURCE", () => {
       test(
         `When access delete ${basePath}/:id without authentication` +
           " in which the id in router parameter is the a valid product" +
-          " the response status code will be 401 and in body response will contain the message property with ''",
+          " the response status code will be 401 and in body response will contain the message property with 'No authorization required'",
         async () => {
           const response = await request(app)
             .delete(setIdInBasePath(productCreated.id))
             .expect(401);
 
-          expect(response.body).toHaveProperty("message");
+          expect(response.body).toHaveProperty(
+            "message",
+            "No authorization required"
+          );
           return expect(response.statusCode).toBe(401);
         }
       );

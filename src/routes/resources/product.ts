@@ -1,6 +1,8 @@
 import { createProductController } from "@controllers/product/create";
 import { deleteProductController } from "@controllers/product/delete";
+import { getProductController } from "@controllers/product/get";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
+import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
 import { validationParams } from "@middlewares/paramsRouter";
 import { Router } from "express";
 import {
@@ -78,6 +80,18 @@ productRouter.post(
   validationAdminAccessToken,
   validationParams,
   createProductController
+);
+
+productRouter.get(
+  "/products/:id",
+  validationUserAccessToken,
+  checkExact([
+    body([], "Body parameters unpermitted"),
+    query([], "Query parameters unpermitted"),
+    param(["id"], "id parameter required"),
+  ]),
+  validationParams,
+  getProductController
 );
 
 productRouter.delete(
