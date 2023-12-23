@@ -1,4 +1,3 @@
-export type CreateAddressRequestBody = {
-  house: string;
-  square: string;
-};
+import { Address } from "@prisma/client";
+
+export type CreateAddressRequestBody = Pick<Address, "house" | "square">;

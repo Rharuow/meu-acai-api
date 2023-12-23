@@ -1,9 +1,3 @@
-export type UpdateCreamRequestBody = {
-  name?: string;
-  amount?: number;
-  price?: number;
-  unit?: string;
-  isSpecial?: boolean;
-  available?: boolean;
-  photo?: string;
-};
+import { Cream } from "@prisma/client";
+
+export type UpdateCreamRequestBody = Partial<Cream>;

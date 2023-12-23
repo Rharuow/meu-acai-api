@@ -69,11 +69,9 @@ export const listCreams: (
 };
 
 export const createCream: (
-  fields: CreateCreamRequestBody & { adminId: string }
+  fields: CreateCreamRequestBody
 ) => Promise<Cream> = async ({ amount, name, price, unit, photo, adminId }) => {
-  creamsInMemory.clear();
-  creamInMemory.clear();
-  return await prismaClient.cream.create({
+  const cream = await prismaClient.cream.create({
     data: {
       name,
       amount,
@@ -83,6 +81,9 @@ export const createCream: (
       ...(photo && { photo }),
     },
   });
+  creamsInMemory.clear();
+  creamInMemory.clear();
+  return cream;
 };
 
 export const updateCream: ({
@@ -92,12 +93,13 @@ export const updateCream: ({
   id: string;
   fields: UpdateCreamRequestBody;
 }) => Promise<Cream> = async ({ fields, id }) => {
-  creamsInMemory.clear();
-  creamInMemory.clear();
-  return await prismaClient.cream.update({
+  const cream = await prismaClient.cream.update({
     where: { id },
     data: fields,
   });
+  creamsInMemory.clear();
+  creamInMemory.clear();
+  return cream;
 };
 
 export const getCream: ({ id }: { id: string }) => Promise<Cream> = async ({
@@ -117,6 +119,8 @@ export const deleteCream: ({ id }: { id: string }) => Promise<void> = async ({
   id,
 }) => {
   await prismaClient.cream.delete({ where: { id } });
+  creamsInMemory.clear();
+  creamInMemory.clear();
   return;
 };
 
@@ -128,4 +132,7 @@ export const deleteManyCreams = async ({ ids }: { ids: Array<string> }) => {
       },
     },
   });
+  creamsInMemory.clear();
+  creamInMemory.clear();
+  return;
 };

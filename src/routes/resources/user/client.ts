@@ -75,6 +75,11 @@ export const validationCreateClientBodySchema: Schema = {
       },
     },
   },
+  adminId: {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "adminId must be a string and not empty",
+  },
 };
 
 export const validationSwapClientBodySchema: Schema = {
@@ -82,6 +87,11 @@ export const validationSwapClientBodySchema: Schema = {
     notEmpty: true,
     isString: true,
     errorMessage: "memberId must be a string and not empty",
+  },
+  adminId: {
+    notEmpty: true,
+    isString: true,
+    errorMessage: "adminId must be a string and not empty",
   },
 };
 

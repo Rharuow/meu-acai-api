@@ -12,27 +12,28 @@ import {
   createReferenceMemoryCacheQuery,
 } from "./utils/queryBuilder";
 import { Topping } from "@prisma/client";
+import { UpdateToppingRequestBody } from "@/types/topping/updateRequestBody";
 
 const TIMETOEXPIRE = process.env.NODE_ENV === "test" ? 5 : 3600; // if test env expire in 5 miliseconds else 1 hour
 
 export const createToppingRepository = async (
   params: CreateToppingRequestBody
 ) => {
-  toppingInMemory.clear();
-  toppingsInMemory.clear();
-  totalToppingsInMemory.clear();
   const topping = await prismaClient.topping.create({
     data: params,
   });
-
+  toppingInMemory.clear();
+  toppingsInMemory.clear();
+  totalToppingsInMemory.clear();
   return topping;
 };
 
 export const deleteToppingRepository = async ({ id }: { id: string }) => {
+  const topping = await prismaClient.topping.delete({ where: { id } });
   toppingInMemory.clear();
   toppingsInMemory.clear();
   totalToppingsInMemory.clear();
-  return await prismaClient.topping.delete({ where: { id } });
+  return topping;
 };
 
 export const deleteManyToppingsRepository = async ({
@@ -40,13 +41,17 @@ export const deleteManyToppingsRepository = async ({
 }: {
   ids: Array<string>;
 }) => {
-  return await prismaClient.topping.deleteMany({
+  const toppings = await prismaClient.topping.deleteMany({
     where: {
       id: {
         in: ids,
       },
     },
   });
+  toppingInMemory.clear();
+  toppingsInMemory.clear();
+  totalToppingsInMemory.clear();
+  return toppings;
 };
 
 export const getToppingRepository = async ({ id }: { id: string }) => {
@@ -95,4 +100,23 @@ export const listToppingRepository: (
     toppingsInMemory.retrieveItemValue(memoryReference),
     totalToppingsInMemory.retrieveItemValue(`total-${memoryReference}`),
   ];
+};
+
+export const updateToppingRepository = async ({
+  data,
+  id,
+}: {
+  data: UpdateToppingRequestBody;
+  id: string;
+}) => {
+  const topping = await prismaClient.topping.update({
+    where: {
+      id,
+    },
+    data,
+  });
+  toppingInMemory.clear();
+  toppingsInMemory.clear();
+  totalToppingsInMemory.clear();
+  return topping;
 };

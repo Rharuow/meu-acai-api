@@ -259,7 +259,8 @@ To get started with the Meu Açai API, follow these steps:
           - [x] Router to delete Cream ( DELETE "/api/v1/resources/creams/:id" )
           - [x] Router to delete many Cream ( DELETE "/api/v1/resources/creams/delteMany?ids=id1&id2" )
 
-      - **TOPPINGS**
+      - **TOPPING**
+
         - **IMPROVEMENTS:**
           - [x] Topping Model in Schema
           - [x] Router to create Topping ( POST "/api/v1/resources/toppings" )
@@ -268,7 +269,7 @@ To get started with the Meu Açai API, follow these steps:
                 price: float,
                 amount: number,
                 unit?: string,
-                isSpeacial?: boolean,
+                isSpecial?: boolean,
                 available?: boolean,
                 photo?: string,
                 }
@@ -278,7 +279,7 @@ To get started with the Meu Açai API, follow these steps:
                 price?: float,
                 amount?: number,
                 unit?: string,
-                isSpeacial?: boolean,
+                isSpecial?: boolean,
                 available?: boolean,
                 photo?: string,
                 }
@@ -286,3 +287,31 @@ To get started with the Meu Açai API, follow these steps:
           - [x] Router to list with pagination and filters Topping ( GET "/api/v1/resources/toppings" )
           - [x] Router to delete Topping ( DELETE "/api/v1/resources/toppings/:id" )
           - [x] Router to delete many Topping ( DELETE "/api/v1/resources/toppings/delteMany?ids=id1&id2" )
+
+      - **PRODUCT**
+        - **IMPROVEMENTS:**
+          - [ ] Product Model in Schema
+          - [ ] Router to create Product ( POST "/api/v1/resources/products" )
+                {
+                name?: string,
+                price: float,
+                size: string,
+                maxCreamsAllowed: number,
+                maxToppingsAllowed: number,
+                available?: boolean,
+                photo?: string,
+                }
+          - [ ] Router to update Product ( PUT "/api/v1/resources/products/:id" )
+                {
+                name?: string,
+                price: float,
+                size: string,
+                maxCreamsAllowed: number,
+                maxToppingsAllowed: number,
+                available?: boolean,
+                photo?: string,
+                }
+          - [ ] Router to get Product ( GET "/api/v1/resources/products/:id" )
+          - [ ] Router to list with pagination and filters Product ( GET "/api/v1/resources/products" )
+          - [ ] Router to delete Product ( DELETE "/api/v1/resources/products/:id" )
+          - [ ] Router to delete many Product ( DELETE "/api/v1/resources/products/delteMany?ids=id1&id2" )

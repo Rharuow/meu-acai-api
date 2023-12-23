@@ -2,10 +2,10 @@ import { createAdminRoleIfNotExist } from "@/__test__/presets/createAdminRoleIfN
 import { createClientRoleIfNotExist } from "@/__test__/presets/createClientRoleIfNotExists";
 import { createMemberRoleIfNotExist } from "@/__test__/presets/createMemberRoleIfNotExists";
 import { app } from "@/app";
-import { CreateToppingRequestBody } from "@/types/topping/createRequestBody";
-import { UpdateToppingRequestBody } from "@/types/topping/updateRequestBody";
+import { CreateProductRequestBody } from "@/types/product/createRequestBody";
+import { UpdateProductRequestBody } from "@/types/product/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
-import { Admin, Client, Member, Role, Topping, User } from "@prisma/client";
+import { Admin, Client, Member, Product, Role, User } from "@prisma/client";
 import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
@@ -33,17 +33,17 @@ beforeAll(async () => {
 
   const [adminCreated, clientCreated] = await Promise.all([
     createAdmin({
-      name: "Test Admin to test Toppings",
+      name: "Test Admin to test Products",
       password: "123",
       roleId: roleIdAdmin,
     }),
     createClient({
-      name: "Test Client to test Toppings",
+      name: "Test Client to test Products",
       password: "123",
       roleId: roleIdClient,
       address: {
-        house: "Test House to test toppings",
-        square: "Test Square to test toppings",
+        house: "Test House to test products",
+        square: "Test Square to test products",
       },
     }),
   ]);
@@ -51,7 +51,7 @@ beforeAll(async () => {
   adminAuthenticated = adminCreated;
   clientAuthenticated = clientCreated;
   memberAuthenticated = await createMember({
-    name: "Test Member to test toppings",
+    name: "Test Member to test Products",
     password: "123",
     roleId: roleIdMember,
     clientId: clientAuthenticated.client.id,
@@ -104,92 +104,115 @@ afterAll(async () => {
   });
 });
 
-describe("CRUD TOPPING RESOURCE", () => {
-  const baseUrl = "/api/v1/resources/toppings";
-  const setIdInBaseUrl = (id: string) => `${baseUrl}/${id}`;
-  let topping: Topping;
-  let toppingsCreated: Array<CreateToppingRequestBody>;
-  let toppings: Array<Topping>;
-  describe("CREATE TESTS", () => {
-    const toppingCreate = {
-      name: "Test Topping created as Admin",
-      price: 12.99,
-      amount: 2,
-      unit: "unidade",
+describe("CRUD PRODCUT RESOURCE", () => {
+  const basePath = "/api/v1/resources/products";
+  const setIdInBasePath = (id: string) => basePath + "/" + id;
+  let productCreated: Product;
+  let products: Array<Product>;
+  let productsCreated: Array<CreateProductRequestBody>;
+
+  describe("CREATE PRODUCT TEST", () => {
+    let createRequestBody: Omit<CreateProductRequestBody, "adminId"> = {
+      maxCreamsAllowed: 1,
+      maxToppingsAllowed: 1,
+      price: 1.99,
+      size: "small",
+      name: "TEST PRODUCT NAME CREATED",
     };
-    describe("CREATING TOPPING AS ADMIN", () => {
+    describe("CREATING AS AN ADMIN", () => {
       test(
-        `When an Admin access POST ${baseUrl}` +
-          " sending name, price and amount in the request body" +
-          " then the response status code is 200 and the adminId must be equal to the admin authenticated",
+        `When an Admin access POST ${basePath}` +
+          ` sending in body ${Object.keys(createRequestBody).join(", ")} ` +
+          " then the response status will be 200 and the body will contain a created product",
         async () => {
           const response = await request(app)
-            .post(baseUrl)
+            .post(basePath)
+            .send(createRequestBody)
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
-            .send(toppingCreate)
             .expect(200);
 
-          topping = response.body.data;
+          productCreated = response.body.data;
 
+          expect(response.body).toHaveProperty("data");
+          expect(response.body.data).toHaveProperty(
+            "name",
+            createRequestBody.name
+          );
+          expect(response.body.data).toHaveProperty(
+            "size",
+            createRequestBody.size
+          );
+          expect(response.body.data).toHaveProperty(
+            "price",
+            createRequestBody.price
+          );
           expect(response.body.data).toHaveProperty(
             "adminId",
             adminAuthenticated.admin.id
           );
-          return expect(response.statusCode).toEqual(200);
+          expect(response.body.data).toHaveProperty(
+            "maxCreamsAllowed",
+            createRequestBody.maxCreamsAllowed
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxToppingsAllowed",
+            createRequestBody.maxToppingsAllowed
+          );
+          return expect(response.statusCode).toBe(200);
         }
       );
 
       test(
-        `When an Admin access POST ${baseUrl}` +
-          " sending name and price but missing amount data in body request" +
-          " then the response status code is 422 and the message in body 'amount must be a number and not empty'",
+        `When an Admin access POST ${basePath}` +
+          ` without body ` +
+          " then the response status will be 422 and the body will contain a message property with 'price must be a float number and not empty'",
         async () => {
-          const { amount, ...createBody } = toppingCreate;
           const response = await request(app)
-            .post(baseUrl)
+            .post(basePath)
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
-            .send(createBody)
             .expect(422);
 
-          return expect(response.body).toHaveProperty(
-            "message",
-            "amount must be a number and not empty"
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain(
+            "price must be a float number and not empty"
           );
         }
       );
 
       test(
-        `When Admin access POST ${baseUrl}` +
-          " with body content empty" +
-          " then the response status code is 422 and the message in body 'amount must be a number and not empty'",
+        `When an Admin access POST ${basePath}` +
+          ` missing some required params in body ` +
+          " then the response status will be 422 and the body will contain a message property with 'size must be a string and not empty'",
         async () => {
+          const { size, ...createRequestBodyMissingParam } = createRequestBody;
           const response = await request(app)
-            .post(baseUrl)
+            .post(basePath)
+            .send(createRequestBodyMissingParam)
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(422);
 
-          return expect(response.body).toHaveProperty(
-            "message",
-            "amount must be a number and not empty"
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain(
+            "size must be a string and not empty"
           );
         }
       );
     });
 
-    describe("CREATING TOPPING AS CLIENT", () => {
+    describe("CREATING AS A CLIENT", () => {
       test(
-        `When a Client access POST ${baseUrl}` +
-          " sending name, price and amount in the request body" +
-          " then the response status code will be 401 and in the body request will have the message 'User haven't permission'",
+        `When a Client access POST ${basePath} ` +
+          " sending all required parameters in body " +
+          " then the response status will be 401 and the body will contain a message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
-            .post(baseUrl)
+            .post(basePath)
+            .send(createRequestBody)
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
-            .send(toppingCreate)
             .expect(401);
 
           return expect(response.body).toHaveProperty(
@@ -200,17 +223,17 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("CREATING TOPPING AS MEMBER", () => {
+    describe("CREATING AS A MEMBER", () => {
       test(
-        `When a Member access POST ${baseUrl}` +
-          " sending name, price and amount in the request body" +
-          " then the response status code will be 401 and in the body request will have the message 'User haven't permission'",
+        `When a Member access POST ${basePath} ` +
+          " sending all required parameters in body " +
+          " then the response status will be 401 and the body will contain a message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
-            .post(baseUrl)
+            .post(basePath)
+            .send(createRequestBody)
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
-            .send(toppingCreate)
             .expect(401);
 
           return expect(response.body).toHaveProperty(
@@ -221,15 +244,15 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("CREATING TOPPING WITHOUT AUTHENTICATION", () => {
+    describe("CREATING WITHOUT AUTHENTICATION", () => {
       test(
-        `When access POST ${baseUrl} without authentication ` +
-          " sending name, price and amount in the request body" +
-          " then the response status code will be 401 and in the body request will have the message 'No authorization required'",
+        `When access POST ${basePath} without authentication` +
+          " sending all required parameters in body " +
+          " then the response status will be 401 and the body will contain a message property with 'No authorization required'",
         async () => {
           const response = await request(app)
-            .post(baseUrl)
-            .send(toppingCreate)
+            .post(basePath)
+            .send(createRequestBody)
             .expect(401);
 
           return expect(response.body).toHaveProperty(
@@ -241,179 +264,210 @@ describe("CRUD TOPPING RESOURCE", () => {
     });
   });
 
-  describe("GET TESTS", () => {
-    describe("GETTING TOPPING AS ADMIN", () => {
+  describe("GET PRODUCT TEST", () => {
+    describe("GETTING PRODUCT AS AN ADMIN", () => {
       test(
-        `When an Admin access GET ${baseUrl}/:id` +
-          " sending in router parameter id that is a existing topping " +
-          " the response status code will be 200 and the topping belongs to the id.",
+        `When an Admin access GET ${basePath}/:id` +
+          " sendding id belongs to the product in router" +
+          " then the response status will be 200 and the body will contain a data property with the product",
         async () => {
           const response = await request(app)
-            .get(setIdInBaseUrl(topping.id))
+            .get(setIdInBasePath(productCreated.id))
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
 
-          expect(response.body).toHaveProperty("data.id", topping.id);
-          expect(response.body).toHaveProperty("data.name", topping.name);
-          expect(response.body).toHaveProperty("data.adminId", topping.adminId);
-          return expect(response.statusCode).toBe(200);
+          expect(response.body).toHaveProperty("data");
+          expect(response.body.data).toHaveProperty(
+            "name",
+            productCreated.name
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxCreamsAllowed",
+            productCreated.maxCreamsAllowed
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxToppingsAllowed",
+            productCreated.maxToppingsAllowed
+          );
+          expect(response.body.data).toHaveProperty("id", productCreated.id);
+          return expect(response.body.data).toHaveProperty(
+            "size",
+            productCreated.size
+          );
         }
       );
 
       test(
-        `When an Admin access GET ${baseUrl}/:id` +
-          " sending in router parameter an invalid id " +
-          " the response status code will be 422 and the in body request will be a message property with value 'Error to retrivier topping: No Topping found'",
+        `When an Admin access GET ${basePath}/:id` +
+          " sendding invalid id in router" +
+          " then the response status will be 400 and the body will contain a message property with the value 'No Product found'",
         async () => {
           const response = await request(app)
-            .get(setIdInBaseUrl("invalid-id"))
+            .get(setIdInBasePath("invalid-id"))
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
-            .expect(422);
+            .expect(400);
 
-          expect(response.body).toHaveProperty(
-            "message",
-            "Error to retrivier topping: No Topping found"
-          );
-          return expect(response.statusCode).toBe(422);
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain("No Product found");
         }
       );
     });
 
-    describe("GETTING TOPPING AS CLIENT", () => {
+    describe("GETTING PRODUCT AS A CLIENT", () => {
       test(
-        `When an Client access GET ${baseUrl}/:id` +
-          " sending in router parameter id that is a existing topping " +
-          " the response status code will be 200 and the topping belongs to the id.",
+        `When an Client access GET ${basePath}/:id` +
+          " sendding id belongs to the product in router" +
+          " then the response status will be 200 and the body will contain a data property with the product",
         async () => {
           const response = await request(app)
-            .get(setIdInBaseUrl(topping.id))
+            .get(setIdInBasePath(productCreated.id))
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
             .expect(200);
 
-          expect(response.body).toHaveProperty("data.id", topping.id);
-          expect(response.body).toHaveProperty("data.name", topping.name);
-          expect(response.body).toHaveProperty("data.adminId", topping.adminId);
-          return expect(response.statusCode).toBe(200);
+          expect(response.body).toHaveProperty("data");
+          expect(response.body.data).toHaveProperty(
+            "name",
+            productCreated.name
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxCreamsAllowed",
+            productCreated.maxCreamsAllowed
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxToppingsAllowed",
+            productCreated.maxToppingsAllowed
+          );
+          expect(response.body.data).toHaveProperty("id", productCreated.id);
+          return expect(response.body.data).toHaveProperty(
+            "size",
+            productCreated.size
+          );
         }
       );
 
       test(
-        `When an Client access GET ${baseUrl}/:id` +
-          " sending in router parameter an invalid id " +
-          " the response status code will be 422 and the in body request will be a message property with value 'Error to retrivier topping: No Topping found'",
+        `When an Client access GET ${basePath}/:id` +
+          " sendding invalid id in router" +
+          " then the response status will be 400 and the body will contain a message property with the value 'No Product found'",
         async () => {
           const response = await request(app)
-            .get(setIdInBaseUrl("invalid-id"))
+            .get(setIdInBasePath("invalid-id"))
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
-            .expect(422);
-
-          expect(response.body).toHaveProperty(
-            "message",
-            "Error to retrivier topping: No Topping found"
-          );
-          return expect(response.statusCode).toBe(422);
+            .expect(400);
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain("No Product found");
         }
       );
     });
 
-    describe("GETTING TOPPING AS MEMBER", () => {
+    describe("GETTING PRODUCT AS A MEMBER", () => {
       test(
-        `When an Member access GET ${baseUrl}/:id` +
-          " sending in router parameter id that is a existing topping " +
-          " the response status code will be 200 and the topping belongs to the id.",
+        `When an Member access GET ${basePath}/:id` +
+          " sendding id belongs to the product in router" +
+          " then the response status will be 200 and the body will contain a data property with the product",
         async () => {
           const response = await request(app)
-            .get(setIdInBaseUrl(topping.id))
+            .get(setIdInBasePath(productCreated.id))
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
             .expect(200);
 
-          expect(response.body).toHaveProperty("data.id", topping.id);
-          expect(response.body).toHaveProperty("data.name", topping.name);
-          expect(response.body).toHaveProperty("data.adminId", topping.adminId);
-          return expect(response.statusCode).toBe(200);
+          expect(response.body).toHaveProperty("data");
+          expect(response.body.data).toHaveProperty(
+            "name",
+            productCreated.name
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxCreamsAllowed",
+            productCreated.maxCreamsAllowed
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxToppingsAllowed",
+            productCreated.maxToppingsAllowed
+          );
+          expect(response.body.data).toHaveProperty("id", productCreated.id);
+          return expect(response.body.data).toHaveProperty(
+            "size",
+            productCreated.size
+          );
         }
       );
 
       test(
-        `When an Member access GET ${baseUrl}/:id` +
-          " sending in router parameter an invalid id " +
-          " the response status code will be 422 and the in body request will be a message property with value 'Error to retrivier topping: No Topping found'",
+        `When an Member access GET ${basePath}/:id` +
+          " sendding invalid id in router" +
+          " then the response status will be 400 and the body will contain a message property with the value 'No Product found'",
         async () => {
           const response = await request(app)
-            .get(setIdInBaseUrl("invalid-id"))
+            .get(setIdInBasePath("invalid-id"))
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
-            .expect(422);
+            .expect(400);
 
-          expect(response.body).toHaveProperty(
-            "message",
-            "Error to retrivier topping: No Topping found"
-          );
-          return expect(response.statusCode).toBe(422);
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain("No Product found");
         }
       );
     });
 
-    describe("GETTING TOPPING WITHOUT AUTHENTTICATION", () => {
+    describe("GETTING PRODUCT WITHOUT AUTHENTICATION", () => {
       test(
-        `When access GET ${baseUrl}/:id without authentication` +
-          " sending in router parameter id that is a existing topping " +
-          " the response status code will be 401 and in the response body there will be an attribute 'message' with text 'Unauthorized: No access token provided'.",
+        `When access GET ${basePath}/:id without authentication` +
+          " sendding id belongs to the product in router" +
+          " then the response status will be 401 and the body will contain a message property with the value 'No access token provided'",
         async () => {
           const response = await request(app)
-            .get(setIdInBaseUrl(topping.id))
+            .get(setIdInBasePath(productCreated.id))
             .expect(401);
 
-          expect(response.body).toHaveProperty(
-            "message",
-            "Unauthorized: No access token provided"
+          expect(response.body).toHaveProperty("message");
+          return expect(response.body.message).toContain(
+            "No access token provided"
           );
-          return expect(response.statusCode).toBe(401);
         }
       );
     });
   });
 
-  describe("LIST TESTS", () => {
-    describe("LISTING TOPPINGS AS AN ADMIN", () => {
+  describe("LIST PRODUCT TESTS", () => {
+    describe("LISTING PRODUCTS AS AN ADMIN", () => {
       test(
-        `When an Admin access GET ${baseUrl}` +
+        `When an Admin access GET ${basePath}` +
           " without any query parameters" +
-          " the response status code will be 200 and in the response body there will be a list of first teen toppings",
+          " the response status code will be 200 and in the response body there will be a list of first teen products",
         async () => {
-          toppingsCreated = Array(20)
+          productsCreated = Array(20)
             .fill(null)
             .map((_, index) => ({
               adminId: adminAuthenticated.admin.id,
-              name: `Test topping creating ${
+              name: `Test product creating ${
                 index % 2 === 0 ? "even" : "odd"
               } many ${index}`,
-              amount: index % 2 === 0 ? index + 20 : index,
+              size: `10${index}`,
+              maxCreamsAllowed: index % 2 === 0 ? 2 : 1,
+              maxToppingsAllowed: index % 2 === 0 ? 2 : 1,
               available: index % 2 === 0,
-              isSpecial: index % 2 === 0,
-              unit: index % 2 === 0 ? "bag" : "litros",
               price: index % 2 === 0 ? 100 + index : index,
             }));
 
-          await prismaClient.topping.createMany({
-            data: toppingsCreated,
+          await prismaClient.product.createMany({
+            data: productsCreated,
           });
 
-          toppings = await prismaClient.topping.findMany({
+          products = await prismaClient.product.findMany({
             where: {
               name: {
-                in: toppingsCreated.map((tpg) => tpg.name),
+                in: productsCreated.map((tpg) => tpg.name),
               },
             },
           });
 
           const response = await request(app)
-            .get(baseUrl)
+            .get(basePath)
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
@@ -427,37 +481,37 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
 
       test(
-        `When an Admin access GET ${baseUrl}?filter=price:gte:100&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings values greater than or equals to 100",
+        `When an Admin access GET ${basePath}?filter=price:gte:100&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products values greater than or equals to 100",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=price:gte:100&perPage=5")
+            .get(basePath + "?filter=price:gte:100&perPage=5")
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) => topping.price >= 100)
+            response.body.data.every((product: Product) => product.price >= 100)
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
         }
       );
 
       test(
-        `When an Admin access GET ${baseUrl}?filter=name:like:even&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        `When an Admin access GET ${basePath}?filter=name:like:even&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products name containing 'even' in name field.",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .get(basePath + "?filter=name:like:even&perPage=5")
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) =>
-              topping.name.includes("even")
+            response.body.data.every((product: Product) =>
+              product.name.includes("even")
             )
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
@@ -465,30 +519,30 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
 
       test(
-        `When an Admin access GET ${baseUrl}?filter=available:true&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings that is available true.",
+        `When an Admin access GET ${basePath}?filter=available:true&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products available true.",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=available:true&perPage=5")
+            .get(basePath + "?filter=available:true&perPage=5")
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) => topping.available)
+            response.body.data.every((product: Product) => product.available)
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
         }
       );
 
       test(
-        `When an Admin access GET ${baseUrl}?filter=available:true&perPage=5` +
+        `When an Admin access GET ${basePath}?filter=available:true&perPage=5` +
           " sending parameters in body request" +
           " the response status will be 422 and in the body response will contain the message property with text 'Unknown field(s)'",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .get(basePath + "?filter=name:like:even&perPage=5")
             .send({ parameter: { something: "invalid parameter" } })
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
@@ -500,14 +554,14 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("LISTING TOPPINGS AS A CLIENT", () => {
+    describe("LISTING PRODUCTS AS A CLIENT", () => {
       test(
-        `When an Client access GET ${baseUrl}` +
+        `When an Client access GET ${basePath}` +
           " without any query parameters" +
-          " the response status code will be 200 and in the response body there will be a list of first teen toppings",
+          " the response status code will be 200 and in the response body there will be a list of first teen products",
         async () => {
           const response = await request(app)
-            .get(baseUrl)
+            .get(basePath)
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
             .expect(200);
@@ -521,37 +575,37 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
 
       test(
-        `When an Client access GET ${baseUrl}?filter=price:gte:100&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings values greater than or equals to 100",
+        `When an Client access GET ${basePath}?filter=price:gte:100&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products values greater than or equals to 100",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=price:gte:100&perPage=5")
+            .get(basePath + "?filter=price:gte:100&perPage=5")
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) => topping.price >= 100)
+            response.body.data.every((product: Product) => product.price >= 100)
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
         }
       );
 
       test(
-        `When an Client access GET ${baseUrl}?filter=name:like:even&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        `When an Client access GET ${basePath}?filter=name:like:even&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products name containing 'even' in name field.",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .get(basePath + "?filter=name:like:even&perPage=5")
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) =>
-              topping.name.includes("even")
+            response.body.data.every((product: Product) =>
+              product.name.includes("even")
             )
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
@@ -559,34 +613,32 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
 
       test(
-        `When an Client access GET ${baseUrl}?filter=available:true&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        `When an Client access GET ${basePath}?filter=available:true&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products available true.",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .get(basePath + "?filter=available:true&perPage=5")
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) =>
-              topping.name.includes("even")
-            )
+            response.body.data.every((product: Product) => product.available)
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
         }
       );
     });
 
-    describe("LISTING TOPPINGS AS A MEMBER", () => {
+    describe("LISTING PRODUCTS AS A MEMBER", () => {
       test(
-        `When an Member access GET ${baseUrl}` +
+        `When an Member access GET ${basePath}` +
           " without any query parameters" +
-          " the response status code will be 200 and in the response body there will be a list of first teen toppings",
+          " the response status code will be 200 and in the response body there will be a list of first teen products",
         async () => {
           const response = await request(app)
-            .get(baseUrl)
+            .get(basePath)
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
             .expect(200);
@@ -600,37 +652,37 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
 
       test(
-        `When an Member access GET ${baseUrl}?filter=price:gte:100&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings values greater than or equals to 100",
+        `When an Member access GET ${basePath}?filter=price:gte:100&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products values greater than or equals to 100",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=price:gte:100&perPage=5")
+            .get(basePath + "?filter=price:gte:100&perPage=5")
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) => topping.price >= 100)
+            response.body.data.every((product: Product) => product.price >= 100)
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
         }
       );
 
       test(
-        `When an Member access GET ${baseUrl}?filter=name:like:even&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        `When an Member access GET ${basePath}?filter=name:like:even&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products name containing 'even' in name field.",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .get(basePath + "?filter=name:like:even&perPage=5")
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) =>
-              topping.name.includes("even")
+            response.body.data.every((product: Product) =>
+              product.name.includes("even")
             )
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
@@ -638,33 +690,31 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
 
       test(
-        `When an Member access GET ${baseUrl}?filter=available:true&perPage=5` +
-          " the response status will be 200 and the body will contain data property with toppings name containing 'even' in name field.",
+        `When an Member access GET ${basePath}?filter=available:true&perPage=5` +
+          " the response status will be 200 and the body will contain data property with products available true.",
         async () => {
           const response = await request(app)
-            .get(baseUrl + "?filter=name:like:even&perPage=5")
+            .get(basePath + "?filter=available:true&perPage=5")
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
             .expect(200);
 
           expect(response.body).toHaveProperty("data");
           expect(
-            response.body.data.every((topping: Topping) =>
-              topping.name.includes("even")
-            )
+            response.body.data.every((product: Product) => product.available)
           ).toBeTruthy();
           return expect(response.body).toHaveProperty("data.length", 5);
         }
       );
     });
 
-    describe("LISTING TOPPINGS WITHOUT AUTHENTICATION", () => {
+    describe("LISTING PRODUCTS WITHOUT AUTHENTICATION", () => {
       test(
-        `When access GET ${baseUrl} without authentication` +
+        `When access GET ${basePath} without authentication` +
           " without any query parameters" +
           " the response status code will be 401",
         async () => {
-          const response = await request(app).get(baseUrl).expect(401);
+          const response = await request(app).get(basePath).expect(401);
 
           expect(response.body).toHaveProperty(
             "message",
@@ -675,12 +725,12 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
 
       test(
-        `When access GET ${baseUrl} with invalid authentication` +
+        `When access GET ${basePath} with invalid authentication` +
           " without any query parameters" +
           " the response status code will be 401",
         async () => {
           const response = await request(app)
-            .get(baseUrl)
+            .get(basePath)
             .set("authorization", "Bearer invalid-token")
             .set("refreshToken", "Bearer invalid-token")
             .expect(401);
@@ -695,73 +745,58 @@ describe("CRUD TOPPING RESOURCE", () => {
     });
   });
 
-  describe("UPDATE TESTS", () => {
-    let toppingsUpdated: UpdateToppingRequestBody;
-    describe("UPDATING TOPPING AS AN ADMIN", () => {
+  describe("UPDATE PRODUCT TESTS", () => {
+    let productsUpdated: UpdateProductRequestBody;
+    describe("UPDATING PRODUCT AS AN ADMIN", () => {
       test(
-        `When an Admin access PUT ${baseUrl}/:id` +
-          " sending in body the parameters at least one of the parameters to update the toppings belongs to id sending in router params" +
-          " then the response status code will be 200 and the body will return the topping updated into data property",
+        `When an Admin access PUT ${basePath}/:id` +
+          " sending in body the parameters at least one of the parameters to update the product belongs to id sending in router params" +
+          " then the response status code will be 200 and the body will return the product updated into data property",
         async () => {
-          toppingsUpdated = {
-            name: "Test Topping updated as Admin",
-            amount: 2,
+          productsUpdated = {
+            name: "Test Product updated as Admin",
             available: false,
-            isSpecial: true,
             photo: "some-photo.jpg",
             price: 12.5,
-            unit: "unit",
           };
 
           const response = await request(app)
-            .put(setIdInBaseUrl(topping.id))
-            .send(toppingsUpdated)
+            .put(setIdInBasePath(productCreated.id))
+            .send(productsUpdated)
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
 
           expect(response.body).toHaveProperty(
             "message",
-            "Topping updated successfully"
-          );
-          expect(response.body).toHaveProperty(
-            "data.amount",
-            toppingsUpdated.amount
+            "Product updated successfully"
           );
           expect(response.body).toHaveProperty(
             "data.available",
-            toppingsUpdated.available
-          );
-          expect(response.body).toHaveProperty(
-            "data.isSpecial",
-            toppingsUpdated.isSpecial
+            productsUpdated.available
           );
           expect(response.body).toHaveProperty(
             "data.photo",
-            toppingsUpdated.photo
+            productsUpdated.photo
           );
           expect(response.body).toHaveProperty(
             "data.price",
-            toppingsUpdated.price
-          );
-          expect(response.body).toHaveProperty(
-            "data.unit",
-            toppingsUpdated.unit
+            productsUpdated.price
           );
           return expect(response.body).toHaveProperty(
             "data.name",
-            "Test Topping updated as Admin"
+            "Test Product updated as Admin"
           );
         }
       );
 
       test(
-        `When an Admin access PUT ${baseUrl}/:id` +
+        `When an Admin access PUT ${basePath}/:id` +
           " with the body request empty" +
           " the response status code will be 400 and the body will contain the message 'At least one body'",
         async () => {
           const response = await request(app)
-            .put(setIdInBaseUrl(topping.id))
+            .put(setIdInBasePath(productCreated.id))
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(400);
@@ -774,34 +809,34 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
 
       test(
-        `When an Admin access PUT ${baseUrl}/:id` +
-          " sending in body the parameters at least one of the parameters to update the toppings doesn't belongs to id sending in router params" +
+        `When an Admin access PUT ${basePath}/:id` +
+          " sending in body the parameters at least one of the parameters to update the product doesn't belongs to id sending in router params" +
           " the response status code will be 400 and the body will contain the message 'At least one body'",
         async () => {
           const response = await request(app)
-            .put(setIdInBaseUrl("invalid-id"))
-            .send(toppingsUpdated)
+            .put(setIdInBasePath("invalid-id"))
+            .send(productsUpdated)
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(400);
 
           expect(response.body).toHaveProperty("message");
           return expect(response.body.message).toContain(
-            "Error updating topping"
+            "Error updating product"
           );
         }
       );
     });
 
-    describe("UPDATING TOPPING AS A CLIENT", () => {
+    describe("UPDATING PRODUCT AS A CLIENT", () => {
       test(
-        `When a Client access PUT ${baseUrl}/:id` +
-          " sending in request body the object with properties to update toppings and the id in router parameters belongs to topping" +
+        `When a Client access PUT ${basePath}/:id` +
+          " sending in request body the object with properties to update products and the id in router parameters belongs to product" +
           " then the response status code is 401 and the request body contains message property with value 'User haven't permission'",
         async () => {
           const response = await request(app)
-            .put(setIdInBaseUrl(topping.id))
-            .send(toppingsUpdated)
+            .put(setIdInBasePath(productCreated.id))
+            .send(productsUpdated)
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
             .expect(401);
@@ -814,15 +849,15 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("UPDATING TOPPING AS A MEMBER", () => {
+    describe("UPDATING PRODUCT AS A MEMBER", () => {
       test(
-        `When a Member access PUT ${baseUrl}/:id` +
-          " sending in request body the object with properties to update toppings and the id in router parameters belongs to topping" +
+        `When a Member access PUT ${basePath}/:id` +
+          " sending in request body the object with properties to update products and the id in router parameters belongs to product" +
           " then the response status code is 401 and the request body contains message property with value 'User haven't permission'",
         async () => {
           const response = await request(app)
-            .put(setIdInBaseUrl(topping.id))
-            .send(toppingsUpdated)
+            .put(setIdInBasePath(productCreated.id))
+            .send(productsUpdated)
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
             .expect(401);
@@ -835,15 +870,15 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("UPDATING TOPPING WITHOUT AUTHENTICATION", () => {
+    describe("UPDATING PRODUCT WITHOUT AUTHENTICATION", () => {
       test(
-        `When access PUT ${baseUrl}/:id without authentitcation` +
-          " sending in request body the object with properties to update toppings and the id in router parameters belongs to topping" +
+        `When access PUT ${basePath}/:id without authentitcation` +
+          " sending in request body the object with properties to update products and the id in router parameters belongs to product" +
           " then the response status code is 401 and the request body contains message property with value 'No authorization required'",
         async () => {
           const response = await request(app)
-            .put(setIdInBaseUrl(topping.id))
-            .send(toppingsUpdated)
+            .put(setIdInBasePath(productCreated.id))
+            .send(productsUpdated)
             .expect(401);
 
           return expect(response.body).toHaveProperty(
@@ -855,51 +890,51 @@ describe("CRUD TOPPING RESOURCE", () => {
     });
   });
 
-  describe("DELETE TESTS", () => {
-    describe("DELETING TOPPING AS ADMIN", () => {
+  describe("DELETE PRODUCT TEST", () => {
+    describe("DELETING AS AN ADMIN", () => {
       test(
-        `When an Admin access DELETE ${baseUrl}/:id` +
-          " sending, in router, the id of topping existing, " +
-          " the response stauts code will be 204",
+        `When an Admin access delete ${basePath}/:id` +
+          " in which the id in router parameter is the a valid product" +
+          " the response status code will be 204",
         async () => {
-          const response = await request(app)
-            .delete(setIdInBaseUrl(topping.id))
+          await request(app)
+            .delete(setIdInBasePath(productCreated.id))
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(204);
 
-          return expect(response.statusCode).toBe(204);
+          products = await prismaClient.product.findMany();
+
+          return expect(
+            products.every((prod) => prod.id !== productCreated.id)
+          ).toBeTruthy();
         }
       );
 
       test(
-        `When an Admin access DELETE ${baseUrl}/invalid-id` +
-          " the response will be 422 and in the body response has a message property with 'Record to delete does not exist.'",
+        `When an Admin access delete ${basePath}/:id` +
+          " in which the id in router parameter doesn't belongs to a product" +
+          " the response status code will be 400",
         async () => {
           const response = await request(app)
-            .delete(baseUrl + "/invalid-id")
+            .delete(setIdInBasePath("invalid-id"))
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
-            .expect(422);
+            .expect(400);
 
-          expect(response.body).toHaveProperty(
-            "message",
-            "Record to delete does not exist."
-          );
-
-          return expect(response.statusCode).toBe(422);
+          return expect(response.statusCode).toBe(400);
         }
       );
     });
 
-    describe("DELETING TOPPING AS CLIENT", () => {
+    describe("DELETING AS A CLIENT", () => {
       test(
-        `When a Client access DELETE ${baseUrl}/:id` +
-          " sending, in router, the id of topping existing, " +
-          " the response stauts code will be 401 and in the body will be contain the message property with value 'User haven't permission'",
+        `When an Client access delete ${basePath}/:id` +
+          " in which the id in router parameter is the a valid product" +
+          " the response status code will be 401 and in body response will contain the message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
-            .delete(setIdInBaseUrl(topping.id))
+            .delete(setIdInBasePath(productCreated.id))
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
             .expect(401);
@@ -913,14 +948,14 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("DELETING TOPPING AS MEMBER", () => {
+    describe("DELETING AS A MEMBER", () => {
       test(
-        `When a Member access DELETE ${baseUrl}/:id` +
-          " sending, in router, the id of topping existing, " +
-          " the response stauts code will be 401 and in the body will be contain the message property with value 'User haven't permission'",
+        `When an Member access delete ${basePath}/:id` +
+          " in which the id in router parameter is the a valid product" +
+          " the response status code will be 401 and in body response will contain the message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
-            .delete(setIdInBaseUrl(topping.id))
+            .delete(setIdInBasePath(productCreated.id))
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
             .expect(401);
@@ -934,14 +969,14 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("DELETING TOPPING WITHOUT AUTHENTICATION", () => {
+    describe("DELETING WHITOUT AUTHENTICATION", () => {
       test(
-        `When access DELETE ${baseUrl}/:id without authentication` +
-          " sending, in router, the id of topping existing, " +
-          " the response stauts code will be 401 and in the body will be contain the message property with value 'No authorization required'",
+        `When access delete ${basePath}/:id without authentication` +
+          " in which the id in router parameter is the a valid product" +
+          " the response status code will be 401 and in body response will contain the message property with 'No authorization required'",
         async () => {
           const response = await request(app)
-            .delete(setIdInBaseUrl(topping.id))
+            .delete(setIdInBasePath(productCreated.id))
             .expect(401);
 
           expect(response.body).toHaveProperty(
@@ -954,16 +989,16 @@ describe("CRUD TOPPING RESOURCE", () => {
     });
   });
 
-  describe("DELETE MANY TEST", () => {
-    const baseUrlToDeleteMany = baseUrl + "/deleteMany";
-    describe("DELETING MANY AS AN ADMIN", () => {
+  describe("DELETE MANY PRODUCT TEST", () => {
+    const baseUrlToDeleteMany = basePath + "/deleteMany";
+    describe("DELETING MANY PRODUCT AS AN ADMIN", () => {
       test(
         `When an Admin access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
           " sending, in query parameters, invalids ids" +
           " the response status will be 204",
         async () => {
-          const toppingsWithInvalidIds = toppings.map((topping) => topping.id);
-          toppingsWithInvalidIds.push("invalid-id");
+          const productsWithInvalidIds = products.map((product) => product.id);
+          productsWithInvalidIds.push("invalid-id");
           const response = await request(app)
             .delete(baseUrlToDeleteMany + `?ids=invalid-id`)
             .set("authorization", accessTokenAsAdmin)
@@ -976,13 +1011,13 @@ describe("CRUD TOPPING RESOURCE", () => {
 
       test(
         `When an Admin access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
-          " sending in query parameters the ids of the topping that were deleted" +
+          " sending in query parameters the ids of the product that were deleted" +
           " the response status will be 204",
         async () => {
           const response = await request(app)
             .delete(
               baseUrlToDeleteMany +
-                `?ids=${toppings.map((topping) => topping.id).join(",")}`
+                `?ids=${products.map((product) => product.id).join(",")}`
             )
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
@@ -993,14 +1028,14 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("DELETING MANY AS A CLIENT", () => {
+    describe("DELETING MANY PRODUCTS AS A CLIENT", () => {
       test(
         `When an Client access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
           " sending, in query parameters, invalids ids" +
           " the response status will be 401 and in the response body will have message property with 'User haven't permission'",
         async () => {
-          const toppingsWithInvalidIds = toppings.map((topping) => topping.id);
-          toppingsWithInvalidIds.push("invalid-id");
+          const productsWithInvalidIds = products.map((product) => product.id);
+          productsWithInvalidIds.push("invalid-id");
           const response = await request(app)
             .delete(baseUrlToDeleteMany + `?ids=invalid-id`)
             .set("authorization", accessTokenAsClient)
@@ -1017,13 +1052,13 @@ describe("CRUD TOPPING RESOURCE", () => {
 
       test(
         `When an Client access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
-          " sending in query parameters the ids of the topping that were deleted" +
+          " sending in query parameters the ids of the product that were deleted" +
           " the response status will be 401 and in the response body will have message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
             .delete(
               baseUrlToDeleteMany +
-                `?ids=${toppings.map((topping) => topping.id).join(",")}`
+                `?ids=${products.map((product) => product.id).join(",")}`
             )
             .set("authorization", accessTokenAsClient)
             .set("refreshToken", refreshTokenAsClient)
@@ -1038,14 +1073,14 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("DELETING MANY AS A MEMBER", () => {
+    describe("DELETING MANY PRODUCT AS A MEMBER", () => {
       test(
         `When an Member access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
           " sending, in query parameters, invalids ids" +
           " the response status will be 401 and in the response body will have message property with 'User haven't permission'",
         async () => {
-          const toppingsWithInvalidIds = toppings.map((topping) => topping.id);
-          toppingsWithInvalidIds.push("invalid-id");
+          const productsWithInvalidIds = products.map((product) => product.id);
+          productsWithInvalidIds.push("invalid-id");
           const response = await request(app)
             .delete(baseUrlToDeleteMany + `?ids=invalid-id`)
             .set("authorization", accessTokenAsMember)
@@ -1062,13 +1097,13 @@ describe("CRUD TOPPING RESOURCE", () => {
 
       test(
         `When an Member access DELETE ${baseUrlToDeleteMany}?ids=id1,id2` +
-          " sending in query parameters the ids of the topping that were deleted" +
+          " sending in query parameters the ids of the product that were deleted" +
           " the response status will be 401 and in the response body will have message property with 'User haven't permission'",
         async () => {
           const response = await request(app)
             .delete(
               baseUrlToDeleteMany +
-                `?ids=${toppings.map((topping) => topping.id).join(",")}`
+                `?ids=${products.map((product) => product.id).join(",")}`
             )
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
@@ -1083,14 +1118,14 @@ describe("CRUD TOPPING RESOURCE", () => {
       );
     });
 
-    describe("DELETING MANY WITHOUT AUTHENTICATION", () => {
+    describe("DELETING MANY PRODUCTS WITHOUT AUTHENTICATION", () => {
       test(
         `When access DELETE ${baseUrlToDeleteMany}?ids=id1,id2 without authentication` +
           " sending, in query parameters, invalids ids" +
           " the response status will be 401 and in the response body will have message property with 'No authorization required'",
         async () => {
-          const toppingsWithInvalidIds = toppings.map((topping) => topping.id);
-          toppingsWithInvalidIds.push("invalid-id");
+          const productsWithInvalidIds = products.map((product) => product.id);
+          productsWithInvalidIds.push("invalid-id");
           const response = await request(app)
             .delete(baseUrlToDeleteMany + `?ids=invalid-id`)
             .expect(401);
@@ -1105,13 +1140,13 @@ describe("CRUD TOPPING RESOURCE", () => {
 
       test(
         `When access DELETE ${baseUrlToDeleteMany}?ids=id1,id2 without authentication` +
-          " sending in query parameters the ids of the topping that were deleted" +
+          " sending in query parameters the ids of the product that were deleted" +
           " the response status will be 401 and in the response body will have message property with 'No authorization required'",
         async () => {
           const response = await request(app)
             .delete(
               baseUrlToDeleteMany +
-                `?ids=${toppings.map((topping) => topping.id).join(",")}`
+                `?ids=${products.map((product) => product.id).join(",")}`
             )
             .expect(401);
 

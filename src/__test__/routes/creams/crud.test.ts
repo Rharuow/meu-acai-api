@@ -64,7 +64,7 @@ afterAll(async () => {
   await cleanCreamTestDatabase();
 });
 
-const createCreamRequestBody: CreateCreamRequestBody = {
+const createCreamRequestBody: Omit<CreateCreamRequestBody, "adminId"> = {
   name: "Test Cream",
   price: 9.99,
   amount: 1,

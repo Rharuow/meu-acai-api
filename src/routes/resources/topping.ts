@@ -10,7 +10,6 @@ import {
   validationParams,
   validationQueryParams,
 } from "@middlewares/paramsRouter";
-import { addAdminIdInBody } from "@middlewares/resources/addAdminIdInBody";
 import { Router } from "express";
 import {
   Schema,
@@ -23,6 +22,8 @@ import {
 import { validationListQueryParamsSchema } from "./list/schema";
 import { listToppingsController } from "@controllers/topping/list";
 import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
+import { notEmptyRequestBody } from "@middlewares/notEmptyRequestBody";
+import { updateToppingController } from "@controllers/topping/update";
 
 export const validationCreateToppingBodySchema: Schema = {
   name: {
@@ -42,6 +43,44 @@ export const validationCreateToppingBodySchema: Schema = {
   },
   unit: {
     notEmpty: true,
+    isString: true,
+    errorMessage: "unit must be a string and not empty",
+  },
+  photo: {
+    isString: true,
+    optional: true,
+    errorMessage: "photo must be a string",
+  },
+  isSpecial: {
+    isBoolean: true,
+    optional: true,
+    errorMessage: "isSpecial must be a boolean",
+  },
+  available: {
+    isBoolean: true,
+    optional: true,
+    errorMessage: "isSpecial must be a boolean",
+  },
+};
+
+export const validationUpdateToppingBodySchema: Schema = {
+  name: {
+    optional: true,
+    isString: true,
+    errorMessage: "name must be a string",
+  },
+  amount: {
+    optional: true,
+    isNumeric: true,
+    errorMessage: "amount must be a number and not empty",
+  },
+  price: {
+    optional: true,
+    isNumeric: true,
+    errorMessage: "price must be a number and not empty",
+  },
+  unit: {
+    optional: true,
     isString: true,
     errorMessage: "unit must be a string and not empty",
   },
@@ -105,7 +144,6 @@ toppingRouter.get(
 
 toppingRouter.post(
   "/toppings",
-  validationAdminAccessToken,
   checkExact(
     [
       checkSchema(validationCreateToppingBodySchema, ["body"]),
@@ -116,10 +154,27 @@ toppingRouter.post(
       message: "Param(s) not permitted",
     }
   ),
-  validationParams,
   validationAdminAccessToken,
-  addAdminIdInBody,
+  validationParams,
   createToppingController
+);
+
+toppingRouter.put(
+  "/toppings/:id",
+  notEmptyRequestBody,
+  checkExact(
+    [
+      checkSchema(validationUpdateToppingBodySchema, ["body"]),
+      query([], "Query parameters unpermitted"),
+      param(["id"], "id parameter is required"),
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
+  validationAdminAccessToken,
+  validationParams,
+  updateToppingController
 );
 
 toppingRouter.delete(

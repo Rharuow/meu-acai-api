@@ -54,12 +54,13 @@ export const updateAdmin = async ({
   id: string;
   fields: UpdateAdminRequestBody;
 }) => {
-  userInMemory.clear();
-  usersInMemory.clear();
-  return await prismaClient.admin.update({
+  const admin = await prismaClient.admin.update({
     where: { userId, id },
     data: fields,
   });
+  userInMemory.clear();
+  usersInMemory.clear();
+  return admin;
 };
 
 export const getAdmin = async ({ id }: { id: string }) => {
