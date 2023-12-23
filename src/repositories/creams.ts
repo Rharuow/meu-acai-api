@@ -116,11 +116,15 @@ export const getCream: ({ id }: { id: string }) => Promise<Cream> = async ({
 export const deleteCream: ({ id }: { id: string }) => Promise<void> = async ({
   id,
 }) => {
+  creamsInMemory.clear();
+  creamInMemory.clear();
   await prismaClient.cream.delete({ where: { id } });
   return;
 };
 
 export const deleteManyCreams = async ({ ids }: { ids: Array<string> }) => {
+  creamsInMemory.clear();
+  creamInMemory.clear();
   await prismaClient.cream.deleteMany({
     where: {
       id: {

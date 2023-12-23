@@ -4071,7 +4071,7 @@ supports-preserve-symlinks-flag@^1.0.0:
 
 swagger-jsdoc@^6.2.8:
   version "6.2.8"
-  resolved "https://registry.npmjs.org/swagger-jsdoc/-/swagger-jsdoc-6.2.8.tgz"
+  resolved "https://registry.yarnpkg.com/swagger-jsdoc/-/swagger-jsdoc-6.2.8.tgz#6d33d9fb07ff4a7c1564379c52c08989ec7d0256"
   integrity sha512-VPvil1+JRpmJ55CgAtn8DIcpBs0bL5L3q5bVQvF4tAW/k/9JYSj7dCpaYCAv5rufe0vcCbBRQXGvzpkWjvLklQ==
   dependencies:
     commander "6.2.0"
@@ -4095,7 +4095,7 @@ swagger-ui-dist@>=5.0.0:
 
 swagger-ui-express@^5.0.0:
   version "5.0.0"
-  resolved "https://registry.npmjs.org/swagger-ui-express/-/swagger-ui-express-5.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/swagger-ui-express/-/swagger-ui-express-5.0.0.tgz#7a00a18dd909574cb0d628574a299b9ba53d4d49"
   integrity sha512-tsU9tODVvhyfkNSvf03E6FAk+z+5cU3lXAzMy6Pv4av2Gt2xA0++fogwC4qo19XuFf6hdxevPuVCSKFuMHJhFA==
   dependencies:
     swagger-ui-dist ">=5.0.0"

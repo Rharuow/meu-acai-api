@@ -18,9 +18,12 @@ import { UpdateProductRequestBody } from "@/types/product/updateRequestBody";
 export const createProductRepository = async (
   data: CreateProductRequestBody
 ) => {
-  return await prismaClient.product.create({
+  const product = await prismaClient.product.create({
     data,
   });
+  productsInMemory.clear();
+  productInMemory.clear();
+  return product;
 };
 
 export const getProductRepository: ({
@@ -98,20 +101,24 @@ export const updateProductRepository: ({
   id: string;
   fields: UpdateProductRequestBody;
 }) => Promise<Product> = async ({ fields, id }) => {
-  productsInMemory.clear();
-  productInMemory.clear();
-  return await prismaClient.product.update({
+  const product = await prismaClient.product.update({
     where: { id },
     data: fields,
   });
+  productsInMemory.clear();
+  productInMemory.clear();
+  return product;
 };
 
 export const deleteProductRepository = async ({ id }: { id: string }) => {
-  return await prismaClient.product.delete({
+  const product = await prismaClient.product.delete({
     where: {
       id,
     },
   });
+  productsInMemory.clear();
+  productInMemory.clear();
+  return product;
 };
 
 export const deleteManyProductsRepository = async ({
@@ -126,4 +133,6 @@ export const deleteManyProductsRepository = async ({
       },
     },
   });
+  productsInMemory.clear();
+  productInMemory.clear();
 };
