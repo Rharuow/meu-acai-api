@@ -745,7 +745,7 @@ describe("CRUD PRODCUT RESOURCE", () => {
     });
   });
 
-  describe("UPDATE TESTS", () => {
+  describe("UPDATE PRODUCT TESTS", () => {
     let productsUpdated: UpdateProductRequestBody;
     describe("UPDATING PRODUCT AS AN ADMIN", () => {
       test(
