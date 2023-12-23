@@ -249,6 +249,178 @@ describe("CRUD PRODCUT RESOURCE", () => {
     });
   });
 
+  describe("GET PRODUCT TEST", () => {
+    describe("GETTING PRODUCT AS AN ADMIN", () => {
+      test(
+        `When an Admin access GET ${basePath}/:id` +
+          " sendding id belongs to the product in router" +
+          " then the response status will be 200 and the body will contain a data property with the product",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBasePath(productCreated.id))
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(response.body.data).toHaveProperty(
+            "name",
+            productCreated.name
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxCreamsAllowed",
+            productCreated.maxCreamsAllowed
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxToppingsAllowed",
+            productCreated.maxToppingsAllowed
+          );
+          expect(response.body.data).toHaveProperty("id", productCreated.id);
+          return expect(response.body.data).toHaveProperty(
+            "size",
+            productCreated.size
+          );
+        }
+      );
+
+      test(
+        `When an Admin access GET ${basePath}/:id` +
+          " sendding invalid id in router" +
+          " then the response status will be 400 and the body will contain a message property with the value ''",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBasePath("invalid-id"))
+            .set("authorization", accessTokenAsAdmin)
+            .set("refreshToken", refreshTokenAsAdmin)
+            .expect(400);
+
+          console.log(response.body);
+
+          return expect(response.body.data).toHaveProperty("message");
+        }
+      );
+    });
+
+    describe("GETTING PRODUCT AS A CLIENT", () => {
+      test(
+        `When an Client access GET ${basePath}/:id` +
+          " sendding id belongs to the product in router" +
+          " then the response status will be 200 and the body will contain a data property with the product",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBasePath(productCreated.id))
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(response.body.data).toHaveProperty(
+            "name",
+            productCreated.name
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxCreamsAllowed",
+            productCreated.maxCreamsAllowed
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxToppingsAllowed",
+            productCreated.maxToppingsAllowed
+          );
+          expect(response.body.data).toHaveProperty("id", productCreated.id);
+          return expect(response.body.data).toHaveProperty(
+            "size",
+            productCreated.size
+          );
+        }
+      );
+
+      test(
+        `When an Client access GET ${basePath}/:id` +
+          " sendding invalid id in router" +
+          " then the response status will be 400 and the body will contain a message property with the value ''",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBasePath("invalid-id"))
+            .set("authorization", accessTokenAsClient)
+            .set("refreshToken", refreshTokenAsClient)
+            .expect(400);
+
+          console.log(response.body);
+
+          return expect(response.body.data).toHaveProperty("message");
+        }
+      );
+    });
+
+    describe("GETTING PRODUCT AS A MEMBER", () => {
+      test(
+        `When an Member access GET ${basePath}/:id` +
+          " sendding id belongs to the product in router" +
+          " then the response status will be 200 and the body will contain a data property with the product",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBasePath(productCreated.id))
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(200);
+
+          expect(response.body).toHaveProperty("data");
+          expect(response.body.data).toHaveProperty(
+            "name",
+            productCreated.name
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxCreamsAllowed",
+            productCreated.maxCreamsAllowed
+          );
+          expect(response.body.data).toHaveProperty(
+            "maxToppingsAllowed",
+            productCreated.maxToppingsAllowed
+          );
+          expect(response.body.data).toHaveProperty("id", productCreated.id);
+          return expect(response.body.data).toHaveProperty(
+            "size",
+            productCreated.size
+          );
+        }
+      );
+
+      test(
+        `When an Member access GET ${basePath}/:id` +
+          " sendding invalid id in router" +
+          " then the response status will be 400 and the body will contain a message property with the value ''",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBasePath("invalid-id"))
+            .set("authorization", accessTokenAsMember)
+            .set("refreshToken", refreshTokenAsMember)
+            .expect(400);
+
+          console.log(response.body);
+
+          return expect(response.body.data).toHaveProperty("message");
+        }
+      );
+    });
+
+    describe("GETTING PRODUCT WITHOUT AUTHENTICATION", () => {
+      test(
+        `When access GET ${basePath}/:id without authentication` +
+          " sendding id belongs to the product in router" +
+          " then the response status will be 401 and the body will contain a message property with the value ''",
+        async () => {
+          const response = await request(app)
+            .get(setIdInBasePath(productCreated.id))
+            .expect(401);
+
+          console.log(response.body);
+
+          return expect(response.body.data).toHaveProperty("message");
+        }
+      );
+    });
+  });
+
   describe("DELETE PRODUCT TEST", () => {
     describe("DELETING AS AN ADMIN", () => {
       test(

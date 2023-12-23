@@ -14,6 +14,17 @@ import {
 
 const productRouter = Router();
 
+export const orderProductByOptions = [
+  "id",
+  "name",
+  "price",
+  "size",
+  "available",
+  "maxCreamsAllowed",
+  "maxToppingsAllowed",
+  "createdAt",
+] as const;
+
 const validationCreateSchema: Schema = {
   name: {
     optional: true,
