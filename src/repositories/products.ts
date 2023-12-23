@@ -23,9 +23,11 @@ export const createProductRepository = async (
   });
 };
 
-export const getProduct: ({ id }: { id: string }) => Promise<Product> = async ({
+export const getProductRepository: ({
   id,
-}) => {
+}: {
+  id: string;
+}) => Promise<Product> = async ({ id }) => {
   if (!productInMemory.hasItem(id)) {
     productInMemory.storeExpiringItem(
       id,
@@ -40,7 +42,7 @@ export type ParamsProduct = Params & {
   orderBy: (typeof orderProductByOptions)[number];
 };
 
-export const listProducts: (
+export const listProductsRepository: (
   params: ParamsProduct
 ) => Promise<[Array<Product>, number]> = async ({
   page,
@@ -89,7 +91,7 @@ export const listProducts: (
   ];
 };
 
-export const updateProduct: ({
+export const updateProductRepository: ({
   id,
   fields,
 }: {
@@ -112,7 +114,11 @@ export const deleteProductRepository = async ({ id }: { id: string }) => {
   });
 };
 
-export const deleteManyProducts = async ({ ids }: { ids: Array<string> }) => {
+export const deleteManyProductsRepository = async ({
+  ids,
+}: {
+  ids: Array<string>;
+}) => {
   await prismaClient.product.deleteMany({
     where: {
       id: {
