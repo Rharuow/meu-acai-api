@@ -1,5 +1,8 @@
 import { createProductController } from "@controllers/product/create";
-import { deleteProductController } from "@controllers/product/delete";
+import {
+  deleteManyProductsController,
+  deleteProductController,
+} from "@controllers/product/delete";
 import { getProductController } from "@controllers/product/get";
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
@@ -20,6 +23,7 @@ import { validationListQueryParamsSchema } from "./list/schema";
 import { listProductsController } from "@controllers/product/list";
 import { notEmptyRequestBody } from "@middlewares/notEmptyRequestBody";
 import { updateProductController } from "@controllers/product/update";
+import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
 
 const productRouter = Router();
 
@@ -169,6 +173,13 @@ productRouter.get(
   ]),
   validationParams,
   getProductController
+);
+
+productRouter.delete(
+  "/products/deleteMany",
+  idsInQueryParams,
+  validationAdminAccessToken,
+  deleteManyProductsController
 );
 
 productRouter.delete(
