@@ -984,6 +984,21 @@ describe("CRUD MEMBER RESOURCE", () => {
         `When an authenticated CLIENT accesses DELETE ${userResourcePath}/members/:id ` +
           "then it should return a 204 status and delete the first member created",
         async () => {
+          /* debug tests */
+          let user: any;
+          verify(
+            accessTokenAsClient,
+            process.env.TOKEN_SECRET,
+            async (err: VerifyErrors, decoded: User) => {
+              user = await prismaClient.user.findUnique({
+                where: {
+                  id: decoded.id,
+                },
+              });
+              console.log("debug tests = ", user);
+            }
+          );
+          /* debug tests */
           const response = await request(app)
             .delete(userResourcePath + `/members/${userMemberClient.id}`)
             .set("authorization", "Bearer " + accessTokenAsClient)

@@ -186,6 +186,7 @@ memberRouter.delete(
     query([], "Query parameters unpermitted"),
     param(["id"], "Router parameters unpermitted"),
   ]),
+  validationParams,
   validationAdminOrClientAccessToken,
   deleteUserController
 );

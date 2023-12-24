@@ -4,7 +4,7 @@ import cors from "cors";
 
 import { router } from "./routes";
 
-import { swaggerDef } from "./swaggerDef";
+import swaggerDef from "./swagger-spec.json";
 
 const PORT = process.env.PORT || 8080;
 
@@ -45,7 +45,7 @@ const start = () => {
     // Method to make express service start to listen requests in port defined by const PORT.
     if (process.env.NODE_ENV !== "test")
       app.listen(PORT, () => {
-        console.log(`Server started on port ${PORT}`);
+        console.log(`API RUN IN: ${process.env.ORIGIN_URL}`);
       });
   } catch (error) {
     process.exit(1);
