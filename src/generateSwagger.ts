@@ -2,10 +2,22 @@ import swaggerJSDoc from "swagger-jsdoc";
 import fs from "fs-extra";
 import { swaggerDef } from "./swaggerDef";
 
-const swaggerSpec = swaggerJSDoc(swaggerDef);
+export const OUTPUTPATH = "./src/swagger-spec.json";
 
-const outputPath = "./src/swagger-spec.json";
+export const saveSwaggerDefinitions = async (definition = {}) => {
+  const swaggerSpec = swaggerJSDoc({
+    ...swaggerDef,
+    definition: {
+      ...swaggerDef.definition,
+      ...definition,
+    },
+  });
+  try {
+    await fs.outputJson(OUTPUTPATH, swaggerSpec, { spaces: 2 });
+    console.log(`Swagger specification saved to ${OUTPUTPATH}`);
+  } catch (error) {
+    console.error("Error writing Swagger specification:", error);
+  }
+};
 
-fs.outputJson(outputPath, swaggerSpec, { spaces: 2 })
-  .then(() => console.log(`Swagger specification saved to ${outputPath}`))
-  .catch((err) => console.error("Error writing Swagger specification:", err));
+saveSwaggerDefinitions();
