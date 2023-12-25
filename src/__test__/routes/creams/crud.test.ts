@@ -155,6 +155,11 @@ afterAll(async () => {
               },
             },
           },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
         },
         get: {
           summary: "Get a Cream",
@@ -182,12 +187,12 @@ afterAll(async () => {
               },
             },
           },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
         },
-        security: [
-          {
-            BearerAuth: [],
-          },
-        ],
       },
     },
   });
