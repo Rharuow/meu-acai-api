@@ -13,6 +13,7 @@ afterAll(async () => {
         get: {
           summary: "This router return the 'welcome'",
           description: "Retrieve details about the sample route.",
+          tags: ["Wellcome"],
           responses: {
             "200": {
               description: "Successful response",

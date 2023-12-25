@@ -961,6 +961,11 @@ describe("CRUD MEMBER RESOURCE", () => {
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(204);
+
+          /* debug test */
+          console.log("debug test = ", userMemberAdmin);
+          /* debug test */
+
           return expect(response.statusCode).toBe(204);
         }
       );
@@ -970,7 +975,7 @@ describe("CRUD MEMBER RESOURCE", () => {
           "then it should return a 422 status",
         async () => {
           const response = await request(app)
-            .delete(userResourcePath + `/some-id-invalid`)
+            .delete(userResourcePath + `/some-invalid-id`)
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(422);
@@ -990,9 +995,16 @@ describe("CRUD MEMBER RESOURCE", () => {
             accessTokenAsClient,
             process.env.TOKEN_SECRET,
             async (err: VerifyErrors, decoded: User) => {
+              console.log("debug tests = ", decoded.id);
               user = await prismaClient.user.findUnique({
                 where: {
                   id: decoded.id,
+                },
+                include: {
+                  admin: true,
+                  client: true,
+                  member: true,
+                  role: true,
                 },
               });
               console.log("debug tests = ", user);
@@ -1013,6 +1025,28 @@ describe("CRUD MEMBER RESOURCE", () => {
         `When an authenticated CLIENT accesses DELETE ${userResourcePath}/:id with invalid id ` +
           "then it should return a 422 status",
         async () => {
+          /* debug tests */
+          let user: any;
+          verify(
+            accessTokenAsClient,
+            process.env.TOKEN_SECRET,
+            async (err: VerifyErrors, decoded: User) => {
+              console.log("debug tests = ", decoded.id);
+              user = await prismaClient.user.findUnique({
+                where: {
+                  id: decoded.id,
+                },
+                include: {
+                  admin: true,
+                  client: true,
+                  member: true,
+                  role: true,
+                },
+              });
+              console.log("debug tests = ", user);
+            }
+          );
+          /* debug tests */
           const response = await request(app)
             .delete(userResourcePath + `/members/some-invalid-id`)
             .set("authorization", "Bearer " + accessTokenAsClient)

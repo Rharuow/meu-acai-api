@@ -19,7 +19,11 @@
     "schemas": {
       "ROLE": {
         "type": "string",
-        "enum": ["ADMIN", "MEMBER", "CLIENT"]
+        "enum": [
+          "ADMIN",
+          "MEMBER",
+          "CLIENT"
+        ]
       },
       "Role": {
         "type": "object",
@@ -466,8 +470,11 @@
   "paths": {
     "/api/v1": {
       "get": {
-        "summary": "Get information about the sample route",
+        "summary": "This router return the 'welcome'",
         "description": "Retrieve details about the sample route.",
+        "tags": [
+          "Wellcome"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -475,6 +482,86 @@
               "application/json": {
                 "example": {
                   "message": "Sample route response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/signin": {
+      "post": {
+        "summary": "User Sign In",
+        "description": "Authenticate and sign in a user.",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "description": "User credentials for sign-in",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "john_doe"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "securepassword"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful sign-in",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Token session created successfully",
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNTAwMGU1LWU0ZTUtNGVmYS1iZDEyLWM3MjUwNTliNDZkNSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzUzNTgwNCwiZXhwIjoxNzAzNTM1ODA5fQ.HYCUW5_P6xBTbRGJkrJX9fF3Tl2SGkgBWMO0xbYTXj4",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNTAwMGU1LWU0ZTUtNGVmYS1iZDEyLWM3MjUwNTliNDZkNSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzUzNTgwNCwiZXhwIjoxNzAzNTM1ODE0fQ.ZSrdxh1dCJ-nNQwRRos7fqPgWS6nxsdhGYKxE4XXP3Y",
+                  "user": {
+                    "id": "5c5000e5-e4e5-4efa-bd12-c725059b46d5",
+                    "name": "Test User Admin to sign in test",
+                    "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                    "role": {
+                      "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "createdAt": "2023-12-02T20:46:23.880Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-02T20:46:23.880Z",
+                      "name": "ADMIN"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Token with user invalid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Param(s) not permitted"
                 }
               }
             }
