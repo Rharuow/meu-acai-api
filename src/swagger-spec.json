@@ -470,8 +470,8 @@
   "paths": {
     "/api/v1": {
       "get": {
-        "summary": "This router return the 'welcome'",
-        "description": "Retrieve details about the sample route.",
+        "summary": "Welcome router",
+        "description": "This router return the 'welcome'",
         "tags": [
           "Wellcome"
         ],
@@ -481,7 +481,106 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Sample route response"
+                  "message": "Welcome to meu açai API"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/resources/creams": {
+      "post": {
+        "summary": "Create Cream",
+        "description": "Endpoint to add a new Cream to the system.",
+        "tags": [
+          "Cream"
+        ],
+        "requestBody": {
+          "description": "Cream details for creation",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Cream",
+                    "require": true
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 1,
+                    "require": true
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 9.99,
+                    "require": true
+                  },
+                  "unit": {
+                    "type": "string",
+                    "example": "unit",
+                    "require": true
+                  },
+                  "photo": {
+                    "type": "string",
+                    "example": "URL PHOTO",
+                    "require": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "amount",
+                  "price",
+                  "unit"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful sign-in",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Cream created successfully",
+                  "data": {
+                    "id": "906ec72f-d001-4c79-96ca-bae0e7827295",
+                    "photo": "URL PHOTO",
+                    "name": "Test Cream",
+                    "isSpecial": false,
+                    "available": false,
+                    "price": 9.99,
+                    "amount": 1,
+                    "unit": "unit",
+                    "createdAt": "2023-12-25T21:21:37.397Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-25T21:21:37.397Z",
+                    "adminId": "97051e46-6bbe-44c5-be2a-889c9837733e"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User haven't permission"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unique constraint failed on the fields: name"
                 }
               }
             }
@@ -528,10 +627,10 @@
               "application/json": {
                 "example": {
                   "message": "Token session created successfully",
-                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNTAwMGU1LWU0ZTUtNGVmYS1iZDEyLWM3MjUwNTliNDZkNSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzUzNTgwNCwiZXhwIjoxNzAzNTM1ODA5fQ.HYCUW5_P6xBTbRGJkrJX9fF3Tl2SGkgBWMO0xbYTXj4",
-                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNTAwMGU1LWU0ZTUtNGVmYS1iZDEyLWM3MjUwNTliNDZkNSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzUzNTgwNCwiZXhwIjoxNzAzNTM1ODE0fQ.ZSrdxh1dCJ-nNQwRRos7fqPgWS6nxsdhGYKxE4XXP3Y",
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjJlNzI4OGY5LWMzY2YtNDg2Mi04OGFjLTJhNThmZmUwNGI3OSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzUzOTI5OSwiZXhwIjoxNzAzNTM5MzA0fQ.580rT_wkjIW1lfqKUGgzhg8b46LDD3fHUYDdYOZ5ZU8",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjJlNzI4OGY5LWMzY2YtNDg2Mi04OGFjLTJhNThmZmUwNGI3OSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzUzOTI5OSwiZXhwIjoxNzAzNTM5MzA5fQ.LdMiZ6It1RLOVrRq-MDMiuoqGhahs3kJkOowwtLnQmQ",
                   "user": {
-                    "id": "5c5000e5-e4e5-4efa-bd12-c725059b46d5",
+                    "id": "2e7288f9-c3cf-4862-88ac-2a58ffe04b79",
                     "name": "Test User Admin to sign in test",
                     "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
                     "role": {

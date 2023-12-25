@@ -9,6 +9,8 @@ import {
   createTwentyCreams,
   presetToCreamTests,
 } from "@/__test__/presets/routes/creams";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
+import swaggerDefinition from "@/swagger-spec.json";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -60,15 +62,12 @@ beforeAll(async () => {
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
 });
 
-afterAll(async () => {
-  await cleanCreamTestDatabase();
-});
-
 const createCreamRequestBody: Omit<CreateCreamRequestBody, "adminId"> = {
   name: "Test Cream",
   price: 9.99,
   amount: 1,
   unit: "unit",
+  photo: "URL PHOTO",
 };
 
 const updateCreamRequestBody: UpdateCreamRequestBody = {
@@ -76,6 +75,153 @@ const updateCreamRequestBody: UpdateCreamRequestBody = {
 };
 
 const creamResourcePath = "/api/v1/resources/creams";
+
+let createSuccessBodyResponse = {};
+let createUnprocessableBodyResponse = {};
+let createUnauthorizedBodyResponse = {};
+
+afterAll(async () => {
+  await cleanCreamTestDatabase();
+  await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/resources/creams": {
+        post: {
+          summary: "Create Cream",
+          description: "Endpoint to add a new Cream to the system.",
+          tags: ["Cream"],
+          requestBody: {
+            description: "Cream details for creation",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: createCreamRequestBody.name,
+                      require: true,
+                    },
+                    amount: {
+                      type: "number",
+                      example: createCreamRequestBody.amount,
+                      require: true,
+                    },
+                    price: {
+                      type: "number",
+                      example: createCreamRequestBody.price,
+                      require: true,
+                    },
+                    unit: {
+                      type: "string",
+                      example: createCreamRequestBody.unit,
+                      require: true,
+                    },
+                    photo: {
+                      type: "string",
+                      example: createCreamRequestBody.photo,
+                      require: false,
+                    },
+                  },
+                  required: ["name", "amount", "price", "unit"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful sign-in",
+              content: {
+                "application/json": { example: createSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: createUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: createUnauthorizedBodyResponse },
+              },
+            },
+          },
+        },
+        // get: {
+        //   summary: "Create Cream",
+        //   description: "Endpoint to add a new Cream to the system.",
+        //   tags: ["Cream"],
+        //   requestBody: {
+        //     description: "Cream details for creation",
+        //     required: true,
+        //     content: {
+        //       "application/json": {
+        //         schema: {
+        //           type: "object",
+        //           properties: {
+        //             name: {
+        //               type: "string",
+        //               example: createCreamRequestBody.name,
+        //               require: true,
+        //             },
+        //             amount: {
+        //               type: "number",
+        //               example: createCreamRequestBody.amount,
+        //               require: true,
+        //             },
+        //             price: {
+        //               type: "number",
+        //               example: createCreamRequestBody.price,
+        //               require: true,
+        //             },
+        //             unit: {
+        //               type: "string",
+        //               example: createCreamRequestBody.unit,
+        //               require: true,
+        //             },
+        //             photo: {
+        //               type: "string",
+        //               example: createCreamRequestBody.photo,
+        //               require: false,
+        //             },
+        //           },
+        //           required: ["name", "amount", "price", "unit"],
+        //         },
+        //       },
+        //     },
+        //   },
+        //   responses: {
+        //     "200": {
+        //       description: "Successful sign-in",
+        //       content: {
+        //         "application/json": { example: createSuccessBodyResponse },
+        //       },
+        //     },
+        //     "422": {
+        //       description: "Unprocessable Entity - parameters are invalid",
+        //       content: {
+        //         "application/json": {
+        //           example: createUnprocessableBodyResponse,
+        //         },
+        //       },
+        //     },
+        //     "401": {
+        //       description: "Unauthorized - Invalid credentials",
+        //       content: {
+        //         "application/json": { example: createUnauthorizedBodyResponse },
+        //       },
+        //     },
+        //   },
+        // },
+      },
+    },
+  });
+});
 
 describe("CRUD CREAM RESOURCE", () => {
   describe("TEST TO CREATE CREAM RESOURCE", () => {
@@ -98,6 +244,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .send(createCreamRequestBody)
           .expect(200);
 
+        createSuccessBodyResponse = response.body;
+
         return expect(response.statusCode).toBe(200);
       });
 
@@ -108,6 +256,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
           .send(createCreamRequestBody)
           .expect(422);
+
+        createUnprocessableBodyResponse = response.body;
 
         expect(response.body).toHaveProperty(
           "message",
@@ -126,6 +276,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
           .send(createCreamRequestBody)
           .expect(401);
+
+        createUnauthorizedBodyResponse = response.body;
 
         return expect(response.statusCode).toBe(401);
       });

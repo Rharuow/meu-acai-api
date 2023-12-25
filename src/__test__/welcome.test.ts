@@ -11,8 +11,8 @@ afterAll(async () => {
       ...swaggerDefinition.paths,
       "/api/v1": {
         get: {
-          summary: "This router return the 'welcome'",
-          description: "Retrieve details about the sample route.",
+          summary: "Welcome router",
+          description: "This router return the 'welcome'",
           tags: ["Wellcome"],
           responses: {
             "200": {
@@ -20,7 +20,7 @@ afterAll(async () => {
               content: {
                 "application/json": {
                   example: {
-                    message: "Sample route response",
+                    message: "Welcome to meu açai API",
                   },
                 },
               },
