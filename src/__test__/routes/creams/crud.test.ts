@@ -183,6 +183,11 @@ afterAll(async () => {
             },
           },
         },
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
       },
     },
   });

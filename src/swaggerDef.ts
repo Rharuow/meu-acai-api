@@ -22,6 +22,13 @@ export const swaggerDef = {
       // },
     ],
     components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
       schemas: {
         ROLE: {
           type: "string",
