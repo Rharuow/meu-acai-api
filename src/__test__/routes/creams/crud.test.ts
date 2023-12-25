@@ -80,6 +80,10 @@ let createSuccessBodyResponse = {};
 let createUnprocessableBodyResponse = {};
 let createUnauthorizedBodyResponse = {};
 
+let getSuccessBodyResponse = {};
+let getUnprocessableBodyResponse = {};
+let getUnauthorizedBodyResponse = {};
+
 afterAll(async () => {
   await cleanCreamTestDatabase();
   await saveSwaggerDefinitions({
@@ -131,7 +135,7 @@ afterAll(async () => {
           },
           responses: {
             "200": {
-              description: "Successful sign-in",
+              description: "Successful creating cream",
               content: {
                 "application/json": { example: createSuccessBodyResponse },
               },
@@ -152,72 +156,33 @@ afterAll(async () => {
             },
           },
         },
-        // get: {
-        //   summary: "Create Cream",
-        //   description: "Endpoint to add a new Cream to the system.",
-        //   tags: ["Cream"],
-        //   requestBody: {
-        //     description: "Cream details for creation",
-        //     required: true,
-        //     content: {
-        //       "application/json": {
-        //         schema: {
-        //           type: "object",
-        //           properties: {
-        //             name: {
-        //               type: "string",
-        //               example: createCreamRequestBody.name,
-        //               require: true,
-        //             },
-        //             amount: {
-        //               type: "number",
-        //               example: createCreamRequestBody.amount,
-        //               require: true,
-        //             },
-        //             price: {
-        //               type: "number",
-        //               example: createCreamRequestBody.price,
-        //               require: true,
-        //             },
-        //             unit: {
-        //               type: "string",
-        //               example: createCreamRequestBody.unit,
-        //               require: true,
-        //             },
-        //             photo: {
-        //               type: "string",
-        //               example: createCreamRequestBody.photo,
-        //               require: false,
-        //             },
-        //           },
-        //           required: ["name", "amount", "price", "unit"],
-        //         },
-        //       },
-        //     },
-        //   },
-        //   responses: {
-        //     "200": {
-        //       description: "Successful sign-in",
-        //       content: {
-        //         "application/json": { example: createSuccessBodyResponse },
-        //       },
-        //     },
-        //     "422": {
-        //       description: "Unprocessable Entity - parameters are invalid",
-        //       content: {
-        //         "application/json": {
-        //           example: createUnprocessableBodyResponse,
-        //         },
-        //       },
-        //     },
-        //     "401": {
-        //       description: "Unauthorized - Invalid credentials",
-        //       content: {
-        //         "application/json": { example: createUnauthorizedBodyResponse },
-        //       },
-        //     },
-        //   },
-        // },
+        get: {
+          summary: "Get a Cream",
+          description: "Endpoint to get one of cream to the system.",
+          tags: ["Cream"],
+          responses: {
+            "200": {
+              description: "Successful getting cream",
+              content: {
+                "application/json": { example: getSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: getUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: getUnauthorizedBodyResponse },
+              },
+            },
+          },
+        },
       },
     },
   });
@@ -321,6 +286,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
           .expect(200);
 
+        getSuccessBodyResponse = response.body;
+
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty("name", cream.name);
         expect(response.body).toHaveProperty("amount", cream.amount);
@@ -328,6 +295,25 @@ describe("CRUD CREAM RESOURCE", () => {
         expect(response.body).toHaveProperty("available", cream.available);
         expect(response.body).toHaveProperty("unit", cream.unit);
         return expect(response.body).toHaveProperty("price", cream.price);
+      });
+
+      test(`when access GET ${creamResourcePath}/:id with authentication as ADMIN and invalid id in router, return 422 and the message 'No Cream found' in body response`, async () => {
+        cream = await prismaClient.cream.findFirst({
+          where: { name: "Test Cream" },
+        });
+
+        const response = await request(app)
+          .get(creamResourcePath + `/invalid-id`)
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+          .expect(422);
+
+        getUnprocessableBodyResponse = response.body;
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "No Cream found"
+        );
       });
     });
 
@@ -372,6 +358,8 @@ describe("CRUD CREAM RESOURCE", () => {
         const response = await request(app)
           .get(creamResourcePath + `/${cream.id}`)
           .expect(401);
+
+        getUnauthorizedBodyResponse = response.body;
 
         return expect(response.statusCode).toBe(401);
       });
