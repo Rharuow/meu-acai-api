@@ -161,9 +161,22 @@ afterAll(async () => {
             },
           ],
         },
+      },
+      "/api/v1/resources/creams/{id}": {
         get: {
-          summary: "Get a Cream",
-          description: "Endpoint to get one of cream to the system.",
+          summary: "Get Cream by ID",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Cream to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Retrieve details of a specific Cream by its ID.",
           tags: ["Cream"],
           responses: {
             "200": {

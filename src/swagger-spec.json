@@ -555,7 +555,7 @@
                 "example": {
                   "message": "Cream created successfully",
                   "data": {
-                    "id": "e10f5d54-72eb-4fbb-b530-68e4f16d1b83",
+                    "id": "6573e2c0-8d95-4bd2-9b5e-59fda4cba6fa",
                     "photo": "URL PHOTO",
                     "name": "Test Cream",
                     "isSpecial": false,
@@ -563,10 +563,10 @@
                     "price": 9.99,
                     "amount": 1,
                     "unit": "unit",
-                    "createdAt": "2023-12-25T22:17:41.378Z",
+                    "createdAt": "2023-12-26T00:11:50.940Z",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-25T22:17:41.378Z",
-                    "adminId": "38970536-3928-4064-aa2b-f31214b571eb"
+                    "updatedAt": "2023-12-26T00:11:50.940Z",
+                    "adminId": "aeff68d4-f202-4f6e-bc1c-b269c261a496"
                   }
                 }
               }
@@ -588,61 +588,6 @@
               "application/json": {
                 "example": {
                   "message": "Unique constraint failed on the fields: name"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "get": {
-        "summary": "Get a Cream",
-        "description": "Endpoint to get one of cream to the system.",
-        "tags": [
-          "Cream"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful getting cream",
-            "content": {
-              "application/json": {
-                "example": {
-                  "id": "e10f5d54-72eb-4fbb-b530-68e4f16d1b83",
-                  "photo": "URL PHOTO",
-                  "name": "Test Cream",
-                  "isSpecial": false,
-                  "available": false,
-                  "price": 9.99,
-                  "amount": 1,
-                  "unit": "unit",
-                  "createdAt": "2023-12-25T22:17:41.378Z",
-                  "deletedAt": null,
-                  "updatedAt": "2023-12-25T22:17:41.378Z",
-                  "adminId": "38970536-3928-4064-aa2b-f31214b571eb"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Unauthorized: No access token provided"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "No Cream found"
                 }
               }
             }
@@ -733,6 +678,74 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/resources/creams/{id}": {
+      "get": {
+        "summary": "Get Cream by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Cream to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Retrieve details of a specific Cream by its ID.",
+        "tags": [
+          "Cream"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting cream",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": "6573e2c0-8d95-4bd2-9b5e-59fda4cba6fa",
+                  "photo": "URL PHOTO",
+                  "name": "Test Cream",
+                  "isSpecial": false,
+                  "available": false,
+                  "price": 9.99,
+                  "amount": 1,
+                  "unit": "unit",
+                  "createdAt": "2023-12-26T00:11:50.940Z",
+                  "deletedAt": null,
+                  "updatedAt": "2023-12-26T00:11:50.940Z",
+                  "adminId": "aeff68d4-f202-4f6e-bc1c-b269c261a496"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unauthorized: No access token provided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No Cream found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
       }
     }
   },
