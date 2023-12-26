@@ -84,6 +84,10 @@ let getSuccessBodyResponse = {};
 let getUnprocessableBodyResponse = {};
 let getUnauthorizedBodyResponse = {};
 
+let listSuccessBodyResponse = {};
+let listUnprocessableBodyResponse = {};
+let listUnauthorizedBodyResponse = {};
+
 afterAll(async () => {
   await cleanCreamTestDatabase();
   await saveSwaggerDefinitions({
@@ -152,6 +156,82 @@ afterAll(async () => {
               description: "Unauthorized - Invalid credentials",
               content: {
                 "application/json": { example: createUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        get: {
+          summary: "List Creams",
+          parameters: [
+            {
+              name: "page",
+              in: "query",
+              description: "Page to list creams",
+              required: false,
+              schema: {
+                type: "number",
+                default: 1,
+              },
+            },
+            {
+              name: "perPage",
+              in: "query",
+              description: "How many creams to return per page",
+              required: false,
+              schema: {
+                type: "number",
+                default: 10,
+              },
+            },
+            {
+              name: "orderBy",
+              in: "query",
+              description: "Order by some field table",
+              required: false,
+              schema: {
+                type: "string",
+                default: "createdAt:asc",
+              },
+            },
+            {
+              name: "filter",
+              in: "query",
+              description: "Filter creams by some fields table",
+              required: false,
+              schema: {
+                type: "string",
+              },
+              example:
+                "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO",
+            },
+          ],
+          description:
+            "Retrieve a list of creams based on optional query parameters.",
+          tags: ["Cream"],
+          responses: {
+            "200": {
+              description: "Successful getting cream",
+              content: {
+                "application/json": { example: listSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: listUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: listUnauthorizedBodyResponse },
               },
             },
           },
@@ -485,6 +565,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshtoken", `Bearer ${refreshTokenAsAdmin}`)
           .expect(200);
 
+        listSuccessBodyResponse = response.body;
+
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty("data");
         expect(response.body).toHaveProperty("hasNextPage", true);
@@ -506,6 +588,21 @@ describe("CRUD CREAM RESOURCE", () => {
         expect(response.body).toHaveProperty("totalPages", 5);
         expect(response.body).toHaveProperty("page", 2);
         return expect(response.body.data.length).toBe(5);
+      });
+
+      test(`when access GET ${creamResourcePath}?filter=invalidField:some-value authenticated as ADMIN role, the response status will be 422 and in the body as property message with 'Filter parameters not permitted'`, async () => {
+        const response = await request(app)
+          .get(creamResourcePath + "?filter=invalidField:some value")
+          .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+          .set("refreshtoken", `Bearer ${refreshTokenAsAdmin}`)
+          .expect(422);
+
+        listUnprocessableBodyResponse = response.body;
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Filter parameters not permitted"
+        );
       });
     });
 
@@ -550,6 +647,8 @@ describe("CRUD CREAM RESOURCE", () => {
         const response = await request(app)
           .get("/api/v1/resources/creams")
           .expect(401);
+
+        listUnauthorizedBodyResponse = response.body;
 
         return expect(response.statusCode).toBe(401);
       });

@@ -9,6 +9,7 @@ module.exports = {
     "@repositories/(.*)$": ["<rootDir>/src/repositories/$1"],
     "@services/(.*)$": ["<rootDir>/src/services/$1"],
     "@models/(.*)$": ["<rootDir>/src/models/$1"],
+    "@routes/(.*)$": ["<rootDir>/src/routes/$1"],
     "@serializer/(.*)$": ["<rootDir>/src/serializer/$1"],
     "@middlewares/(.*)$": ["<rootDir>/src/middlewares/$1"],
     "@libs/(.*)$": ["<rootDir>/src/libs/$1"],

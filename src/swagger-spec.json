@@ -555,7 +555,7 @@
                 "example": {
                   "message": "Cream created successfully",
                   "data": {
-                    "id": "6573e2c0-8d95-4bd2-9b5e-59fda4cba6fa",
+                    "id": "f3150444-e41c-48b4-9f4e-1b8a4a7e86c8",
                     "photo": "URL PHOTO",
                     "name": "Test Cream",
                     "isSpecial": false,
@@ -563,10 +563,10 @@
                     "price": 9.99,
                     "amount": 1,
                     "unit": "unit",
-                    "createdAt": "2023-12-26T00:11:50.940Z",
+                    "createdAt": "2023-12-26T01:35:56.179Z",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-26T00:11:50.940Z",
-                    "adminId": "aeff68d4-f202-4f6e-bc1c-b269c261a496"
+                    "updatedAt": "2023-12-26T01:35:56.179Z",
+                    "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
                   }
                 }
               }
@@ -588,6 +588,236 @@
               "application/json": {
                 "example": {
                   "message": "Unique constraint failed on the fields: name"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "List Creams",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page to list creams",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "How many creams to return per page",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 10
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Order by some field table",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "createdAt:asc"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Filter creams by some fields table",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO"
+          }
+        ],
+        "description": "Retrieve a list of creams based on optional query parameters.",
+        "tags": [
+          "Cream"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting cream",
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": [
+                    {
+                      "id": "970ad806-0d30-49bf-8b2d-398d19d980ab",
+                      "photo": null,
+                      "name": "Test to list creams 1",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 11,
+                      "amount": 2,
+                      "unit": "bag",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    },
+                    {
+                      "id": "e9ee083b-4b87-471e-9e9a-07f1f179e7ca",
+                      "photo": null,
+                      "name": "Test to list creams 2",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 12,
+                      "amount": 3,
+                      "unit": "box",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    },
+                    {
+                      "id": "6177bf1f-2728-4a48-9f0f-0f495e630ff4",
+                      "photo": null,
+                      "name": "Test to list creams 3",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 13,
+                      "amount": 4,
+                      "unit": "bag",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    },
+                    {
+                      "id": "752018e5-dc79-4c96-9442-b887a999998a",
+                      "photo": null,
+                      "name": "Test to list creams 4",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 14,
+                      "amount": 5,
+                      "unit": "box",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    },
+                    {
+                      "id": "fe088846-ecd0-4238-8cbc-82ce43275230",
+                      "photo": null,
+                      "name": "Test to list creams 5",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 15,
+                      "amount": 6,
+                      "unit": "bag",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    },
+                    {
+                      "id": "6b4a1f7f-dbf9-4c93-8336-b694e81bb4ca",
+                      "photo": null,
+                      "name": "Test to list creams 6",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 16,
+                      "amount": 7,
+                      "unit": "box",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    },
+                    {
+                      "id": "a2209e9a-a33a-44d4-a977-2906fa8442f3",
+                      "photo": null,
+                      "name": "Test to list creams 7",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 17,
+                      "amount": 8,
+                      "unit": "bag",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    },
+                    {
+                      "id": "96e0b8fa-5b81-474d-a7d6-7c6c9ec638ac",
+                      "photo": null,
+                      "name": "Test to list creams 8",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 18,
+                      "amount": 9,
+                      "unit": "box",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    },
+                    {
+                      "id": "a3092d3b-3e49-44c1-80c3-dea58b1afe8f",
+                      "photo": null,
+                      "name": "Test to list creams 9",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 19,
+                      "amount": 10,
+                      "unit": "bag",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    },
+                    {
+                      "id": "b1e0abd9-4d75-404e-858d-06d4dc8f108c",
+                      "photo": null,
+                      "name": "Test to list creams 0",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 10,
+                      "amount": 1,
+                      "unit": "box",
+                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-26T01:35:56.079Z",
+                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    }
+                  ],
+                  "hasNextPage": true,
+                  "page": 1,
+                  "totalPages": 3
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unauthorized: No access token provided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Filter parameters not permitted"
                 }
               }
             }
@@ -704,7 +934,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "id": "6573e2c0-8d95-4bd2-9b5e-59fda4cba6fa",
+                  "id": "f3150444-e41c-48b4-9f4e-1b8a4a7e86c8",
                   "photo": "URL PHOTO",
                   "name": "Test Cream",
                   "isSpecial": false,
@@ -712,10 +942,10 @@
                   "price": 9.99,
                   "amount": 1,
                   "unit": "unit",
-                  "createdAt": "2023-12-26T00:11:50.940Z",
+                  "createdAt": "2023-12-26T01:35:56.179Z",
                   "deletedAt": null,
-                  "updatedAt": "2023-12-26T00:11:50.940Z",
-                  "adminId": "aeff68d4-f202-4f6e-bc1c-b269c261a496"
+                  "updatedAt": "2023-12-26T01:35:56.179Z",
+                  "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
                 }
               }
             }

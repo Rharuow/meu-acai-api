@@ -29,6 +29,9 @@
       "@serializer/*": [
         "./src/serializer/*"
       ],
+      "@routes/*": [
+        "./src/routes/*"
+      ],
       "@controllers/*": [
         "./src/controllers/*"
       ],
