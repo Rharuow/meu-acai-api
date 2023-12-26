@@ -555,7 +555,7 @@
                 "example": {
                   "message": "Cream created successfully",
                   "data": {
-                    "id": "f3150444-e41c-48b4-9f4e-1b8a4a7e86c8",
+                    "id": "68377949-0aa2-4e15-b4da-79a47e68b89c",
                     "photo": "URL PHOTO",
                     "name": "Test Cream",
                     "isSpecial": false,
@@ -563,10 +563,10 @@
                     "price": 9.99,
                     "amount": 1,
                     "unit": "unit",
-                    "createdAt": "2023-12-26T01:35:56.179Z",
+                    "createdAt": "2023-12-26T15:13:31.231Z",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-26T01:35:56.179Z",
-                    "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                    "updatedAt": "2023-12-26T15:13:31.231Z",
+                    "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                   }
                 }
               }
@@ -655,7 +655,7 @@
                 "example": {
                   "data": [
                     {
-                      "id": "970ad806-0d30-49bf-8b2d-398d19d980ab",
+                      "id": "7f8086ba-d126-41dc-8b6d-b6b20e0219eb",
                       "photo": null,
                       "name": "Test to list creams 1",
                       "isSpecial": false,
@@ -663,13 +663,13 @@
                       "price": 11,
                       "amount": 2,
                       "unit": "bag",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     },
                     {
-                      "id": "e9ee083b-4b87-471e-9e9a-07f1f179e7ca",
+                      "id": "78a41d97-4645-4c56-9724-c3053cdf3fb3",
                       "photo": null,
                       "name": "Test to list creams 2",
                       "isSpecial": false,
@@ -677,13 +677,13 @@
                       "price": 12,
                       "amount": 3,
                       "unit": "box",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     },
                     {
-                      "id": "6177bf1f-2728-4a48-9f0f-0f495e630ff4",
+                      "id": "44f2ba3f-975f-4f2a-9662-5a8fc021ac30",
                       "photo": null,
                       "name": "Test to list creams 3",
                       "isSpecial": false,
@@ -691,13 +691,13 @@
                       "price": 13,
                       "amount": 4,
                       "unit": "bag",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     },
                     {
-                      "id": "752018e5-dc79-4c96-9442-b887a999998a",
+                      "id": "d003df99-ef95-4d7c-9dff-dd415e577654",
                       "photo": null,
                       "name": "Test to list creams 4",
                       "isSpecial": false,
@@ -705,13 +705,13 @@
                       "price": 14,
                       "amount": 5,
                       "unit": "box",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     },
                     {
-                      "id": "fe088846-ecd0-4238-8cbc-82ce43275230",
+                      "id": "7532705c-2a39-4d19-b13e-420f7703ac98",
                       "photo": null,
                       "name": "Test to list creams 5",
                       "isSpecial": false,
@@ -719,13 +719,13 @@
                       "price": 15,
                       "amount": 6,
                       "unit": "bag",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     },
                     {
-                      "id": "6b4a1f7f-dbf9-4c93-8336-b694e81bb4ca",
+                      "id": "fd11f209-5bff-4505-b09b-916f97e5f487",
                       "photo": null,
                       "name": "Test to list creams 6",
                       "isSpecial": false,
@@ -733,13 +733,13 @@
                       "price": 16,
                       "amount": 7,
                       "unit": "box",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     },
                     {
-                      "id": "a2209e9a-a33a-44d4-a977-2906fa8442f3",
+                      "id": "c9942053-fcc1-4751-8197-1d7e1b3e20d9",
                       "photo": null,
                       "name": "Test to list creams 7",
                       "isSpecial": false,
@@ -747,13 +747,13 @@
                       "price": 17,
                       "amount": 8,
                       "unit": "bag",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     },
                     {
-                      "id": "96e0b8fa-5b81-474d-a7d6-7c6c9ec638ac",
+                      "id": "22f70b06-be93-43bc-adcb-8a2b963e26f6",
                       "photo": null,
                       "name": "Test to list creams 8",
                       "isSpecial": false,
@@ -761,13 +761,13 @@
                       "price": 18,
                       "amount": 9,
                       "unit": "box",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     },
                     {
-                      "id": "a3092d3b-3e49-44c1-80c3-dea58b1afe8f",
+                      "id": "379fd3f6-eb69-41a9-bb13-cf488600d16b",
                       "photo": null,
                       "name": "Test to list creams 9",
                       "isSpecial": false,
@@ -775,13 +775,13 @@
                       "price": 19,
                       "amount": 10,
                       "unit": "bag",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     },
                     {
-                      "id": "b1e0abd9-4d75-404e-858d-06d4dc8f108c",
+                      "id": "327232ca-28fc-401a-8b67-973705916429",
                       "photo": null,
                       "name": "Test to list creams 0",
                       "isSpecial": false,
@@ -789,10 +789,10 @@
                       "price": 10,
                       "amount": 1,
                       "unit": "box",
-                      "createdAt": "2023-12-26T01:35:56.079Z",
+                      "createdAt": "2023-12-26T15:13:31.162Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-26T01:35:56.079Z",
-                      "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                      "updatedAt": "2023-12-26T15:13:31.162Z",
+                      "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                     }
                   ],
                   "hasNextPage": true,
@@ -869,10 +869,10 @@
               "application/json": {
                 "example": {
                   "message": "Token session created successfully",
-                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjJlNzI4OGY5LWMzY2YtNDg2Mi04OGFjLTJhNThmZmUwNGI3OSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzUzOTI5OSwiZXhwIjoxNzAzNTM5MzA0fQ.580rT_wkjIW1lfqKUGgzhg8b46LDD3fHUYDdYOZ5ZU8",
-                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjJlNzI4OGY5LWMzY2YtNDg2Mi04OGFjLTJhNThmZmUwNGI3OSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzUzOTI5OSwiZXhwIjoxNzAzNTM5MzA5fQ.LdMiZ6It1RLOVrRq-MDMiuoqGhahs3kJkOowwtLnQmQ",
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRhOTE5ZWZmLTkyMjEtNDM4Mi1hNWU0LWUyODhmZGNjNGEwNSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzYwMzYxMCwiZXhwIjoxNzAzNjAzNjE1fQ.dHLHTAt3CB48h8HF3jJN3bwJ3SgpnC1Xl8BPPdYZZpM",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRhOTE5ZWZmLTkyMjEtNDM4Mi1hNWU0LWUyODhmZGNjNGEwNSIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzYwMzYxMCwiZXhwIjoxNzAzNjAzNjIwfQ.xndyT6D15fUc6ryYtmT18JosCMJiS1FgCNFjmWSDzEM",
                   "user": {
-                    "id": "2e7288f9-c3cf-4862-88ac-2a58ffe04b79",
+                    "id": "4a919eff-9221-4382-a5e4-e288fdcc4a05",
                     "name": "Test User Admin to sign in test",
                     "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
                     "role": {
@@ -934,7 +934,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "id": "f3150444-e41c-48b4-9f4e-1b8a4a7e86c8",
+                  "id": "68377949-0aa2-4e15-b4da-79a47e68b89c",
                   "photo": "URL PHOTO",
                   "name": "Test Cream",
                   "isSpecial": false,
@@ -942,10 +942,10 @@
                   "price": 9.99,
                   "amount": 1,
                   "unit": "unit",
-                  "createdAt": "2023-12-26T01:35:56.179Z",
+                  "createdAt": "2023-12-26T15:13:31.231Z",
                   "deletedAt": null,
-                  "updatedAt": "2023-12-26T01:35:56.179Z",
-                  "adminId": "8a4b20d9-e377-481c-a7c9-ab6a6e2832a6"
+                  "updatedAt": "2023-12-26T15:13:31.231Z",
+                  "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
                 }
               }
             }
@@ -966,6 +966,99 @@
               "application/json": {
                 "example": {
                   "message": "No Cream found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Cream",
+        "description": "Endpoint to update a Cream to the system.",
+        "tags": [
+          "Cream"
+        ],
+        "requestBody": {
+          "description": "Cream details for updating",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Cream Edited"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "price": {
+                    "type": "number"
+                  },
+                  "unit": {
+                    "type": "string"
+                  },
+                  "photo": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "amount",
+                  "price",
+                  "unit"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful updating cream",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Cream updated successfully",
+                  "data": {
+                    "id": "68377949-0aa2-4e15-b4da-79a47e68b89c",
+                    "photo": "URL PHOTO",
+                    "name": "Test Cream Edited",
+                    "isSpecial": false,
+                    "available": false,
+                    "price": 9.99,
+                    "amount": 1,
+                    "unit": "unit",
+                    "createdAt": "2023-12-26T15:13:31.231Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-26T15:13:31.303Z",
+                    "adminId": "3a288440-9ae9-4443-9812-7c0f0fefc06a"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User haven't permission"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "At least one property must exist in the request body"
                 }
               }
             }

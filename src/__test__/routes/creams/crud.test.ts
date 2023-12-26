@@ -88,6 +88,10 @@ let listSuccessBodyResponse = {};
 let listUnprocessableBodyResponse = {};
 let listUnauthorizedBodyResponse = {};
 
+let updateSuccessBodyResponse = {};
+let updateUnprocessableBodyResponse = {};
+let updateUnauthorizedBodyResponse = {};
+
 afterAll(async () => {
   await cleanCreamTestDatabase();
   await saveSwaggerDefinitions({
@@ -277,6 +281,72 @@ afterAll(async () => {
               description: "Unauthorized - Invalid credentials",
               content: {
                 "application/json": { example: getUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        put: {
+          summary: "Update Cream",
+          description: "Endpoint to update a Cream to the system.",
+          tags: ["Cream"],
+          requestBody: {
+            description: "Cream details for updating",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: updateCreamRequestBody.name,
+                    },
+                    amount: {
+                      type: "number",
+                      example: updateCreamRequestBody.amount,
+                    },
+                    price: {
+                      type: "number",
+                      example: updateCreamRequestBody.price,
+                    },
+                    unit: {
+                      type: "string",
+                      example: updateCreamRequestBody.unit,
+                    },
+                    photo: {
+                      type: "string",
+                      example: updateCreamRequestBody.photo,
+                    },
+                  },
+                  required: ["name", "amount", "price", "unit"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful updating cream",
+              content: {
+                "application/json": { example: updateSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: updateUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: updateUnauthorizedBodyResponse },
               },
             },
           },
@@ -479,6 +549,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .send(updateCreamRequestBody)
           .expect(200);
 
+        updateSuccessBodyResponse = response.body;
+
         return expect(response.statusCode).toBe(200);
       });
 
@@ -513,6 +585,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
           .expect(422);
 
+        updateUnprocessableBodyResponse = response.body;
+
         expect(response.body).toHaveProperty(
           "message",
           "At least one property must exist in the request body"
@@ -530,6 +604,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", "Bearer " + refreshTokenAsClient)
           .send(updateCreamRequestBody)
           .expect(401);
+
+        updateUnauthorizedBodyResponse = responseAsClient.body;
 
         const responseAsMember = await request(app)
           .put(creamResourcePath + `/${cream.id}`)
