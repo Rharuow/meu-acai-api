@@ -70,6 +70,20 @@ To get started with the Meu Açai API, follow these steps:
 
 ## To-Do List
 
+- **Docs**
+
+  - Wellcome
+    - [x] Get
+  - AUTHENTICATION
+    - [x] Create signIn
+  - CREAM
+    - [x] Create
+    - [x] Update
+    - [x] List
+    - [x] Get
+    - [x] Delete
+    - [x] Delete Many
+
 - **TESTS:**
 
   - **Routes:**
@@ -139,23 +153,55 @@ To get started with the Meu Açai API, follow these steps:
             - [x] Test for DELETE MANY Client
             - [x] Test for failed cases in DELETE MANY a Client
 
-        - **CREAM**
-          - **REFACTOR:**
-            - [x] In the test description, use variables for routers and parameters.
-            - [x] Separate the CRUD routes into different descriptions.
-          - **IMPROVEMENTS:**
-            - [x] Test to CREATE Cream
-            - [x] Test for failed cases in CREATE a Cream
-            - [x] Test to UPDATE Cream
-            - [x] Test for failed cases in UPDATE a Cream
-            - [x] Test to GET Cream
-            - [x] Test for failed cases in GET a Cream
-            - [x] Test to LIST Cream
-            - [x] Test for failed cases in LIST a Cream
-            - [x] Test to DELETE Cream
-            - [x] Test for failed cases in DELETE a Cream
-            - [x] Test for DELETE MANY Cream
-            - [x] Test for failed cases in DELETE MANY a Cream
+      - **CREAM**
+
+        - **REFACTOR:**
+          - [x] In the test description, use variables for routers and parameters.
+          - [x] Separate the CRUD routes into different descriptions.
+        - **IMPROVEMENTS:**
+          - [x] Test to CREATE Cream
+          - [x] Test for failed cases in CREATE a Cream
+          - [x] Test to UPDATE Cream
+          - [x] Test for failed cases in UPDATE a Cream
+          - [x] Test to GET Cream
+          - [x] Test for failed cases in GET a Cream
+          - [x] Test to LIST Cream
+          - [x] Test for failed cases in LIST a Cream
+          - [x] Test to DELETE Cream
+          - [x] Test for failed cases in DELETE a Cream
+          - [x] Test for DELETE MANY Cream
+          - [x] Test for failed cases in DELETE MANY a Cream
+
+      - **TOPPING**
+
+        - **IMPROVEMENTS:**
+          - [x] Test to CREATE Topping
+          - [x] Test for failed cases in CREATE a Topping
+          - [x] Test to UPDATE Topping
+          - [x] Test for failed cases in UPDATE a Topping
+          - [x] Test to GET Topping
+          - [x] Test for failed cases in GET a Topping
+          - [x] Test to LIST Toppings
+          - [x] Test for failed cases in LIST a Toppings
+          - [x] Test to DELETE Topping
+          - [x] Test for failed cases in DELETE a Topping
+          - [x] Test for DELETE MANY Toppings
+          - [x] Test for failed cases in DELETE MANY a Toppings
+
+      - **PRODUCT**
+        - **IMPROVEMENTS:**
+          - [x] Test to CREATE Product
+          - [x] Test for failed cases in CREATE a Product
+          - [x] Test to UPDATE Product
+          - [x] Test for failed cases in UPDATE a Product
+          - [x] Test to GET Product
+          - [x] Test for failed cases in GET a Product
+          - [x] Test to LIST Products
+          - [x] Test for failed cases in LIST a Products
+          - [x] Test to DELETE Product
+          - [x] Test for failed cases in DELETE a Product
+          - [x] Test for DELETE MANY Products
+          - [x] Test for failed cases in DELETE MANY a Products
 
 - **FEATS:**
 
@@ -290,8 +336,8 @@ To get started with the Meu Açai API, follow these steps:
 
       - **PRODUCT**
         - **IMPROVEMENTS:**
-          - [ ] Product Model in Schema
-          - [ ] Router to create Product ( POST "/api/v1/resources/products" )
+          - [x] Product Model in Schema
+          - [x] Router to create Product ( POST "/api/v1/resources/products" )
                 {
                 name?: string,
                 price: float,
@@ -301,7 +347,7 @@ To get started with the Meu Açai API, follow these steps:
                 available?: boolean,
                 photo?: string,
                 }
-          - [ ] Router to update Product ( PUT "/api/v1/resources/products/:id" )
+          - [x] Router to update Product ( PUT "/api/v1/resources/products/:id" )
                 {
                 name?: string,
                 price: float,
@@ -311,7 +357,7 @@ To get started with the Meu Açai API, follow these steps:
                 available?: boolean,
                 photo?: string,
                 }
-          - [ ] Router to get Product ( GET "/api/v1/resources/products/:id" )
-          - [ ] Router to list with pagination and filters Product ( GET "/api/v1/resources/products" )
-          - [ ] Router to delete Product ( DELETE "/api/v1/resources/products/:id" )
-          - [ ] Router to delete many Product ( DELETE "/api/v1/resources/products/delteMany?ids=id1&id2" )
+          - [x] Router to get Product ( GET "/api/v1/resources/products/:id" )
+          - [x] Router to list with pagination and filters Product ( GET "/api/v1/resources/products" )
+          - [x] Router to delete Product ( DELETE "/api/v1/resources/products/:id" )
+          - [x] Router to delete many Product ( DELETE "/api/v1/resources/products/delteMany?ids=id1&id2" )

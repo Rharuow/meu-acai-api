@@ -245,6 +245,39 @@ afterAll(async () => {
             },
           ],
         },
+        delete: {
+          summary: "Delete Many Creams",
+          parameters: [
+            {
+              name: "ids",
+              in: "query",
+              description: "ids of creams to delete",
+              required: true,
+              schema: {
+                type: "string",
+                default: "id-1,id-2",
+              },
+            },
+          ],
+          description: "Delete creams based on ids query parameter.",
+          tags: ["Cream"],
+          responses: {
+            "204": {
+              description: "Successful deleting creams",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
       },
       "/api/v1/resources/creams/{id}": {
         get: {
@@ -348,6 +381,38 @@ afterAll(async () => {
               content: {
                 "application/json": { example: updateUnauthorizedBodyResponse },
               },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Many Creams",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "id of cream to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Delete cream based on id path parameter.",
+          tags: ["Cream"],
+          responses: {
+            "204": {
+              description: "Successful deleting cream",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
             },
           },
           security: [
@@ -900,7 +965,7 @@ describe("CRUD CREAM RESOURCE", () => {
 
     describe("DELETING MANY AS AN ADMIN", () => {
       test(
-        `when an autenticated ADMIN accesses DELETE ${creamResourcePath}/deleteMany?ids=id1&id2 ` +
+        `when an autenticated ADMIN accesses DELETE ${creamResourcePath}/deleteMany?ids=id1,id2 ` +
           "where the ids are ids of creams " +
           "should return 204 and delete all the creams thats contains the ids.",
         async () => {
@@ -943,7 +1008,7 @@ describe("CRUD CREAM RESOURCE", () => {
 
     describe("DELETING MANY AS A CLIENT", () => {
       test(
-        `When an autenticated CLIENT accesses DELETE ${creamResourcePath}/deleteMany?ids=id1&id2` +
+        `When an autenticated CLIENT accesses DELETE ${creamResourcePath}/deleteMany?ids=id1,id2` +
           "then it should return a 401 status code",
         async () => {
           const response = await request(app)
@@ -963,7 +1028,7 @@ describe("CRUD CREAM RESOURCE", () => {
 
     describe("DELETING MANY AS A MEMBER", () => {
       test(
-        `When an autenticated MEMBER accesses DELETE ${creamResourcePath}/deleteMany?ids=id1&id2` +
+        `When an autenticated MEMBER accesses DELETE ${creamResourcePath}/deleteMany?ids=id1,id2` +
           "then it should return a 401 status code",
         async () => {
           const response = await request(app)
@@ -983,7 +1048,7 @@ describe("CRUD CREAM RESOURCE", () => {
 
     describe("DELETING MANY WITHOUT AUTHENTICATION", () => {
       test(
-        `When accesses DELETE ${creamResourcePath}/deleteMany?ids=id1&id2 without authentication ` +
+        `When accesses DELETE ${creamResourcePath}/deleteMany?ids=id1,id2 without authentication ` +
           "then it should return a 401 status code",
         async () => {
           const response = await request(app)
