@@ -2,6 +2,7 @@ import { createAdminRoleIfNotExist } from "@/__test__/presets/createAdminRoleIfN
 import { createClientRoleIfNotExist } from "@/__test__/presets/createClientRoleIfNotExists";
 import { createMemberRoleIfNotExist } from "@/__test__/presets/createMemberRoleIfNotExists";
 import { app } from "@/app";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
 import { CreateToppingRequestBody } from "@/types/topping/createRequestBody";
 import { UpdateToppingRequestBody } from "@/types/topping/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
@@ -10,6 +11,7 @@ import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
 import request from "supertest";
+import swaggerDefinition from "@/swagger-spec.json";
 
 let adminAuthenticated: User & { role: Role; admin: Admin };
 let clientAuthenticated: User & { role: Role; client: Client };
@@ -90,8 +92,44 @@ beforeAll(async () => {
   return;
 });
 
+let createSuccessBodyResponse = {};
+let createUnprocessableBodyResponse = {};
+let createUnauthorizedBodyResponse = {};
+
+let getSuccessBodyResponse = {};
+let getUnprocessableBodyResponse = {};
+let getUnauthorizedBodyResponse = {};
+
+let listSuccessBodyResponse = {};
+let listUnprocessableBodyResponse = {};
+let listUnauthorizedBodyResponse = {};
+
+let updateSuccessBodyResponse = {};
+let updateBadRequestBodyResponse = {};
+let updateUnauthorizedBodyResponse = {};
+
+const toppingCreate: Omit<CreateToppingRequestBody, "adminId"> = {
+  name: "Test Topping created as Admin",
+  price: 12.99,
+  amount: 2,
+  unit: "unidade",
+  available: true,
+  isSpecial: false,
+  photo: "URL-PHOTO",
+};
+
+const toppingsUpdated: UpdateToppingRequestBody = {
+  name: "Test Topping updated as Admin",
+  amount: 2,
+  available: false,
+  isSpecial: true,
+  photo: "some-photo.jpg",
+  price: 12.5,
+  unit: "unit",
+};
+
 afterAll(async () => {
-  return await prismaClient.user.deleteMany({
+  await prismaClient.user.deleteMany({
     where: {
       id: {
         in: [
@@ -99,6 +137,355 @@ afterAll(async () => {
           clientAuthenticated.id,
           memberAuthenticated.id,
         ],
+      },
+    },
+  });
+
+  return await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/resources/toppings": {
+        post: {
+          summary: "Create Topping",
+          description: "Endpoint to add a new Topping to the system.",
+          tags: ["Topping"],
+          requestBody: {
+            description: "Topping details for creation",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: toppingCreate.name,
+                      require: true,
+                    },
+                    amount: {
+                      type: "number",
+                      example: toppingCreate.amount,
+                      require: true,
+                    },
+                    price: {
+                      type: "number",
+                      example: toppingCreate.price,
+                      require: true,
+                    },
+                    unit: {
+                      type: "string",
+                      example: toppingCreate.unit,
+                      require: true,
+                    },
+                    photo: {
+                      type: "string",
+                      example: toppingCreate.photo,
+                      require: false,
+                    },
+                    available: {
+                      type: "boolean",
+                      example: toppingCreate.available,
+                      require: false,
+                    },
+                    isSpecial: {
+                      type: "boolean",
+                      example: toppingCreate.isSpecial,
+                      require: false,
+                    },
+                  },
+                  required: ["name", "amount", "price", "unit"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful creating topping",
+              content: {
+                "application/json": { example: createSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: createUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: createUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        get: {
+          summary: "List Toppings",
+          parameters: [
+            {
+              name: "page",
+              in: "query",
+              description: "Page to list toppings",
+              required: false,
+              schema: {
+                type: "number",
+                default: 1,
+              },
+            },
+            {
+              name: "perPage",
+              in: "query",
+              description: "How many toppings to return per page",
+              required: false,
+              schema: {
+                type: "number",
+                default: 10,
+              },
+            },
+            {
+              name: "orderBy",
+              in: "query",
+              description: "Order by some field table",
+              required: false,
+              schema: {
+                type: "string",
+                default: "createdAt:asc",
+              },
+            },
+            {
+              name: "filter",
+              in: "query",
+              description: "Filter toppings by some fields table",
+              required: false,
+              schema: {
+                type: "string",
+              },
+              example:
+                "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO",
+            },
+          ],
+          description:
+            "Retrieve a list of toppings based on optional query parameters.",
+          tags: ["Topping"],
+          responses: {
+            "200": {
+              description: "Successful getting topping",
+              content: {
+                "application/json": { example: listSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: listUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: listUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Many Toppings",
+          parameters: [
+            {
+              name: "ids",
+              in: "query",
+              description: "ids of toppings to delete",
+              required: true,
+              schema: {
+                type: "string",
+                default: "id-1,id-2",
+              },
+            },
+          ],
+          description: "Delete toppings based on ids query parameter.",
+          tags: ["Topping"],
+          responses: {
+            "204": {
+              description: "Successful deleting toppings",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+      "/api/v1/resources/toppings/{id}": {
+        get: {
+          summary: "Get Topping by ID",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Topping to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Retrieve details of a specific Topping by its ID.",
+          tags: ["Topping"],
+          responses: {
+            "200": {
+              description: "Successful getting topping",
+              content: {
+                "application/json": { example: getSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: getUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: getUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        put: {
+          summary: "Update Topping",
+          description: "Endpoint to update a Topping to the system.",
+          tags: ["Topping"],
+          requestBody: {
+            description: "Topping details for updating",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: toppingsUpdated.name,
+                    },
+                    amount: {
+                      type: "number",
+                      example: toppingsUpdated.amount,
+                    },
+                    price: {
+                      type: "number",
+                      example: toppingsUpdated.price,
+                    },
+                    unit: {
+                      type: "string",
+                      example: toppingsUpdated.unit,
+                    },
+                    photo: {
+                      type: "string",
+                      example: toppingsUpdated.photo,
+                    },
+                    available: {
+                      type: "boolean",
+                      example: toppingsUpdated.available,
+                    },
+                    isSpecial: {
+                      type: "boolean",
+                      example: toppingsUpdated.isSpecial,
+                    },
+                  },
+                  required: ["name", "amount", "price", "unit"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful updating topping",
+              content: {
+                "application/json": { example: updateSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: updateBadRequestBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: updateUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Many Toppings",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "id of topping to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Delete topping based on id path parameter.",
+          tags: ["Topping"],
+          responses: {
+            "204": {
+              description: "Successful deleting topping",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
       },
     },
   });
@@ -111,12 +498,6 @@ describe("CRUD TOPPING RESOURCE", () => {
   let toppingsCreated: Array<CreateToppingRequestBody>;
   let toppings: Array<Topping>;
   describe("CREATE TESTS", () => {
-    const toppingCreate = {
-      name: "Test Topping created as Admin",
-      price: 12.99,
-      amount: 2,
-      unit: "unidade",
-    };
     describe("CREATING TOPPING AS ADMIN", () => {
       test(
         `When an Admin access POST ${baseUrl}` +
@@ -131,6 +512,7 @@ describe("CRUD TOPPING RESOURCE", () => {
             .expect(200);
 
           topping = response.body.data;
+          createSuccessBodyResponse = response.body;
 
           expect(response.body.data).toHaveProperty(
             "adminId",
@@ -152,6 +534,8 @@ describe("CRUD TOPPING RESOURCE", () => {
             .set("refreshToken", refreshTokenAsAdmin)
             .send(createBody)
             .expect(422);
+
+          createUnprocessableBodyResponse = response.body;
 
           return expect(response.body).toHaveProperty(
             "message",
@@ -232,6 +616,8 @@ describe("CRUD TOPPING RESOURCE", () => {
             .send(toppingCreate)
             .expect(401);
 
+          createUnauthorizedBodyResponse = response.body;
+
           return expect(response.body).toHaveProperty(
             "message",
             "No authorization required"
@@ -254,6 +640,8 @@ describe("CRUD TOPPING RESOURCE", () => {
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
 
+          getSuccessBodyResponse = response.body;
+
           expect(response.body).toHaveProperty("data.id", topping.id);
           expect(response.body).toHaveProperty("data.name", topping.name);
           expect(response.body).toHaveProperty("data.adminId", topping.adminId);
@@ -271,6 +659,8 @@ describe("CRUD TOPPING RESOURCE", () => {
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(422);
+
+          getUnprocessableBodyResponse = response.body;
 
           expect(response.body).toHaveProperty(
             "message",
@@ -369,6 +759,8 @@ describe("CRUD TOPPING RESOURCE", () => {
             .get(setIdInBaseUrl(topping.id))
             .expect(401);
 
+          getUnauthorizedBodyResponse = response.body;
+
           expect(response.body).toHaveProperty(
             "message",
             "Unauthorized: No access token provided"
@@ -417,6 +809,8 @@ describe("CRUD TOPPING RESOURCE", () => {
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
+
+          listSuccessBodyResponse = response.body;
 
           expect(response.body).toHaveProperty("data");
           expect(response.body).toHaveProperty("hasNextPage", true);
@@ -493,6 +887,8 @@ describe("CRUD TOPPING RESOURCE", () => {
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(422);
+
+          listUnprocessableBodyResponse = response.body;
 
           expect(response.body).toHaveProperty("message", "Unknown field(s)");
           return expect(response.statusCode).toBe(422);
@@ -666,6 +1062,8 @@ describe("CRUD TOPPING RESOURCE", () => {
         async () => {
           const response = await request(app).get(baseUrl).expect(401);
 
+          listUnauthorizedBodyResponse = response.body;
+
           expect(response.body).toHaveProperty(
             "message",
             "Unauthorized: No access token provided"
@@ -696,29 +1094,20 @@ describe("CRUD TOPPING RESOURCE", () => {
   });
 
   describe("UPDATE TESTS", () => {
-    let toppingsUpdated: UpdateToppingRequestBody;
     describe("UPDATING TOPPING AS AN ADMIN", () => {
       test(
         `When an Admin access PUT ${baseUrl}/:id` +
           " sending in body the parameters at least one of the parameters to update the toppings belongs to id sending in router params" +
           " then the response status code will be 200 and the body will return the topping updated into data property",
         async () => {
-          toppingsUpdated = {
-            name: "Test Topping updated as Admin",
-            amount: 2,
-            available: false,
-            isSpecial: true,
-            photo: "some-photo.jpg",
-            price: 12.5,
-            unit: "unit",
-          };
-
           const response = await request(app)
             .put(setIdInBaseUrl(topping.id))
             .send(toppingsUpdated)
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
+
+          updateSuccessBodyResponse = response.body;
 
           expect(response.body).toHaveProperty(
             "message",
@@ -765,6 +1154,8 @@ describe("CRUD TOPPING RESOURCE", () => {
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(400);
+
+          updateBadRequestBodyResponse = response.body;
 
           return expect(response.body).toHaveProperty(
             "message",
@@ -826,6 +1217,8 @@ describe("CRUD TOPPING RESOURCE", () => {
             .set("authorization", accessTokenAsMember)
             .set("refreshToken", refreshTokenAsMember)
             .expect(401);
+
+          updateUnauthorizedBodyResponse = response.body;
 
           return expect(response.body).toHaveProperty(
             "message",

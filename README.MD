@@ -70,6 +70,8 @@ To get started with the Meu Açai API, follow these steps:
 
 ## To-Do List
 
+#### Access the router "/docs" to see documentation
+
 - **Docs**
 
   - Wellcome
@@ -77,6 +79,13 @@ To get started with the Meu Açai API, follow these steps:
   - AUTHENTICATION
     - [x] Create signIn
   - CREAM
+    - [x] Create
+    - [x] Update
+    - [x] List
+    - [x] Get
+    - [x] Delete
+    - [x] Delete Many
+  - TOPPING
     - [x] Create
     - [x] Update
     - [x] List

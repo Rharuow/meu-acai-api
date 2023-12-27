@@ -904,10 +904,10 @@
               "application/json": {
                 "example": {
                   "message": "Token session created successfully",
-                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRhYmVkMWE0LTFjNmQtNDYyZi05ZTE5LWY1MjU4NmIzZDI4NiIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzcxMjIzNiwiZXhwIjoxNzAzNzEyMjQxfQ.zWNJcg8ic7VNJJyQW6WLOxLq0cIL4vWVSV1RuR0WME0",
-                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRhYmVkMWE0LTFjNmQtNDYyZi05ZTE5LWY1MjU4NmIzZDI4NiIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzcxMjIzNiwiZXhwIjoxNzAzNzEyMjQ2fQ.mi21LnxPY08W-VYgn-UQsqGLHrJgSBwa69rxQzvkly0",
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRmZDgyMGY1LTlmMzktNDc0Zi1hYmI0LWI1NDVjZDcyZDNiNCIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzcxMzk5MywiZXhwIjoxNzAzNzEzOTk4fQ.0b3lAzcKPDrgejcbsfHSWDK2ZBT5zUvuBC1ZR0f8HoQ",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRmZDgyMGY1LTlmMzktNDc0Zi1hYmI0LWI1NDVjZDcyZDNiNCIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzcxMzk5MywiZXhwIjoxNzAzNzE0MDAzfQ.7mZxBN9xETclNiJwooyb_mVW4fu6IPa-nuPuydJMWME",
                   "user": {
-                    "id": "4abed1a4-1c6d-462f-9e19-f52586b3d286",
+                    "id": "4fd820f5-9f39-474f-abb4-b545cd72d3b4",
                     "name": "Test User Admin to sign in test",
                     "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
                     "role": {
@@ -1125,6 +1125,595 @@
         "responses": {
           "204": {
             "description": "Successful deleting cream"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials"
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/resources/toppings": {
+      "post": {
+        "summary": "Create Topping",
+        "description": "Endpoint to add a new Topping to the system.",
+        "tags": [
+          "Topping"
+        ],
+        "requestBody": {
+          "description": "Topping details for creation",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Topping created as Admin",
+                    "require": true
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 2,
+                    "require": true
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 12.99,
+                    "require": true
+                  },
+                  "unit": {
+                    "type": "string",
+                    "example": "unidade",
+                    "require": true
+                  },
+                  "photo": {
+                    "type": "string",
+                    "example": "URL-PHOTO",
+                    "require": false
+                  },
+                  "available": {
+                    "type": "boolean",
+                    "example": true,
+                    "require": false
+                  },
+                  "isSpecial": {
+                    "type": "boolean",
+                    "example": false,
+                    "require": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "amount",
+                  "price",
+                  "unit"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful creating topping",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Topping created successfully",
+                  "data": {
+                    "id": "4c0fe43c-fe7f-48d8-99aa-1e528cc4edfe",
+                    "createdAt": "2023-12-27T21:53:08.883Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-27T21:53:08.883Z",
+                    "name": "Test Topping created as Admin",
+                    "photo": "URL-PHOTO",
+                    "isSpecial": false,
+                    "available": true,
+                    "price": 12.99,
+                    "amount": 2,
+                    "unit": "unidade",
+                    "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No authorization required"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "amount must be a number and not empty"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "List Toppings",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page to list toppings",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "How many toppings to return per page",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 10
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Order by some field table",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "createdAt:asc"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Filter toppings by some fields table",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO"
+          }
+        ],
+        "description": "Retrieve a list of toppings based on optional query parameters.",
+        "tags": [
+          "Topping"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting topping",
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": [
+                    {
+                      "id": "4c0fe43c-fe7f-48d8-99aa-1e528cc4edfe",
+                      "createdAt": "2023-12-27T21:53:08.883Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.883Z",
+                      "name": "Test Topping created as Admin",
+                      "photo": "URL-PHOTO",
+                      "isSpecial": false,
+                      "available": true,
+                      "price": 12.99,
+                      "amount": 2,
+                      "unit": "unidade",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    },
+                    {
+                      "id": "141140df-9377-4961-b4bb-1fe3c2a712e4",
+                      "createdAt": "2023-12-27T21:53:08.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.977Z",
+                      "name": "Test topping creating odd many 1",
+                      "photo": null,
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 1,
+                      "amount": 1,
+                      "unit": "litros",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    },
+                    {
+                      "id": "7ccacf58-7d3c-49a4-a509-2876551d5a79",
+                      "createdAt": "2023-12-27T21:53:08.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.977Z",
+                      "name": "Test topping creating even many 6",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 106,
+                      "amount": 26,
+                      "unit": "bag",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    },
+                    {
+                      "id": "daf140bf-4802-4e7b-9cf9-d3dff7f7eb83",
+                      "createdAt": "2023-12-27T21:53:08.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.977Z",
+                      "name": "Test topping creating odd many 3",
+                      "photo": null,
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 3,
+                      "amount": 3,
+                      "unit": "litros",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    },
+                    {
+                      "id": "90141d96-50e8-48a4-99b5-b29738486e9c",
+                      "createdAt": "2023-12-27T21:53:08.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.977Z",
+                      "name": "Test topping creating even many 4",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 104,
+                      "amount": 24,
+                      "unit": "bag",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    },
+                    {
+                      "id": "2f4309fc-5f43-4806-aeed-b6ebc995e34c",
+                      "createdAt": "2023-12-27T21:53:08.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.977Z",
+                      "name": "Test topping creating odd many 5",
+                      "photo": null,
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 5,
+                      "amount": 5,
+                      "unit": "litros",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    },
+                    {
+                      "id": "736f2f48-2808-4a02-8e25-e6c1080b271b",
+                      "createdAt": "2023-12-27T21:53:08.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.977Z",
+                      "name": "Test topping creating even many 2",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 102,
+                      "amount": 22,
+                      "unit": "bag",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    },
+                    {
+                      "id": "d2955944-8999-4c46-bcd6-ca32715d97d0",
+                      "createdAt": "2023-12-27T21:53:08.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.977Z",
+                      "name": "Test topping creating odd many 7",
+                      "photo": null,
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 7,
+                      "amount": 7,
+                      "unit": "litros",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    },
+                    {
+                      "id": "1d971c13-85f6-4adb-94e4-ba1adefaf5d6",
+                      "createdAt": "2023-12-27T21:53:08.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.977Z",
+                      "name": "Test topping creating even many 8",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 108,
+                      "amount": 28,
+                      "unit": "bag",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    },
+                    {
+                      "id": "a6d7e2f6-5737-42cd-9a12-d5a0f0da447f",
+                      "createdAt": "2023-12-27T21:53:08.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-27T21:53:08.977Z",
+                      "name": "Test topping creating even many 0",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 100,
+                      "amount": 20,
+                      "unit": "bag",
+                      "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                    }
+                  ],
+                  "hasNextPage": true,
+                  "page": 1,
+                  "totalPages": 3
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unauthorized: No access token provided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unknown field(s)"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Many Toppings",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "description": "ids of toppings to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "id-1,id-2"
+            }
+          }
+        ],
+        "description": "Delete toppings based on ids query parameter.",
+        "tags": [
+          "Topping"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deleting toppings"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials"
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/resources/toppings/{id}": {
+      "get": {
+        "summary": "Get Topping by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Topping to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Retrieve details of a specific Topping by its ID.",
+        "tags": [
+          "Topping"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting topping",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Topping retrieved successfully",
+                  "data": {
+                    "id": "4c0fe43c-fe7f-48d8-99aa-1e528cc4edfe",
+                    "createdAt": "2023-12-27T21:53:08.883Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-27T21:53:08.883Z",
+                    "name": "Test Topping created as Admin",
+                    "photo": "URL-PHOTO",
+                    "isSpecial": false,
+                    "available": true,
+                    "price": 12.99,
+                    "amount": 2,
+                    "unit": "unidade",
+                    "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unauthorized: No access token provided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Error to retrivier topping: No Topping found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Topping",
+        "description": "Endpoint to update a Topping to the system.",
+        "tags": [
+          "Topping"
+        ],
+        "requestBody": {
+          "description": "Topping details for updating",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Topping updated as Admin"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 2
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 12.5
+                  },
+                  "unit": {
+                    "type": "string",
+                    "example": "unit"
+                  },
+                  "photo": {
+                    "type": "string",
+                    "example": "some-photo.jpg"
+                  },
+                  "available": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "isSpecial": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                },
+                "required": [
+                  "name",
+                  "amount",
+                  "price",
+                  "unit"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful updating topping",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Topping updated successfully",
+                  "data": {
+                    "id": "4c0fe43c-fe7f-48d8-99aa-1e528cc4edfe",
+                    "createdAt": "2023-12-27T21:53:08.883Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-27T21:53:09.062Z",
+                    "name": "Test Topping updated as Admin",
+                    "photo": "some-photo.jpg",
+                    "isSpecial": true,
+                    "available": false,
+                    "price": 12.5,
+                    "amount": 2,
+                    "unit": "unit",
+                    "adminId": "3b19e958-33e5-4043-b93f-e5ea97e4cd3c"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User haven't permission"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "At least one body"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Many Toppings",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of topping to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Delete topping based on id path parameter.",
+        "tags": [
+          "Topping"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deleting topping"
           },
           "401": {
             "description": "Unauthorized - Invalid credentials"
