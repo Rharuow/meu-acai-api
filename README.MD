@@ -92,6 +92,13 @@ To get started with the Meu Açai API, follow these steps:
     - [x] Get
     - [x] Delete
     - [x] Delete Many
+  - PRODUCT
+    - [x] Create
+    - [x] Update
+    - [x] List
+    - [x] Get
+    - [x] Delete
+    - [x] Delete Many
 
 - **TESTS:**
 

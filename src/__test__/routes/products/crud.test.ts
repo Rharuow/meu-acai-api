@@ -2,6 +2,7 @@ import { createAdminRoleIfNotExist } from "@/__test__/presets/createAdminRoleIfN
 import { createClientRoleIfNotExist } from "@/__test__/presets/createClientRoleIfNotExists";
 import { createMemberRoleIfNotExist } from "@/__test__/presets/createMemberRoleIfNotExists";
 import { app } from "@/app";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
 import { CreateProductRequestBody } from "@/types/product/createRequestBody";
 import { UpdateProductRequestBody } from "@/types/product/updateRequestBody";
 import { prismaClient } from "@libs/prisma";
@@ -10,6 +11,7 @@ import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
 import request from "supertest";
+import swaggerDefinition from "@/swagger-spec.json";
 
 let adminAuthenticated: User & { role: Role; admin: Admin };
 let clientAuthenticated: User & { role: Role; client: Client };
@@ -90,7 +92,397 @@ beforeAll(async () => {
   return;
 });
 
+let createSuccessBodyResponse = {};
+let createUnprocessableBodyResponse = {};
+let createUnauthorizedBodyResponse = {};
+
+let getSuccessBodyResponse = {};
+let getBadRequestBodyResponse = {};
+let getUnauthorizedBodyResponse = {};
+
+let listSuccessBodyResponse = {};
+let listUnprocessableBodyResponse = {};
+let listUnauthorizedBodyResponse = {};
+
+let updateSuccessBodyResponse = {};
+let updateBadRequestBodyResponse = {};
+let updateUnauthorizedBodyResponse = {};
+
+const createRequestBody: Omit<CreateProductRequestBody, "adminId"> = {
+  maxCreamsAllowed: 1,
+  maxToppingsAllowed: 1,
+  price: 1.99,
+  size: "small",
+  name: "TEST PRODUCT NAME CREATED",
+  available: true,
+  photo: "url-photo",
+};
+
+const productsUpdated: UpdateProductRequestBody = {
+  name: "Test Product updated as Admin",
+  size: "Update size product test",
+  available: false,
+  photo: "some-photo.jpg",
+  price: 12.5,
+  maxCreamsAllowed: 2,
+  maxToppingsAllowed: 2,
+};
+
 afterAll(async () => {
+  await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/resources/products": {
+        post: {
+          summary: "Create Product",
+          description: "Endpoint to add a new Product to the system.",
+          tags: ["Product"],
+          requestBody: {
+            description: "Product details for creation",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    price: {
+                      type: "number",
+                      example: createRequestBody.price,
+                      require: true,
+                    },
+                    size: {
+                      type: "number",
+                      example: createRequestBody.size,
+                      require: true,
+                    },
+                    maxCreamsAllowed: {
+                      type: "number",
+                      example: createRequestBody.maxCreamsAllowed,
+                      require: true,
+                    },
+                    maxToppingsAllowed: {
+                      type: "number",
+                      example: createRequestBody.maxToppingsAllowed,
+                      require: true,
+                    },
+                    photo: {
+                      type: "string",
+                      example: createRequestBody.photo,
+                      require: false,
+                    },
+                    name: {
+                      type: "string",
+                      example: createRequestBody.name,
+                      require: false,
+                    },
+                    available: {
+                      type: "boolean",
+                      example: createRequestBody.available,
+                      require: false,
+                    },
+                  },
+                  required: [
+                    "maxCreamsAllowed",
+                    "maxToppingsAllowed",
+                    "price",
+                    "size",
+                  ],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful creating product",
+              content: {
+                "application/json": { example: createSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: createUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: createUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        get: {
+          summary: "List Products",
+          parameters: [
+            {
+              name: "page",
+              in: "query",
+              description: "Page to list products",
+              required: false,
+              schema: {
+                type: "number",
+                default: 1,
+              },
+            },
+            {
+              name: "perPage",
+              in: "query",
+              description: "How many products to return per page",
+              required: false,
+              schema: {
+                type: "number",
+                default: 10,
+              },
+            },
+            {
+              name: "orderBy",
+              in: "query",
+              description: "Order by some field table",
+              required: false,
+              schema: {
+                type: "string",
+                default: "createdAt:asc",
+              },
+            },
+            {
+              name: "filter",
+              in: "query",
+              description: "Filter products by some fields table",
+              required: false,
+              schema: {
+                type: "string",
+              },
+              example:
+                "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO",
+            },
+          ],
+          description:
+            "Retrieve a list of products based on optional query parameters.",
+          tags: ["Product"],
+          responses: {
+            "200": {
+              description: "Successful getting product",
+              content: {
+                "application/json": { example: listSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: listUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: listUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Many Products",
+          parameters: [
+            {
+              name: "ids",
+              in: "query",
+              description: "ids of products to delete",
+              required: true,
+              schema: {
+                type: "string",
+                default: "id-1,id-2",
+              },
+            },
+          ],
+          description: "Delete products based on ids query parameter.",
+          tags: ["Product"],
+          responses: {
+            "204": {
+              description: "Successful deleting products",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+      "/api/v1/resources/products/{id}": {
+        get: {
+          summary: "Get Product by ID",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Product to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Retrieve details of a specific Product by its ID.",
+          tags: ["Product"],
+          responses: {
+            "200": {
+              description: "Successful getting product",
+              content: {
+                "application/json": { example: getSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: getBadRequestBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: getUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        put: {
+          summary: "Update Product",
+          description: "Endpoint to update a Product to the system.",
+          tags: ["Product"],
+          requestBody: {
+            description: "Product details for updating",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: productsUpdated.name,
+                    },
+                    price: {
+                      type: "number",
+                      example: productsUpdated.price,
+                    },
+                    photo: {
+                      type: "string",
+                      example: productsUpdated.photo,
+                    },
+                    size: {
+                      type: "string",
+                      example: productsUpdated.size,
+                    },
+                    maxCreamsAllowed: {
+                      type: "string",
+                      example: productsUpdated.maxCreamsAllowed,
+                    },
+                    maxToppingsAllowed: {
+                      type: "string",
+                      example: productsUpdated.maxToppingsAllowed,
+                    },
+                    available: {
+                      type: "boolean",
+                      example: productsUpdated.available,
+                    },
+                  },
+                  required: ["name", "amount", "price", "unit"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful updating product",
+              content: {
+                "application/json": { example: updateSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: updateBadRequestBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: updateUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Many Products",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "id of product to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Delete product based on id path parameter.",
+          tags: ["Product"],
+          responses: {
+            "204": {
+              description: "Successful deleting product",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+    },
+  });
+
   return await prismaClient.user.deleteMany({
     where: {
       id: {
@@ -112,13 +504,6 @@ describe("CRUD PRODCUT RESOURCE", () => {
   let productsCreated: Array<CreateProductRequestBody>;
 
   describe("CREATE PRODUCT TEST", () => {
-    let createRequestBody: Omit<CreateProductRequestBody, "adminId"> = {
-      maxCreamsAllowed: 1,
-      maxToppingsAllowed: 1,
-      price: 1.99,
-      size: "small",
-      name: "TEST PRODUCT NAME CREATED",
-    };
     describe("CREATING AS AN ADMIN", () => {
       test(
         `When an Admin access POST ${basePath}` +
@@ -133,6 +518,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .expect(200);
 
           productCreated = response.body.data;
+
+          createSuccessBodyResponse = response.body;
 
           expect(response.body).toHaveProperty("data");
           expect(response.body.data).toHaveProperty(
@@ -173,6 +560,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(422);
+
+          createUnprocessableBodyResponse = response.body;
 
           expect(response.body).toHaveProperty("message");
           return expect(response.body.message).toContain(
@@ -255,6 +644,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .send(createRequestBody)
             .expect(401);
 
+          createUnauthorizedBodyResponse = response.body;
+
           return expect(response.body).toHaveProperty(
             "message",
             "No authorization required"
@@ -276,6 +667,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
+
+          getSuccessBodyResponse = response.body;
 
           expect(response.body).toHaveProperty("data");
           expect(response.body.data).toHaveProperty(
@@ -308,6 +701,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(400);
+
+          getBadRequestBodyResponse = response.body;
 
           expect(response.body).toHaveProperty("message");
           return expect(response.body.message).toContain("No Product found");
@@ -423,6 +818,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
           const response = await request(app)
             .get(setIdInBasePath(productCreated.id))
             .expect(401);
+
+          getUnauthorizedBodyResponse = response.body;
 
           expect(response.body).toHaveProperty("message");
           return expect(response.body.message).toContain(
@@ -746,26 +1143,20 @@ describe("CRUD PRODCUT RESOURCE", () => {
   });
 
   describe("UPDATE PRODUCT TESTS", () => {
-    let productsUpdated: UpdateProductRequestBody;
     describe("UPDATING PRODUCT AS AN ADMIN", () => {
       test(
         `When an Admin access PUT ${basePath}/:id` +
           " sending in body the parameters at least one of the parameters to update the product belongs to id sending in router params" +
           " then the response status code will be 200 and the body will return the product updated into data property",
         async () => {
-          productsUpdated = {
-            name: "Test Product updated as Admin",
-            available: false,
-            photo: "some-photo.jpg",
-            price: 12.5,
-          };
-
           const response = await request(app)
             .put(setIdInBasePath(productCreated.id))
             .send(productsUpdated)
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(200);
+
+          updateSuccessBodyResponse = response.body;
 
           expect(response.body).toHaveProperty(
             "message",
@@ -800,6 +1191,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .set("authorization", accessTokenAsAdmin)
             .set("refreshToken", refreshTokenAsAdmin)
             .expect(400);
+
+          updateBadRequestBodyResponse = response.body;
 
           return expect(response.body).toHaveProperty(
             "message",
@@ -880,6 +1273,8 @@ describe("CRUD PRODCUT RESOURCE", () => {
             .put(setIdInBasePath(productCreated.id))
             .send(productsUpdated)
             .expect(401);
+
+          updateUnauthorizedBodyResponse = response.body;
 
           return expect(response.body).toHaveProperty(
             "message",
