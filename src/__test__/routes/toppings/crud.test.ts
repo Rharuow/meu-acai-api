@@ -455,7 +455,7 @@ afterAll(async () => {
           ],
         },
         delete: {
-          summary: "Delete Many Toppings",
+          summary: "Delete Topping",
           parameters: [
             {
               name: "id",

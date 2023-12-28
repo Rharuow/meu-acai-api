@@ -2,6 +2,7 @@ import { createAdminController } from "@controllers/user/admin/create";
 import { updateAdminController } from "@controllers/user/admin/update";
 import { getUserController } from "@controllers/user/get";
 import { listUserController } from "@controllers/user/list";
+import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import {
   validationParams,
   validationQueryParams,
@@ -14,6 +15,7 @@ import { updateBodyUser } from "@middlewares/resources/user/updateBody";
 import { Router } from "express";
 import {
   Schema,
+  body,
   checkExact,
   checkSchema,
   param,
@@ -32,6 +34,18 @@ export const validationCreateAdminBodySchema: Schema = {
     notEmpty: true,
     isString: true,
     errorMessage: "password must be a string and not empty",
+  },
+  email: {
+    notEmpty: false,
+    optional: true,
+    isString: true,
+    errorMessage: "email must be a string",
+  },
+  phone: {
+    notEmpty: false,
+    optional: true,
+    isString: true,
+    errorMessage: "phone must be a string",
   },
   roleId: {
     notEmpty: true,
@@ -120,6 +134,17 @@ adminRouter.put(
 
 adminRouter.get(
   "/:userId/admins/:id",
+  checkExact(
+    [
+      body(["adminId"], "adminId parameter is required"),
+      param(["userId", "id"], "userId and id are required"),
+      query([], "Query parameters unpermitted"),
+    ],
+    {
+      message: "Param(s) not permitted",
+    }
+  ),
+  validationParams,
   addIncludesAdminAndRoleAtBody,
   getUserController
 );

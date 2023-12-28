@@ -6,6 +6,10 @@ import {
   cleanAdminTestDatabase,
   presetToAdminTests,
 } from "@/__test__/presets/routes/admin";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
+import swaggerDefinition from "@/swagger-spec.json";
+import { CreateAdminRequestBody } from "@/types/user/admin/createRequestBody";
+import { UpdateAdminRequestBody } from "@/types/user/admin/updateRequestBody";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -22,12 +26,16 @@ const userResourcePath = "/api/v1/resources/users";
 
 const adminResourcePath = "/api/v1/resources/users/admins";
 
-const createAdminBody = {
+const createAdminBody: Omit<CreateAdminRequestBody, "roleId"> = {
   name: "Test Admin Created",
   password: "123",
+  email: "admin@example.com",
+  phone: "123",
 };
 
-const updateAdminBody = {
+let admin: User;
+
+const updateAdminBody: UpdateAdminRequestBody = {
   name: "Test Admin Updated",
   email: "testadminupdated@mail.com",
   phone: "(00)000000000",
@@ -91,11 +99,383 @@ beforeAll(async () => {
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
 });
 
+let createSuccessBodyResponse = {};
+let createUnprocessableBodyResponse = {};
+let createUnauthorizedBodyResponse = {};
+
+let getSuccessBodyResponse = {};
+let getBadRequestBodyResponse = {};
+let getUnauthorizedBodyResponse = {};
+
+let listSuccessBodyResponse = {};
+let listUnprocessableBodyResponse = {};
+let listUnauthorizedBodyResponse = {};
+
+let updateSuccessBodyResponse = {};
+let updateBadRequestBodyResponse = {};
+let updateUnauthorizedBodyResponse = {};
+
 afterAll(async () => {
   await cleanAdminTestDatabase();
+
   await prismaClient.user.delete({
     where: {
       name: createAdminBody.name,
+    },
+  });
+
+  return await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/resources/users/admins": {
+        post: {
+          summary: "Create Admin",
+          description: "Endpoint to add a new Admin to the system.",
+          tags: ["Admin"],
+          requestBody: {
+            description: "Admin details for creation",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: createAdminBody.name,
+                      require: true,
+                    },
+                    password: {
+                      type: "string",
+                      example: createAdminBody.password,
+                      require: true,
+                    },
+                    email: {
+                      type: "string",
+                      example: createAdminBody.email,
+                      require: false,
+                    },
+                    phone: {
+                      type: "string",
+                      example: createAdminBody.phone,
+                      require: false,
+                    },
+                  },
+                  required: ["name", "password"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful creating admin",
+              content: {
+                "application/json": { example: createSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: createUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: createUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        get: {
+          summary: "List Admins",
+          parameters: [
+            {
+              name: "page",
+              in: "query",
+              description: "Page to list admins",
+              required: false,
+              schema: {
+                type: "number",
+                default: 1,
+              },
+            },
+            {
+              name: "perPage",
+              in: "query",
+              description: "How many admins to return per page",
+              required: false,
+              schema: {
+                type: "number",
+                default: 10,
+              },
+            },
+            {
+              name: "orderBy",
+              in: "query",
+              description: "Order by some field table",
+              required: false,
+              schema: {
+                type: "string",
+                default: "createdAt:asc",
+              },
+            },
+            {
+              name: "filter",
+              in: "query",
+              description: "Filter admins by some fields table",
+              required: false,
+              schema: {
+                type: "string",
+              },
+              example:
+                "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO",
+            },
+          ],
+          description:
+            "Retrieve a list of admins based on optional query parameters.",
+          tags: ["Admin"],
+          responses: {
+            "200": {
+              description: "Successful getting admin",
+              content: {
+                "application/json": { example: listSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: listUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: listUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Many Admins",
+          parameters: [
+            {
+              name: "ids",
+              in: "query",
+              description: "ids of admins to delete",
+              required: true,
+              schema: {
+                type: "string",
+                default: "id-1,id-2",
+              },
+            },
+          ],
+          description: "Delete admins based on ids query parameter.",
+          tags: ["Admin"],
+          responses: {
+            "204": {
+              description: "Successful deleting admins",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+      "/api/v1/resources/users/{userId}/admins/{id}": {
+        get: {
+          summary: "Get Admin by ID",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Admin to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "userId",
+              in: "path",
+              description: "ID of the User that is a Admin to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Retrieve details of a specific Admin by its ID.",
+          tags: ["Admin"],
+          responses: {
+            "200": {
+              description: "Successful getting admin",
+              content: {
+                "application/json": { example: getSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: getBadRequestBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: getUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        put: {
+          summary: "Update Admin",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Admin to update",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "userId",
+              in: "path",
+              description: "ID of the User that is a Admin to update",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Endpoint to update a Admin to the system.",
+          tags: ["Admin"],
+          requestBody: {
+            description: "Admin details for updating",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: updateAdminBody.name,
+                    },
+                    phone: {
+                      type: "string",
+                      example: updateAdminBody.phone,
+                    },
+                    email: {
+                      type: "string",
+                      example: updateAdminBody.email,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful updating admin",
+              content: {
+                "application/json": { example: updateSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: updateBadRequestBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: updateUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Admin",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "id of admin to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "userId",
+              in: "path",
+              description: "id of user that is a admin to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Delete admin based on id path parameter.",
+          tags: ["Admin"],
+          responses: {
+            "204": {
+              description: "Successful deleting admin",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
     },
   });
 });
@@ -114,6 +494,10 @@ describe("CRUD ADMIN RESOURCE", () => {
             .set("authorization", `Bearer ${accessTokenAsAdmin}`)
             .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
             .expect(200);
+
+          admin = response.body.data;
+
+          createSuccessBodyResponse = response.body;
 
           expect(response.body.data.user).toHaveProperty(
             "name",
@@ -152,6 +536,8 @@ describe("CRUD ADMIN RESOURCE", () => {
             .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
             .expect(422);
 
+          createUnprocessableBodyResponse = response.body;
+
           return expect(response.statusCode).toBe(422);
         }
       );
@@ -181,6 +567,8 @@ describe("CRUD ADMIN RESOURCE", () => {
             .post(adminResourcePath)
             .send(createAdminBody)
             .expect(401);
+
+          createUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }
@@ -240,6 +628,8 @@ describe("CRUD ADMIN RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(200);
 
+          updateSuccessBodyResponse = response.body;
+
           expect(response.body.data.user.name).toBe(updateAdminBody.name);
           expect(response.body.data.user).toHaveProperty("admin");
           expect(response.body.data.user.admin).toHaveProperty(
@@ -274,6 +664,8 @@ describe("CRUD ADMIN RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(400);
 
+          updateBadRequestBodyResponse = response.body;
+
           return expect(response.statusCode).toBe(400);
         }
       );
@@ -307,6 +699,8 @@ describe("CRUD ADMIN RESOURCE", () => {
             )
             .send(updateAdminBody)
             .expect(401);
+
+          updateUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }
@@ -357,22 +751,41 @@ describe("CRUD ADMIN RESOURCE", () => {
   describe("TEST TO GET ADMIN RESOURCE", () => {
     describe("GETTING ADMIN AS AN ADMIN", () => {
       test(
-        `When an authenticated ADMIN accesses GET ${adminResourcePath}/:id ` +
+        `When an authenticated ADMIN accesses GET ${userResourcePath}/:userId/admins/:id ` +
           "with the ID of the first admin, " +
           "then it should return the first admin and associated user created",
         async () => {
           const response = await request(app)
             .get(
-              userResourcePath + `/${userAdmin.id}/admins/${userAdmin.adminId}`
+              userResourcePath + `/${userAdmin.id}/admins/${userAdmin.admin.id}`
             )
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(200);
 
+          getSuccessBodyResponse = response.body;
+
           expect(response.body.data.user.name).toBe(userAdmin.name);
           expect(response.body.data.user.admin.id).toBe(userAdmin.admin.id);
           expect(response.body.data.user.roleId).toBe(userAdmin.roleId);
           return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an authenticated ADMIN accesses GET ${adminResourcePath}/:id ` +
+          "with invalid id in path parameter, " +
+          "then it should return the first admin and associated user created",
+        async () => {
+          const response = await request(app)
+            .get(userResourcePath + `/${userAdmin.id}/admins/invalid-id`)
+            .set("authorization", "Bearer " + accessTokenAsAdmin)
+            .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+            .expect(422);
+
+          getBadRequestBodyResponse = response.body;
+
+          return expect(response.statusCode).toBe(422);
         }
       );
 
@@ -386,6 +799,8 @@ describe("CRUD ADMIN RESOURCE", () => {
               userResourcePath + `/${userAdmin.id}/admins/${userAdmin.adminId}`
             )
             .expect(401);
+
+          getUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }
@@ -462,10 +877,29 @@ describe("CRUD ADMIN RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(200);
 
+          listSuccessBodyResponse = response.body;
+
           expect(response.body.data.length).toBe(10);
           expect(response.body.page).toBe(1);
           expect(response.body.hasNextPage).toBe(true);
           return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an authenticated admin accesses GET ${adminResourcePath} ` +
+          "sending invalid page param in query" +
+          "then it should return 422 status code",
+        async () => {
+          const response = await request(app)
+            .get(adminResourcePath + "?page=-1")
+            .set("authorization", "Bearer " + accessTokenAsAdmin)
+            .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+            .expect(422);
+
+          listUnprocessableBodyResponse = response.body;
+
+          return expect(response.statusCode).toBe(422);
         }
       );
 
@@ -476,6 +910,8 @@ describe("CRUD ADMIN RESOURCE", () => {
           const response = await request(app)
             .get(adminResourcePath)
             .expect(401);
+
+          listUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }

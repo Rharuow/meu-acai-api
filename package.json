@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "test": "jest --forceExit --runInBand --config ./jest.config.ts",
+    "test": "yarn generate-swagger && jest --forceExit --runInBand --config ./jest.config.ts",
     "generate-swagger": "ts-node ./src/generateSwagger.ts",
     "start": "node build/app.js",
     "dev": "nodemon"

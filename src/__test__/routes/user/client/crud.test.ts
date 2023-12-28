@@ -464,7 +464,7 @@ describe("CRUD CLIENT RESOURCE", () => {
           const response = await request(app)
             .get(
               userResourcePath +
-                `/${userClient.id}/clients/${userClient.clientId}`
+                `/${userClient.id}/clients/${userClient.client.id}`
             )
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
@@ -487,7 +487,7 @@ describe("CRUD CLIENT RESOURCE", () => {
           const response = await request(app)
             .get(
               userResourcePath +
-                `/${clientAuthenticated.id}/clients/${clientAuthenticated.clientId}`
+                `/${clientAuthenticated.id}/clients/${clientAuthenticated.client.id}`
             )
             .set("authorization", "Bearer " + accessTokenAsClient)
             .set("refreshToken", "Bearer " + refreshTokenAsClient)

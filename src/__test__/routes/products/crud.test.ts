@@ -448,7 +448,7 @@ afterAll(async () => {
           ],
         },
         delete: {
-          summary: "Delete Many Products",
+          summary: "Delete Product",
           parameters: [
             {
               name: "id",

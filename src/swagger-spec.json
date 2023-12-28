@@ -475,36 +475,15 @@
     }
   },
   "paths": {
-    "/api/v1": {
-      "get": {
-        "summary": "Welcome router",
-        "description": "This router return the 'welcome'",
-        "tags": [
-          "Wellcome"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Welcome to meu açai API"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/resources/creams": {
+    "/api/v1/resources/users/admins": {
       "post": {
-        "summary": "Create Cream",
-        "description": "Endpoint to add a new Cream to the system.",
+        "summary": "Create Admin",
+        "description": "Endpoint to add a new Admin to the system.",
         "tags": [
-          "Cream"
+          "Admin"
         ],
         "requestBody": {
-          "description": "Cream details for creation",
+          "description": "Admin details for creation",
           "required": true,
           "content": {
             "application/json": {
@@ -513,35 +492,28 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                    "example": "Test Cream",
+                    "example": "Test Admin Created",
                     "require": true
                   },
-                  "amount": {
-                    "type": "number",
-                    "example": 1,
-                    "require": true
-                  },
-                  "price": {
-                    "type": "number",
-                    "example": 9.99,
-                    "require": true
-                  },
-                  "unit": {
+                  "password": {
                     "type": "string",
-                    "example": "unit",
+                    "example": "123",
                     "require": true
                   },
-                  "photo": {
+                  "email": {
                     "type": "string",
-                    "example": "URL PHOTO",
+                    "example": "admin@example.com",
+                    "require": false
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "123",
                     "require": false
                   }
                 },
                 "required": [
                   "name",
-                  "amount",
-                  "price",
-                  "unit"
+                  "password"
                 ]
               }
             }
@@ -549,24 +521,40 @@
         },
         "responses": {
           "200": {
-            "description": "Successful creating cream",
+            "description": "Successful creating admin",
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Cream created successfully",
+                  "message": "User created successfully",
                   "data": {
-                    "id": "8011899c-bbd7-483f-983a-92ec7bfa55e7",
-                    "photo": "URL PHOTO",
-                    "name": "Test Cream",
-                    "isSpecial": false,
-                    "available": false,
-                    "price": 9.99,
-                    "amount": 1,
-                    "unit": "unit",
-                    "createdAt": "2023-12-27T21:23:48.611Z",
-                    "deletedAt": null,
-                    "updatedAt": "2023-12-27T21:23:48.611Z",
-                    "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                    "user": {
+                      "id": "04a090c2-f884-4cc4-b540-3791daf5506a",
+                      "createdAt": "2023-12-28T19:54:17.311Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:17.311Z",
+                      "name": "Test Admin Created",
+                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": {
+                        "id": "1b5f64be-972c-4252-8374-4f636076b85c",
+                        "createdAt": "2023-12-28T19:54:17.311Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T19:54:17.311Z",
+                        "email": "admin@example.com",
+                        "phone": "123",
+                        "userId": "04a090c2-f884-4cc4-b540-3791daf5506a"
+                      },
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    }
                   }
                 }
               }
@@ -577,7 +565,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "User haven't permission"
+                  "message": "No authorization required"
                 }
               }
             }
@@ -587,7 +575,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Unique constraint failed on the fields: name"
+                  "message": "password must be a string and not empty"
                 }
               }
             }
@@ -600,12 +588,12 @@
         ]
       },
       "get": {
-        "summary": "List Creams",
+        "summary": "List Admins",
         "parameters": [
           {
             "name": "page",
             "in": "query",
-            "description": "Page to list creams",
+            "description": "Page to list admins",
             "required": false,
             "schema": {
               "type": "number",
@@ -615,7 +603,7 @@
           {
             "name": "perPage",
             "in": "query",
-            "description": "How many creams to return per page",
+            "description": "How many admins to return per page",
             "required": false,
             "schema": {
               "type": "number",
@@ -635,7 +623,7 @@
           {
             "name": "filter",
             "in": "query",
-            "description": "Filter creams by some fields table",
+            "description": "Filter admins by some fields table",
             "required": false,
             "schema": {
               "type": "string"
@@ -643,161 +631,237 @@
             "example": "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO"
           }
         ],
-        "description": "Retrieve a list of creams based on optional query parameters.",
+        "description": "Retrieve a list of admins based on optional query parameters.",
         "tags": [
-          "Cream"
+          "Admin"
         ],
         "responses": {
           "200": {
-            "description": "Successful getting cream",
+            "description": "Successful getting admin",
             "content": {
               "application/json": {
                 "example": {
                   "data": [
                     {
-                      "id": "7dd5ea34-6055-4fa3-b620-596fa018a69a",
-                      "photo": null,
-                      "name": "Test to list creams 1",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 11,
-                      "amount": 2,
-                      "unit": "bag",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "30e1734f-7952-477a-8ae6-a3ead8b1c853",
+                      "createdAt": "2023-12-28T19:54:17.222Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.222Z",
+                      "name": "Test Admin Authenticate to admin crud test",
+                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": {
+                        "id": "cd615a21-deac-435a-b22d-fc1362263e82",
+                        "createdAt": "2023-12-28T19:54:17.222Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T19:54:17.366Z",
+                        "email": "testadminupdated@mail.com",
+                        "phone": "(00)000000000",
+                        "userId": "30e1734f-7952-477a-8ae6-a3ead8b1c853"
+                      },
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     },
                     {
-                      "id": "78ed4ac6-e806-4675-86ff-83f5b4f24ced",
-                      "photo": null,
-                      "name": "Test to list creams 2",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 12,
-                      "amount": 3,
-                      "unit": "box",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "04a090c2-f884-4cc4-b540-3791daf5506a",
+                      "createdAt": "2023-12-28T19:54:17.311Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.311Z",
+                      "name": "Test Admin Created",
+                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": {
+                        "id": "1b5f64be-972c-4252-8374-4f636076b85c",
+                        "createdAt": "2023-12-28T19:54:17.311Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T19:54:17.311Z",
+                        "email": "admin@example.com",
+                        "phone": "123",
+                        "userId": "04a090c2-f884-4cc4-b540-3791daf5506a"
+                      },
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     },
                     {
-                      "id": "44826869-0121-4b12-8c0a-69d0bffe02ee",
-                      "photo": null,
-                      "name": "Test to list creams 3",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 13,
-                      "amount": 4,
-                      "unit": "bag",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "415310fb-62e6-4ed2-9988-26235203ddae",
+                      "createdAt": "2023-12-28T19:54:17.428Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.428Z",
+                      "name": "Test Many Admins 1",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     },
                     {
-                      "id": "be4341b9-42be-4432-aa0a-c708eb6cc6fd",
-                      "photo": null,
-                      "name": "Test to list creams 4",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 14,
-                      "amount": 5,
-                      "unit": "box",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "177d76dd-3290-419a-92ad-24eb03c3e54a",
+                      "createdAt": "2023-12-28T19:54:17.428Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.428Z",
+                      "name": "Test Many Admins 2",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     },
                     {
-                      "id": "2b2a1df3-ecef-452f-8cc6-61f997df2530",
-                      "photo": null,
-                      "name": "Test to list creams 5",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 15,
-                      "amount": 6,
-                      "unit": "bag",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "e97a159c-6cda-4741-8eab-b3d421ab3e5a",
+                      "createdAt": "2023-12-28T19:54:17.428Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.428Z",
+                      "name": "Test Many Admins 3",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     },
                     {
-                      "id": "42a694d5-cd02-4f5f-ad27-286ecb561284",
-                      "photo": null,
-                      "name": "Test to list creams 6",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 16,
-                      "amount": 7,
-                      "unit": "box",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "ba0435fd-2754-447e-9bfb-710fb6d5b854",
+                      "createdAt": "2023-12-28T19:54:17.428Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.428Z",
+                      "name": "Test Many Admins 4",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     },
                     {
-                      "id": "a8c0bd71-3010-4209-8866-2d94fd51dcd5",
-                      "photo": null,
-                      "name": "Test to list creams 7",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 17,
-                      "amount": 8,
-                      "unit": "bag",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "e50c6373-2fba-4b02-afaf-4a42c8c7e187",
+                      "createdAt": "2023-12-28T19:54:17.428Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.428Z",
+                      "name": "Test Many Admins 5",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     },
                     {
-                      "id": "b9cafc9d-1702-4571-b37c-d650b123ab6f",
-                      "photo": null,
-                      "name": "Test to list creams 8",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 18,
-                      "amount": 9,
-                      "unit": "box",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "c361c52d-fcfe-46d1-947d-34b02b086ffc",
+                      "createdAt": "2023-12-28T19:54:17.428Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.428Z",
+                      "name": "Test Many Admins 6",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     },
                     {
-                      "id": "ed261448-3acc-455d-ab3f-77f6a0c8b881",
-                      "photo": null,
-                      "name": "Test to list creams 9",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 19,
-                      "amount": 10,
-                      "unit": "bag",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "cc9dc700-a4c7-4dd1-8fb1-bab6c5e958ad",
+                      "createdAt": "2023-12-28T19:54:17.428Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.428Z",
+                      "name": "Test Many Admins 7",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     },
                     {
-                      "id": "ccc04e88-e0d4-4fd2-8b1e-e8c7e871aa6a",
-                      "photo": null,
-                      "name": "Test to list creams 0",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 10,
-                      "amount": 1,
-                      "unit": "box",
-                      "createdAt": "2023-12-27T21:23:48.534Z",
+                      "id": "e547870c-6857-4f30-b74e-eedf84098331",
+                      "createdAt": "2023-12-28T19:54:17.428Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-27T21:23:48.534Z",
-                      "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                      "updatedAt": "2023-12-28T19:54:17.428Z",
+                      "name": "Test Many Admins 8",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
                     }
                   ],
                   "hasNextPage": true,
                   "page": 1,
-                  "totalPages": 3
+                  "totalPages": 2
                 }
               }
             }
@@ -807,7 +871,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Unauthorized: No access token provided"
+                  "message": "No authorization required"
                 }
               }
             }
@@ -817,7 +881,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Filter parameters not permitted"
+                  "message": "invalid parameters"
                 }
               }
             }
@@ -830,12 +894,12 @@
         ]
       },
       "delete": {
-        "summary": "Delete Many Creams",
+        "summary": "Delete Many Admins",
         "parameters": [
           {
             "name": "ids",
             "in": "query",
-            "description": "ids of creams to delete",
+            "description": "ids of admins to delete",
             "required": true,
             "schema": {
               "type": "string",
@@ -843,13 +907,13 @@
             }
           }
         ],
-        "description": "Delete creams based on ids query parameter.",
+        "description": "Delete admins based on ids query parameter.",
         "tags": [
-          "Cream"
+          "Admin"
         ],
         "responses": {
           "204": {
-            "description": "Successful deleting creams"
+            "description": "Successful deleting admins"
           },
           "401": {
             "description": "Unauthorized - Invalid credentials"
@@ -865,57 +929,68 @@
         ]
       }
     },
-    "/api/v1/signin": {
-      "post": {
-        "summary": "User Sign In",
-        "description": "Authenticate and sign in a user.",
-        "tags": [
-          "Authentication"
-        ],
-        "requestBody": {
-          "description": "User credentials for sign-in",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "example": "john_doe"
-                  },
-                  "password": {
-                    "type": "string",
-                    "example": "securepassword"
-                  }
-                },
-                "required": [
-                  "username",
-                  "password"
-                ]
-              }
+    "/api/v1/resources/users/{userId}/admins/{id}": {
+      "get": {
+        "summary": "Get Admin by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Admin to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of the User that is a Admin to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
+        "description": "Retrieve details of a specific Admin by its ID.",
+        "tags": [
+          "Admin"
+        ],
         "responses": {
           "200": {
-            "description": "Successful sign-in",
+            "description": "Successful getting admin",
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Token session created successfully",
-                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhkYTQ5YzQ3LTNiMzYtNDcxYS04ZGJkLTJkODBiN2QyNTMxZiIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzcxNTkwOSwiZXhwIjoxNzAzNzE1OTE0fQ.UDgAnukI9v1426QX5LGGeedg9hLe1M1tD-0Wdx7BR4c",
-                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhkYTQ5YzQ3LTNiMzYtNDcxYS04ZGJkLTJkODBiN2QyNTMxZiIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzcxNTkwOSwiZXhwIjoxNzAzNzE1OTE5fQ.QBFiLv0XMsK4EVPwCfu394mOnPzbyvIDklLPtXE6sNo",
-                  "user": {
-                    "id": "8da49c47-3b36-471a-8dbd-2d80b7d2531f",
-                    "name": "Test User Admin to sign in test",
-                    "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                    "role": {
-                      "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "createdAt": "2023-12-02T20:46:23.880Z",
+                  "message": "User founded successfully",
+                  "data": {
+                    "user": {
+                      "id": "30e1734f-7952-477a-8ae6-a3ead8b1c853",
+                      "createdAt": "2023-12-28T19:54:17.222Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-02T20:46:23.880Z",
-                      "name": "ADMIN"
+                      "updatedAt": "2023-12-28T19:54:17.222Z",
+                      "name": "Test Admin Authenticate to admin crud test",
+                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      },
+                      "admin": {
+                        "id": "cd615a21-deac-435a-b22d-fc1362263e82",
+                        "createdAt": "2023-12-28T19:54:17.222Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T19:54:17.366Z",
+                        "email": "testadminupdated@mail.com",
+                        "phone": "(00)000000000",
+                        "userId": "30e1734f-7952-477a-8ae6-a3ead8b1c853"
+                      }
                     }
                   }
                 }
@@ -927,7 +1002,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Token with user invalid"
+                  "message": "No authorization required"
                 }
               }
             }
@@ -937,70 +1012,9 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Param(s) not permitted"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/resources/creams/{id}": {
-      "get": {
-        "summary": "Get Cream by ID",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the Cream to retrieve",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "description": "Retrieve details of a specific Cream by its ID.",
-        "tags": [
-          "Cream"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful getting cream",
-            "content": {
-              "application/json": {
-                "example": {
-                  "id": "8011899c-bbd7-483f-983a-92ec7bfa55e7",
-                  "photo": "URL PHOTO",
-                  "name": "Test Cream",
-                  "isSpecial": false,
-                  "available": false,
-                  "price": 9.99,
-                  "amount": 1,
-                  "unit": "unit",
-                  "createdAt": "2023-12-27T21:23:48.611Z",
-                  "deletedAt": null,
-                  "updatedAt": "2023-12-27T21:23:48.611Z",
-                  "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Unauthorized: No access token provided"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "No Cream found"
+                  "message": {
+                    "message": "Error get a userAdmin does not belongs to this user"
+                  }
                 }
               }
             }
@@ -1013,13 +1027,33 @@
         ]
       },
       "put": {
-        "summary": "Update Cream",
-        "description": "Endpoint to update a Cream to the system.",
+        "summary": "Update Admin",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Admin to update",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of the User that is a Admin to update",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Endpoint to update a Admin to the system.",
         "tags": [
-          "Cream"
+          "Admin"
         ],
         "requestBody": {
-          "description": "Cream details for updating",
+          "description": "Admin details for updating",
           "required": true,
           "content": {
             "application/json": {
@@ -1028,51 +1062,41 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                    "example": "Test Cream Edited"
+                    "example": "Test Admin Updated"
                   },
-                  "amount": {
-                    "type": "number"
+                  "phone": {
+                    "type": "string",
+                    "example": "(00)000000000"
                   },
-                  "price": {
-                    "type": "number"
-                  },
-                  "unit": {
-                    "type": "string"
-                  },
-                  "photo": {
-                    "type": "string"
+                  "email": {
+                    "type": "string",
+                    "example": "testadminupdated@mail.com"
                   }
-                },
-                "required": [
-                  "name",
-                  "amount",
-                  "price",
-                  "unit"
-                ]
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Successful updating cream",
+            "description": "Successful updating admin",
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Cream updated successfully",
+                  "message": "User updated successfully",
                   "data": {
-                    "id": "8011899c-bbd7-483f-983a-92ec7bfa55e7",
-                    "photo": "URL PHOTO",
-                    "name": "Test Cream Edited",
-                    "isSpecial": false,
-                    "available": false,
-                    "price": 9.99,
-                    "amount": 1,
-                    "unit": "unit",
-                    "createdAt": "2023-12-27T21:23:48.611Z",
-                    "deletedAt": null,
-                    "updatedAt": "2023-12-27T21:23:48.690Z",
-                    "adminId": "03461fa3-d166-48fc-8261-a6a55345a03c"
+                    "user": {
+                      "name": "Test Admin Updated",
+                      "admin": {
+                        "id": "cd615a21-deac-435a-b22d-fc1362263e82",
+                        "createdAt": "2023-12-28T19:54:17.222Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T19:54:17.366Z",
+                        "email": "testadminupdated@mail.com",
+                        "phone": "(00)000000000",
+                        "userId": "30e1734f-7952-477a-8ae6-a3ead8b1c853"
+                      }
+                    }
                   }
                 }
               }
@@ -1083,7 +1107,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "User haven't permission"
+                  "message": "No authorization required"
                 }
               }
             }
@@ -1106,614 +1130,34 @@
         ]
       },
       "delete": {
-        "summary": "Delete Many Creams",
+        "summary": "Delete Admin",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "id of cream to delete",
+            "description": "id of admin to delete",
             "required": true,
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "description": "Delete cream based on id path parameter.",
-        "tags": [
-          "Cream"
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful deleting cream"
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials"
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid"
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/resources/toppings": {
-      "post": {
-        "summary": "Create Topping",
-        "description": "Endpoint to add a new Topping to the system.",
-        "tags": [
-          "Topping"
-        ],
-        "requestBody": {
-          "description": "Topping details for creation",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "example": "Test Topping created as Admin",
-                    "require": true
-                  },
-                  "amount": {
-                    "type": "number",
-                    "example": 2,
-                    "require": true
-                  },
-                  "price": {
-                    "type": "number",
-                    "example": 12.99,
-                    "require": true
-                  },
-                  "unit": {
-                    "type": "string",
-                    "example": "unidade",
-                    "require": true
-                  },
-                  "photo": {
-                    "type": "string",
-                    "example": "URL-PHOTO",
-                    "require": false
-                  },
-                  "available": {
-                    "type": "boolean",
-                    "example": true,
-                    "require": false
-                  },
-                  "isSpecial": {
-                    "type": "boolean",
-                    "example": false,
-                    "require": false
-                  }
-                },
-                "required": [
-                  "name",
-                  "amount",
-                  "price",
-                  "unit"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful creating topping",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Topping created successfully",
-                  "data": {
-                    "id": "a5629989-a0f4-4726-8884-1f3ba46fd9be",
-                    "createdAt": "2023-12-27T22:25:07.171Z",
-                    "deletedAt": null,
-                    "updatedAt": "2023-12-27T22:25:07.171Z",
-                    "name": "Test Topping created as Admin",
-                    "photo": "URL-PHOTO",
-                    "isSpecial": false,
-                    "available": true,
-                    "price": 12.99,
-                    "amount": 2,
-                    "unit": "unidade",
-                    "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "No authorization required"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "amount must be a number and not empty"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "get": {
-        "summary": "List Toppings",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Page to list toppings",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "default": 1
-            }
           },
           {
-            "name": "perPage",
-            "in": "query",
-            "description": "How many toppings to return per page",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "default": 10
-            }
-          },
-          {
-            "name": "orderBy",
-            "in": "query",
-            "description": "Order by some field table",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "createdAt:asc"
-            }
-          },
-          {
-            "name": "filter",
-            "in": "query",
-            "description": "Filter toppings by some fields table",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "example": "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO"
-          }
-        ],
-        "description": "Retrieve a list of toppings based on optional query parameters.",
-        "tags": [
-          "Topping"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful getting topping",
-            "content": {
-              "application/json": {
-                "example": {
-                  "data": [
-                    {
-                      "id": "a5629989-a0f4-4726-8884-1f3ba46fd9be",
-                      "createdAt": "2023-12-27T22:25:07.171Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.171Z",
-                      "name": "Test Topping created as Admin",
-                      "photo": "URL-PHOTO",
-                      "isSpecial": false,
-                      "available": true,
-                      "price": 12.99,
-                      "amount": 2,
-                      "unit": "unidade",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    },
-                    {
-                      "id": "c48f3383-946b-4333-890b-ccea035605d0",
-                      "createdAt": "2023-12-27T22:25:07.262Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.262Z",
-                      "name": "Test topping creating odd many 1",
-                      "photo": null,
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 1,
-                      "amount": 1,
-                      "unit": "litros",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    },
-                    {
-                      "id": "3649bf04-ee66-4aa4-8ee4-c688726f36f5",
-                      "createdAt": "2023-12-27T22:25:07.262Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.262Z",
-                      "name": "Test topping creating even many 6",
-                      "photo": null,
-                      "isSpecial": true,
-                      "available": true,
-                      "price": 106,
-                      "amount": 26,
-                      "unit": "bag",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    },
-                    {
-                      "id": "61c20a0f-2c24-4c48-ae7b-95b85cef5b86",
-                      "createdAt": "2023-12-27T22:25:07.262Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.262Z",
-                      "name": "Test topping creating odd many 3",
-                      "photo": null,
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 3,
-                      "amount": 3,
-                      "unit": "litros",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    },
-                    {
-                      "id": "64b5439d-e411-4ba9-a66b-c7ef4d0ae4d2",
-                      "createdAt": "2023-12-27T22:25:07.262Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.262Z",
-                      "name": "Test topping creating even many 4",
-                      "photo": null,
-                      "isSpecial": true,
-                      "available": true,
-                      "price": 104,
-                      "amount": 24,
-                      "unit": "bag",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    },
-                    {
-                      "id": "f619c927-79af-4f8f-9a43-572f7924f11e",
-                      "createdAt": "2023-12-27T22:25:07.262Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.262Z",
-                      "name": "Test topping creating odd many 5",
-                      "photo": null,
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 5,
-                      "amount": 5,
-                      "unit": "litros",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    },
-                    {
-                      "id": "e22ef44d-32c4-4800-b4ab-f8e25967629f",
-                      "createdAt": "2023-12-27T22:25:07.262Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.262Z",
-                      "name": "Test topping creating even many 2",
-                      "photo": null,
-                      "isSpecial": true,
-                      "available": true,
-                      "price": 102,
-                      "amount": 22,
-                      "unit": "bag",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    },
-                    {
-                      "id": "a66af103-2857-4054-8799-e069f31b48c7",
-                      "createdAt": "2023-12-27T22:25:07.262Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.262Z",
-                      "name": "Test topping creating odd many 7",
-                      "photo": null,
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 7,
-                      "amount": 7,
-                      "unit": "litros",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    },
-                    {
-                      "id": "bf8c8aea-df43-445b-87e0-1c5cfdf73cb8",
-                      "createdAt": "2023-12-27T22:25:07.262Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.262Z",
-                      "name": "Test topping creating even many 8",
-                      "photo": null,
-                      "isSpecial": true,
-                      "available": true,
-                      "price": 108,
-                      "amount": 28,
-                      "unit": "bag",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    },
-                    {
-                      "id": "f886bc59-37ea-41df-b607-1a1ce6181adf",
-                      "createdAt": "2023-12-27T22:25:07.262Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-27T22:25:07.262Z",
-                      "name": "Test topping creating even many 0",
-                      "photo": null,
-                      "isSpecial": true,
-                      "available": true,
-                      "price": 100,
-                      "amount": 20,
-                      "unit": "bag",
-                      "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                    }
-                  ],
-                  "hasNextPage": true,
-                  "page": 1,
-                  "totalPages": 3
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Unauthorized: No access token provided"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Unknown field(s)"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "summary": "Delete Many Toppings",
-        "parameters": [
-          {
-            "name": "ids",
-            "in": "query",
-            "description": "ids of toppings to delete",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "id-1,id-2"
-            }
-          }
-        ],
-        "description": "Delete toppings based on ids query parameter.",
-        "tags": [
-          "Topping"
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful deleting toppings"
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials"
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid"
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/resources/toppings/{id}": {
-      "get": {
-        "summary": "Get Topping by ID",
-        "parameters": [
-          {
-            "name": "id",
+            "name": "userId",
             "in": "path",
-            "description": "ID of the Topping to retrieve",
+            "description": "id of user that is a admin to delete",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
-        "description": "Retrieve details of a specific Topping by its ID.",
+        "description": "Delete admin based on id path parameter.",
         "tags": [
-          "Topping"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful getting topping",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Topping retrieved successfully",
-                  "data": {
-                    "id": "a5629989-a0f4-4726-8884-1f3ba46fd9be",
-                    "createdAt": "2023-12-27T22:25:07.171Z",
-                    "deletedAt": null,
-                    "updatedAt": "2023-12-27T22:25:07.171Z",
-                    "name": "Test Topping created as Admin",
-                    "photo": "URL-PHOTO",
-                    "isSpecial": false,
-                    "available": true,
-                    "price": 12.99,
-                    "amount": 2,
-                    "unit": "unidade",
-                    "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Unauthorized: No access token provided"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Error to retrivier topping: No Topping found"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "put": {
-        "summary": "Update Topping",
-        "description": "Endpoint to update a Topping to the system.",
-        "tags": [
-          "Topping"
-        ],
-        "requestBody": {
-          "description": "Topping details for updating",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "example": "Test Topping updated as Admin"
-                  },
-                  "amount": {
-                    "type": "number",
-                    "example": 2
-                  },
-                  "price": {
-                    "type": "number",
-                    "example": 12.5
-                  },
-                  "unit": {
-                    "type": "string",
-                    "example": "unit"
-                  },
-                  "photo": {
-                    "type": "string",
-                    "example": "some-photo.jpg"
-                  },
-                  "available": {
-                    "type": "boolean",
-                    "example": false
-                  },
-                  "isSpecial": {
-                    "type": "boolean",
-                    "example": true
-                  }
-                },
-                "required": [
-                  "name",
-                  "amount",
-                  "price",
-                  "unit"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful updating topping",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Topping updated successfully",
-                  "data": {
-                    "id": "a5629989-a0f4-4726-8884-1f3ba46fd9be",
-                    "createdAt": "2023-12-27T22:25:07.171Z",
-                    "deletedAt": null,
-                    "updatedAt": "2023-12-27T22:25:07.347Z",
-                    "name": "Test Topping updated as Admin",
-                    "photo": "some-photo.jpg",
-                    "isSpecial": true,
-                    "available": false,
-                    "price": 12.5,
-                    "amount": 2,
-                    "unit": "unit",
-                    "adminId": "c4c3f8f2-f7e5-463e-b189-6d078fc42f8d"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "User haven't permission"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "At least one body"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "summary": "Delete Many Toppings",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "id of topping to delete",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "description": "Delete topping based on id path parameter.",
-        "tags": [
-          "Topping"
+          "Admin"
         ],
         "responses": {
           "204": {
-            "description": "Successful deleting topping"
+            "description": "Successful deleting admin"
           },
           "401": {
             "description": "Unauthorized - Invalid credentials"
@@ -1798,18 +1242,18 @@
                 "example": {
                   "message": "Product created successfully",
                   "data": {
-                    "id": "fa1c72c1-96e6-46e7-a8d0-46ebd0baf716",
+                    "id": "fc46158a-eb0e-4624-a872-8d1c6ebb5fe2",
                     "size": "small",
                     "name": "TEST PRODUCT NAME CREATED",
-                    "createdAt": "2023-12-27T22:25:05.892Z",
+                    "createdAt": "2023-12-28T19:54:20.153Z",
                     "photo": "url-photo",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-27T22:25:05.892Z",
+                    "updatedAt": "2023-12-28T19:54:20.153Z",
                     "available": true,
                     "price": 1.99,
                     "maxCreamsAllowed": 1,
                     "maxToppingsAllowed": 1,
-                    "adminId": "1fd47e56-2817-4e96-8632-7c2ceef05a28"
+                    "adminId": "bd59f7bb-d3c2-40f2-9a6b-c9f18ab795cb"
                   }
                 }
               }
@@ -1984,18 +1428,18 @@
                 "example": {
                   "message": "Product retrieved successfully",
                   "data": {
-                    "id": "fa1c72c1-96e6-46e7-a8d0-46ebd0baf716",
+                    "id": "fc46158a-eb0e-4624-a872-8d1c6ebb5fe2",
                     "size": "small",
                     "name": "TEST PRODUCT NAME CREATED",
-                    "createdAt": "2023-12-27T22:25:05.892Z",
+                    "createdAt": "2023-12-28T19:54:20.153Z",
                     "photo": "url-photo",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-27T22:25:05.892Z",
+                    "updatedAt": "2023-12-28T19:54:20.153Z",
                     "available": true,
                     "price": 1.99,
                     "maxCreamsAllowed": 1,
                     "maxToppingsAllowed": 1,
-                    "adminId": "1fd47e56-2817-4e96-8632-7c2ceef05a28"
+                    "adminId": "bd59f7bb-d3c2-40f2-9a6b-c9f18ab795cb"
                   }
                 }
               }
@@ -2089,18 +1533,18 @@
                 "example": {
                   "message": "Product updated successfully",
                   "data": {
-                    "id": "fa1c72c1-96e6-46e7-a8d0-46ebd0baf716",
+                    "id": "fc46158a-eb0e-4624-a872-8d1c6ebb5fe2",
                     "size": "Update size product test",
                     "name": "Test Product updated as Admin",
-                    "createdAt": "2023-12-27T22:25:05.892Z",
+                    "createdAt": "2023-12-28T19:54:20.153Z",
                     "photo": "some-photo.jpg",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-27T22:25:06.060Z",
+                    "updatedAt": "2023-12-28T19:54:20.319Z",
                     "available": false,
                     "price": 12.5,
                     "maxCreamsAllowed": 2,
                     "maxToppingsAllowed": 2,
-                    "adminId": "1fd47e56-2817-4e96-8632-7c2ceef05a28"
+                    "adminId": "bd59f7bb-d3c2-40f2-9a6b-c9f18ab795cb"
                   }
                 }
               }
@@ -2134,7 +1578,7 @@
         ]
       },
       "delete": {
-        "summary": "Delete Many Products",
+        "summary": "Delete Product",
         "parameters": [
           {
             "name": "id",
@@ -2166,6 +1610,1260 @@
             "BearerAuth": []
           }
         ]
+      }
+    },
+    "/api/v1/resources/creams": {
+      "post": {
+        "summary": "Create Cream",
+        "description": "Endpoint to add a new Cream to the system.",
+        "tags": [
+          "Cream"
+        ],
+        "requestBody": {
+          "description": "Cream details for creation",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Cream",
+                    "require": true
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 1,
+                    "require": true
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 9.99,
+                    "require": true
+                  },
+                  "unit": {
+                    "type": "string",
+                    "example": "unit",
+                    "require": true
+                  },
+                  "photo": {
+                    "type": "string",
+                    "example": "URL PHOTO",
+                    "require": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "amount",
+                  "price",
+                  "unit"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful creating cream",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Cream created successfully",
+                  "data": {
+                    "id": "85bf4f7a-8bcb-41d2-aaae-6f46ee7a6c98",
+                    "photo": "URL PHOTO",
+                    "name": "Test Cream",
+                    "isSpecial": false,
+                    "available": false,
+                    "price": 9.99,
+                    "amount": 1,
+                    "unit": "unit",
+                    "createdAt": "2023-12-28T19:54:21.492Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-28T19:54:21.492Z",
+                    "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User haven't permission"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unique constraint failed on the fields: name"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "List Creams",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page to list creams",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "How many creams to return per page",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 10
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Order by some field table",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "createdAt:asc"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Filter creams by some fields table",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO"
+          }
+        ],
+        "description": "Retrieve a list of creams based on optional query parameters.",
+        "tags": [
+          "Cream"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting cream",
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": [
+                    {
+                      "id": "520a63c1-1df6-4264-b9d4-3aebbc6e8c5a",
+                      "photo": null,
+                      "name": "Test to list creams 1",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 11,
+                      "amount": 2,
+                      "unit": "bag",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    },
+                    {
+                      "id": "4136e2e1-d484-4893-aa3c-98b34c51265d",
+                      "photo": null,
+                      "name": "Test to list creams 2",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 12,
+                      "amount": 3,
+                      "unit": "box",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    },
+                    {
+                      "id": "637a224f-5eb8-4ba5-9dbd-7f5f36378f40",
+                      "photo": null,
+                      "name": "Test to list creams 3",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 13,
+                      "amount": 4,
+                      "unit": "bag",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    },
+                    {
+                      "id": "d91b2fdf-be34-4770-8bab-e9aaf388d0e4",
+                      "photo": null,
+                      "name": "Test to list creams 4",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 14,
+                      "amount": 5,
+                      "unit": "box",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    },
+                    {
+                      "id": "f4264e32-78fb-4b99-9bb1-6661273d1cd8",
+                      "photo": null,
+                      "name": "Test to list creams 5",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 15,
+                      "amount": 6,
+                      "unit": "bag",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    },
+                    {
+                      "id": "2235bcfb-cdd4-4a78-be08-f44581b51732",
+                      "photo": null,
+                      "name": "Test to list creams 6",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 16,
+                      "amount": 7,
+                      "unit": "box",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    },
+                    {
+                      "id": "45f87092-41ce-4917-ba51-5bbf53d3ce42",
+                      "photo": null,
+                      "name": "Test to list creams 7",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 17,
+                      "amount": 8,
+                      "unit": "bag",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    },
+                    {
+                      "id": "90fe0985-da4e-4050-bf25-1c9ba47f83ed",
+                      "photo": null,
+                      "name": "Test to list creams 8",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 18,
+                      "amount": 9,
+                      "unit": "box",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    },
+                    {
+                      "id": "eb7f6cdc-0c8b-4c7f-9b2d-2bfea3acbbf8",
+                      "photo": null,
+                      "name": "Test to list creams 9",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 19,
+                      "amount": 10,
+                      "unit": "bag",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    },
+                    {
+                      "id": "c85f9878-59a4-49e1-a595-4bda03395a9f",
+                      "photo": null,
+                      "name": "Test to list creams 0",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 10,
+                      "amount": 1,
+                      "unit": "box",
+                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:21.424Z",
+                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    }
+                  ],
+                  "hasNextPage": true,
+                  "page": 1,
+                  "totalPages": 3
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unauthorized: No access token provided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Filter parameters not permitted"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Many Creams",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "description": "ids of creams to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "id-1,id-2"
+            }
+          }
+        ],
+        "description": "Delete creams based on ids query parameter.",
+        "tags": [
+          "Cream"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deleting creams"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials"
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/resources/creams/{id}": {
+      "get": {
+        "summary": "Get Cream by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Cream to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Retrieve details of a specific Cream by its ID.",
+        "tags": [
+          "Cream"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting cream",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": "85bf4f7a-8bcb-41d2-aaae-6f46ee7a6c98",
+                  "photo": "URL PHOTO",
+                  "name": "Test Cream",
+                  "isSpecial": false,
+                  "available": false,
+                  "price": 9.99,
+                  "amount": 1,
+                  "unit": "unit",
+                  "createdAt": "2023-12-28T19:54:21.492Z",
+                  "deletedAt": null,
+                  "updatedAt": "2023-12-28T19:54:21.492Z",
+                  "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unauthorized: No access token provided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No Cream found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Cream",
+        "description": "Endpoint to update a Cream to the system.",
+        "tags": [
+          "Cream"
+        ],
+        "requestBody": {
+          "description": "Cream details for updating",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Cream Edited"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "price": {
+                    "type": "number"
+                  },
+                  "unit": {
+                    "type": "string"
+                  },
+                  "photo": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "amount",
+                  "price",
+                  "unit"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful updating cream",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Cream updated successfully",
+                  "data": {
+                    "id": "85bf4f7a-8bcb-41d2-aaae-6f46ee7a6c98",
+                    "photo": "URL PHOTO",
+                    "name": "Test Cream Edited",
+                    "isSpecial": false,
+                    "available": false,
+                    "price": 9.99,
+                    "amount": 1,
+                    "unit": "unit",
+                    "createdAt": "2023-12-28T19:54:21.492Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-28T19:54:21.570Z",
+                    "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User haven't permission"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "At least one property must exist in the request body"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Cream",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of cream to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Delete cream based on id path parameter.",
+        "tags": [
+          "Cream"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deleting cream"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials"
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/resources/toppings": {
+      "post": {
+        "summary": "Create Topping",
+        "description": "Endpoint to add a new Topping to the system.",
+        "tags": [
+          "Topping"
+        ],
+        "requestBody": {
+          "description": "Topping details for creation",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Topping created as Admin",
+                    "require": true
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 2,
+                    "require": true
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 12.99,
+                    "require": true
+                  },
+                  "unit": {
+                    "type": "string",
+                    "example": "unidade",
+                    "require": true
+                  },
+                  "photo": {
+                    "type": "string",
+                    "example": "URL-PHOTO",
+                    "require": false
+                  },
+                  "available": {
+                    "type": "boolean",
+                    "example": true,
+                    "require": false
+                  },
+                  "isSpecial": {
+                    "type": "boolean",
+                    "example": false,
+                    "require": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "amount",
+                  "price",
+                  "unit"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful creating topping",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Topping created successfully",
+                  "data": {
+                    "id": "534d99ed-d665-4241-b8d2-c9da3e7cca2b",
+                    "createdAt": "2023-12-28T19:54:23.977Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-28T19:54:23.977Z",
+                    "name": "Test Topping created as Admin",
+                    "photo": "URL-PHOTO",
+                    "isSpecial": false,
+                    "available": true,
+                    "price": 12.99,
+                    "amount": 2,
+                    "unit": "unidade",
+                    "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No authorization required"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "amount must be a number and not empty"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "List Toppings",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page to list toppings",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "How many toppings to return per page",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 10
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Order by some field table",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "createdAt:asc"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Filter toppings by some fields table",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO"
+          }
+        ],
+        "description": "Retrieve a list of toppings based on optional query parameters.",
+        "tags": [
+          "Topping"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting topping",
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": [
+                    {
+                      "id": "534d99ed-d665-4241-b8d2-c9da3e7cca2b",
+                      "createdAt": "2023-12-28T19:54:23.977Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:23.977Z",
+                      "name": "Test Topping created as Admin",
+                      "photo": "URL-PHOTO",
+                      "isSpecial": false,
+                      "available": true,
+                      "price": 12.99,
+                      "amount": 2,
+                      "unit": "unidade",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    },
+                    {
+                      "id": "927e01df-74f8-4c30-a68a-b97c75b70d67",
+                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "name": "Test topping creating odd many 1",
+                      "photo": null,
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 1,
+                      "amount": 1,
+                      "unit": "litros",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    },
+                    {
+                      "id": "9ed7f538-fbad-4cfc-8dbc-fbea2688a2c6",
+                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "name": "Test topping creating even many 6",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 106,
+                      "amount": 26,
+                      "unit": "bag",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    },
+                    {
+                      "id": "373f195b-05cf-4792-a6e6-87f3671fdb9f",
+                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "name": "Test topping creating odd many 3",
+                      "photo": null,
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 3,
+                      "amount": 3,
+                      "unit": "litros",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    },
+                    {
+                      "id": "ad04fdfa-6d33-42a0-8512-2827da28cc6d",
+                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "name": "Test topping creating even many 4",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 104,
+                      "amount": 24,
+                      "unit": "bag",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    },
+                    {
+                      "id": "439651b4-e695-4f25-aac1-3a6e9cef31fe",
+                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "name": "Test topping creating odd many 5",
+                      "photo": null,
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 5,
+                      "amount": 5,
+                      "unit": "litros",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    },
+                    {
+                      "id": "f3b4c327-dd0e-4e32-9a24-24fc09cddfa9",
+                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "name": "Test topping creating even many 2",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 102,
+                      "amount": 22,
+                      "unit": "bag",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    },
+                    {
+                      "id": "a6de0673-5daa-41d0-b1ce-ba800d609114",
+                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "name": "Test topping creating odd many 7",
+                      "photo": null,
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 7,
+                      "amount": 7,
+                      "unit": "litros",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    },
+                    {
+                      "id": "c79a3f51-6882-4cb5-ae59-b6edb5634b06",
+                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "name": "Test topping creating even many 8",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 108,
+                      "amount": 28,
+                      "unit": "bag",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    },
+                    {
+                      "id": "67057d62-3a6a-43e4-b4cd-241e7d23f917",
+                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "name": "Test topping creating even many 0",
+                      "photo": null,
+                      "isSpecial": true,
+                      "available": true,
+                      "price": 100,
+                      "amount": 20,
+                      "unit": "bag",
+                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    }
+                  ],
+                  "hasNextPage": true,
+                  "page": 1,
+                  "totalPages": 3
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unauthorized: No access token provided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unknown field(s)"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Many Toppings",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "description": "ids of toppings to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "id-1,id-2"
+            }
+          }
+        ],
+        "description": "Delete toppings based on ids query parameter.",
+        "tags": [
+          "Topping"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deleting toppings"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials"
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/resources/toppings/{id}": {
+      "get": {
+        "summary": "Get Topping by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Topping to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Retrieve details of a specific Topping by its ID.",
+        "tags": [
+          "Topping"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting topping",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Topping retrieved successfully",
+                  "data": {
+                    "id": "534d99ed-d665-4241-b8d2-c9da3e7cca2b",
+                    "createdAt": "2023-12-28T19:54:23.977Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-28T19:54:23.977Z",
+                    "name": "Test Topping created as Admin",
+                    "photo": "URL-PHOTO",
+                    "isSpecial": false,
+                    "available": true,
+                    "price": 12.99,
+                    "amount": 2,
+                    "unit": "unidade",
+                    "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unauthorized: No access token provided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Error to retrivier topping: No Topping found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Topping",
+        "description": "Endpoint to update a Topping to the system.",
+        "tags": [
+          "Topping"
+        ],
+        "requestBody": {
+          "description": "Topping details for updating",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Topping updated as Admin"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 2
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 12.5
+                  },
+                  "unit": {
+                    "type": "string",
+                    "example": "unit"
+                  },
+                  "photo": {
+                    "type": "string",
+                    "example": "some-photo.jpg"
+                  },
+                  "available": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "isSpecial": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                },
+                "required": [
+                  "name",
+                  "amount",
+                  "price",
+                  "unit"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful updating topping",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Topping updated successfully",
+                  "data": {
+                    "id": "534d99ed-d665-4241-b8d2-c9da3e7cca2b",
+                    "createdAt": "2023-12-28T19:54:23.977Z",
+                    "deletedAt": null,
+                    "updatedAt": "2023-12-28T19:54:24.137Z",
+                    "name": "Test Topping updated as Admin",
+                    "photo": "some-photo.jpg",
+                    "isSpecial": true,
+                    "available": false,
+                    "price": 12.5,
+                    "amount": 2,
+                    "unit": "unit",
+                    "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User haven't permission"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "At least one body"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Topping",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of topping to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Delete topping based on id path parameter.",
+        "tags": [
+          "Topping"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deleting topping"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials"
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/signin": {
+      "post": {
+        "summary": "User Sign In",
+        "description": "Authenticate and sign in a user.",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "description": "User credentials for sign-in",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "john_doe"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "securepassword"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful sign-in",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Token session created successfully",
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEzMTkwYjU4LWI4Y2MtNDA3NC1iM2Q4LTBlZGNmOTVmNjRjMiIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzc5MzI2NiwiZXhwIjoxNzAzNzkzMjcxfQ.76_UG5RRlYauxFNPAkAuksW7m8gXp8pJ523Hmxkdo8I",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEzMTkwYjU4LWI4Y2MtNDA3NC1iM2Q4LTBlZGNmOTVmNjRjMiIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzc5MzI2NiwiZXhwIjoxNzAzNzkzMjc2fQ.FwigyBVKm1zr1LwigDgyMTmbjlNVF-PCRJdFMSYd_NE",
+                  "user": {
+                    "id": "13190b58-b8cc-4074-b3d8-0edcf95f64c2",
+                    "name": "Test User Admin to sign in test",
+                    "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                    "role": {
+                      "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "createdAt": "2023-12-02T20:46:23.880Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-02T20:46:23.880Z",
+                      "name": "ADMIN"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Token with user invalid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Param(s) not permitted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1": {
+      "get": {
+        "summary": "Welcome router",
+        "description": "This router return the 'welcome'",
+        "tags": [
+          "Wellcome"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Welcome to meu açai API"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },

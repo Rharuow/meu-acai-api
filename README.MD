@@ -99,6 +99,14 @@ To get started with the Meu Açai API, follow these steps:
     - [x] Get
     - [x] Delete
     - [x] Delete Many
+  - [x] USER
+    - [x] ADMIN
+      - [x] Create
+      - [x] Update
+      - [x] List
+      - [x] Get
+      - [x] Delete
+      - [x] Delete Many
 
 - **TESTS:**
 
@@ -245,6 +253,7 @@ To get started with the Meu Açai API, follow these steps:
                   email?: string;
                   phone?: string
                   }
+            - [ ] Router to update password of ADMIN ( PUT /api/v1/resources/users/admins/:id/password )
             - [x] Router to get ADMIN ( GET /api/v1/resources/users/admins/:id )
             - [x] Router to list with pagination and filters ADMIN ( GET /api/v1/resources/users/admins)
             - [x] Router to delete ADMIN ( DELETE /api/v1/resources/users/:id )
@@ -270,6 +279,7 @@ To get started with the Meu Açai API, follow these steps:
                   email?: string;
                   phone?: string
                   }
+            - [ ] Router to update password of CLIENT ( PUT /api/v1/resources/users/clients/:id/password )
             - [x] Router to get CLIENT ( GET /api/v1/resources/users/clients/:id )
             - [x] Router to list with pagination and filters CLIENT ( GET /api/v1/resources/users/clients)
             - [x] Router to delete CLIENT ( DELETE /api/v1/resources/users/:id )
@@ -294,6 +304,7 @@ To get started with the Meu Açai API, follow these steps:
                   email?: string;
                   phone?: string
                   }
+            - [ ] Router to update password of MEMBER ( PUT /api/v1/resources/users/members/:id/password )
             - [x] Router to get Member ( GET "/api/v1/resources/users/members/:id" )
             - [x] Router to list with pagination and filters Member ( GET "/api/v1/resources/users/members/" )
             - [x] Router to delete many Member ( DELETE "/api/v1/resources/users/members/deleteMany?ids=id1&id2" )

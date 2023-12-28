@@ -21,7 +21,7 @@ type Params = {
   password: string;
 };
 
-type Includes = "Role" | "Admin" | "Member" | "Client";
+export type Includes = "Role" | "Admin" | "Member" | "Client";
 
 export type ParamsUser = FilterParams & {
   orderBy:

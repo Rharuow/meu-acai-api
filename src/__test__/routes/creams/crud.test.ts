@@ -390,7 +390,7 @@ afterAll(async () => {
           ],
         },
         delete: {
-          summary: "Delete Many Creams",
+          summary: "Delete Cream",
           parameters: [
             {
               name: "id",
