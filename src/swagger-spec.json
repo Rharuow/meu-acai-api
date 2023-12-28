@@ -475,602 +475,44 @@
     }
   },
   "paths": {
-    "/api/v1/resources/users/admins": {
-      "post": {
-        "summary": "Create Admin",
-        "description": "Endpoint to add a new Admin to the system.",
-        "tags": [
-          "Admin"
-        ],
-        "requestBody": {
-          "description": "Admin details for creation",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "example": "Test Admin Created",
-                    "require": true
-                  },
-                  "password": {
-                    "type": "string",
-                    "example": "123",
-                    "require": true
-                  },
-                  "email": {
-                    "type": "string",
-                    "example": "admin@example.com",
-                    "require": false
-                  },
-                  "phone": {
-                    "type": "string",
-                    "example": "123",
-                    "require": false
-                  }
-                },
-                "required": [
-                  "name",
-                  "password"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful creating admin",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "User created successfully",
-                  "data": {
-                    "user": {
-                      "id": "04a090c2-f884-4cc4-b540-3791daf5506a",
-                      "createdAt": "2023-12-28T19:54:17.311Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.311Z",
-                      "name": "Test Admin Created",
-                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": {
-                        "id": "1b5f64be-972c-4252-8374-4f636076b85c",
-                        "createdAt": "2023-12-28T19:54:17.311Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-28T19:54:17.311Z",
-                        "email": "admin@example.com",
-                        "phone": "123",
-                        "userId": "04a090c2-f884-4cc4-b540-3791daf5506a"
-                      },
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "No authorization required"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "password must be a string and not empty"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "get": {
-        "summary": "List Admins",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Page to list admins",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "default": 1
-            }
-          },
-          {
-            "name": "perPage",
-            "in": "query",
-            "description": "How many admins to return per page",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "default": 10
-            }
-          },
-          {
-            "name": "orderBy",
-            "in": "query",
-            "description": "Order by some field table",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "createdAt:asc"
-            }
-          },
-          {
-            "name": "filter",
-            "in": "query",
-            "description": "Filter admins by some fields table",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "example": "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO"
-          }
-        ],
-        "description": "Retrieve a list of admins based on optional query parameters.",
-        "tags": [
-          "Admin"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful getting admin",
-            "content": {
-              "application/json": {
-                "example": {
-                  "data": [
-                    {
-                      "id": "30e1734f-7952-477a-8ae6-a3ead8b1c853",
-                      "createdAt": "2023-12-28T19:54:17.222Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.222Z",
-                      "name": "Test Admin Authenticate to admin crud test",
-                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": {
-                        "id": "cd615a21-deac-435a-b22d-fc1362263e82",
-                        "createdAt": "2023-12-28T19:54:17.222Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-28T19:54:17.366Z",
-                        "email": "testadminupdated@mail.com",
-                        "phone": "(00)000000000",
-                        "userId": "30e1734f-7952-477a-8ae6-a3ead8b1c853"
-                      },
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    },
-                    {
-                      "id": "04a090c2-f884-4cc4-b540-3791daf5506a",
-                      "createdAt": "2023-12-28T19:54:17.311Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.311Z",
-                      "name": "Test Admin Created",
-                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": {
-                        "id": "1b5f64be-972c-4252-8374-4f636076b85c",
-                        "createdAt": "2023-12-28T19:54:17.311Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-28T19:54:17.311Z",
-                        "email": "admin@example.com",
-                        "phone": "123",
-                        "userId": "04a090c2-f884-4cc4-b540-3791daf5506a"
-                      },
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    },
-                    {
-                      "id": "415310fb-62e6-4ed2-9988-26235203ddae",
-                      "createdAt": "2023-12-28T19:54:17.428Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.428Z",
-                      "name": "Test Many Admins 1",
-                      "password": "123",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": null,
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    },
-                    {
-                      "id": "177d76dd-3290-419a-92ad-24eb03c3e54a",
-                      "createdAt": "2023-12-28T19:54:17.428Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.428Z",
-                      "name": "Test Many Admins 2",
-                      "password": "123",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": null,
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    },
-                    {
-                      "id": "e97a159c-6cda-4741-8eab-b3d421ab3e5a",
-                      "createdAt": "2023-12-28T19:54:17.428Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.428Z",
-                      "name": "Test Many Admins 3",
-                      "password": "123",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": null,
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    },
-                    {
-                      "id": "ba0435fd-2754-447e-9bfb-710fb6d5b854",
-                      "createdAt": "2023-12-28T19:54:17.428Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.428Z",
-                      "name": "Test Many Admins 4",
-                      "password": "123",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": null,
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    },
-                    {
-                      "id": "e50c6373-2fba-4b02-afaf-4a42c8c7e187",
-                      "createdAt": "2023-12-28T19:54:17.428Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.428Z",
-                      "name": "Test Many Admins 5",
-                      "password": "123",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": null,
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    },
-                    {
-                      "id": "c361c52d-fcfe-46d1-947d-34b02b086ffc",
-                      "createdAt": "2023-12-28T19:54:17.428Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.428Z",
-                      "name": "Test Many Admins 6",
-                      "password": "123",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": null,
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    },
-                    {
-                      "id": "cc9dc700-a4c7-4dd1-8fb1-bab6c5e958ad",
-                      "createdAt": "2023-12-28T19:54:17.428Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.428Z",
-                      "name": "Test Many Admins 7",
-                      "password": "123",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": null,
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    },
-                    {
-                      "id": "e547870c-6857-4f30-b74e-eedf84098331",
-                      "createdAt": "2023-12-28T19:54:17.428Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.428Z",
-                      "name": "Test Many Admins 8",
-                      "password": "123",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "admin": null,
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      }
-                    }
-                  ],
-                  "hasNextPage": true,
-                  "page": 1,
-                  "totalPages": 2
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "No authorization required"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "invalid parameters"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "summary": "Delete Many Admins",
-        "parameters": [
-          {
-            "name": "ids",
-            "in": "query",
-            "description": "ids of admins to delete",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "id-1,id-2"
-            }
-          }
-        ],
-        "description": "Delete admins based on ids query parameter.",
-        "tags": [
-          "Admin"
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful deleting admins"
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials"
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid"
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/resources/users/{userId}/admins/{id}": {
-      "get": {
-        "summary": "Get Admin by ID",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the Admin to retrieve",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of the User that is a Admin to retrieve",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "description": "Retrieve details of a specific Admin by its ID.",
-        "tags": [
-          "Admin"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful getting admin",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "User founded successfully",
-                  "data": {
-                    "user": {
-                      "id": "30e1734f-7952-477a-8ae6-a3ead8b1c853",
-                      "createdAt": "2023-12-28T19:54:17.222Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:17.222Z",
-                      "name": "Test Admin Authenticate to admin crud test",
-                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                      "adminId": null,
-                      "clientId": null,
-                      "memberId": null,
-                      "role": {
-                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
-                        "createdAt": "2023-12-02T20:46:23.880Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-02T20:46:23.880Z",
-                        "name": "ADMIN"
-                      },
-                      "admin": {
-                        "id": "cd615a21-deac-435a-b22d-fc1362263e82",
-                        "createdAt": "2023-12-28T19:54:17.222Z",
-                        "deletedAt": null,
-                        "updatedAt": "2023-12-28T19:54:17.366Z",
-                        "email": "testadminupdated@mail.com",
-                        "phone": "(00)000000000",
-                        "userId": "30e1734f-7952-477a-8ae6-a3ead8b1c853"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "No authorization required"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": {
-                    "message": "Error get a userAdmin does not belongs to this user"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
+    "/api/v1/resources/users/clients/{id}/change-address": {
       "put": {
-        "summary": "Update Admin",
+        "summary": "Update Address Client",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the Admin to update",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of the User that is a Admin to update",
+            "description": "ID of the Client that address to update",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
-        "description": "Endpoint to update a Admin to the system.",
+        "description": "Endpoint to update Address belongs to a Client to the system.",
         "tags": [
-          "Admin"
+          "Client"
         ],
         "requestBody": {
-          "description": "Admin details for updating",
+          "description": "Client's Address details for updating",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {
-                    "type": "string",
-                    "example": "Test Admin Updated"
-                  },
-                  "phone": {
-                    "type": "string",
-                    "example": "(00)000000000"
-                  },
-                  "email": {
-                    "type": "string",
-                    "example": "testadminupdated@mail.com"
+                  "address": {
+                    "type": "object",
+                    "properties": {
+                      "house": {
+                        "type": "stirng",
+                        "example": "new house create by member"
+                      },
+                      "square": {
+                        "type": "stirng",
+                        "example": "new house create by member"
+                      }
+                    }
                   }
                 }
               }
@@ -1079,25 +521,80 @@
         },
         "responses": {
           "200": {
-            "description": "Successful updating admin",
+            "description": "Successful updating address of the client",
             "content": {
               "application/json": {
                 "example": {
-                  "message": "User updated successfully",
+                  "message": "Client's address updated successfully",
                   "data": {
                     "user": {
-                      "name": "Test Admin Updated",
-                      "admin": {
-                        "id": "cd615a21-deac-435a-b22d-fc1362263e82",
-                        "createdAt": "2023-12-28T19:54:17.222Z",
+                      "id": "7132e07d-d95a-4faa-8a71-0baebbaf88ce",
+                      "createdAt": "2023-12-28T22:29:59.998Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:29:59.998Z",
+                      "name": "Test Client to change address",
+                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                      "roleId": "bce34a8f-b0d2-48da-b046-aca28ce84a35",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "role": {
+                        "id": "bce34a8f-b0d2-48da-b046-aca28ce84a35",
+                        "createdAt": "2023-12-02T20:46:23.884Z",
                         "deletedAt": null,
-                        "updatedAt": "2023-12-28T19:54:17.366Z",
-                        "email": "testadminupdated@mail.com",
-                        "phone": "(00)000000000",
-                        "userId": "30e1734f-7952-477a-8ae6-a3ead8b1c853"
+                        "updatedAt": "2023-12-02T20:46:23.884Z",
+                        "name": "CLIENT"
+                      },
+                      "client": {
+                        "id": "c1fe7194-a2b5-4b24-b0d8-41b4b88330d6",
+                        "createdAt": "2023-12-28T22:29:59.998Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T22:29:59.998Z",
+                        "email": "test@example.com",
+                        "phone": "123",
+                        "userId": "7132e07d-d95a-4faa-8a71-0baebbaf88ce",
+                        "addressId": null,
+                        "user": {
+                          "id": "7132e07d-d95a-4faa-8a71-0baebbaf88ce",
+                          "createdAt": "2023-12-28T22:29:59.998Z",
+                          "deletedAt": null,
+                          "updatedAt": "2023-12-28T22:29:59.998Z",
+                          "name": "Test Client to change address",
+                          "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                          "roleId": "bce34a8f-b0d2-48da-b046-aca28ce84a35",
+                          "adminId": null,
+                          "clientId": null,
+                          "memberId": null,
+                          "role": {
+                            "id": "bce34a8f-b0d2-48da-b046-aca28ce84a35",
+                            "createdAt": "2023-12-02T20:46:23.884Z",
+                            "deletedAt": null,
+                            "updatedAt": "2023-12-02T20:46:23.884Z",
+                            "name": "CLIENT"
+                          }
+                        },
+                        "address": {
+                          "id": "3f217c82-0724-4a33-b47a-4599352f0b48",
+                          "createdAt": "2023-12-28T22:29:59.998Z",
+                          "deletedAt": null,
+                          "updatedAt": "2023-12-28T22:30:00.102Z",
+                          "square": "new house create by admin",
+                          "house": "new house create by admin",
+                          "clientId": "c1fe7194-a2b5-4b24-b0d8-41b4b88330d6"
+                        }
                       }
                     }
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Id mismatch in user authenticated"
                 }
               }
             }
@@ -1107,7 +604,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "No authorization required"
+                  "message": "User has no permissions"
                 }
               }
             }
@@ -1117,53 +614,10 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "At least one property must exist in the request body"
+                  "message": "Address house must be a string and not empty"
                 }
               }
             }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "summary": "Delete Admin",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "id of admin to delete",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "id of user that is a admin to delete",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "description": "Delete admin based on id path parameter.",
-        "tags": [
-          "Admin"
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful deleting admin"
-          },
-          "401": {
-            "description": "Unauthorized - Invalid credentials"
-          },
-          "422": {
-            "description": "Unprocessable Entity - parameters are invalid"
           }
         },
         "security": [
@@ -1242,18 +696,18 @@
                 "example": {
                   "message": "Product created successfully",
                   "data": {
-                    "id": "fc46158a-eb0e-4624-a872-8d1c6ebb5fe2",
+                    "id": "503dcbd9-bf70-4984-9f05-e872536b9261",
                     "size": "small",
                     "name": "TEST PRODUCT NAME CREATED",
-                    "createdAt": "2023-12-28T19:54:20.153Z",
+                    "createdAt": "2023-12-28T22:30:04.497Z",
                     "photo": "url-photo",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-28T19:54:20.153Z",
+                    "updatedAt": "2023-12-28T22:30:04.497Z",
                     "available": true,
                     "price": 1.99,
                     "maxCreamsAllowed": 1,
                     "maxToppingsAllowed": 1,
-                    "adminId": "bd59f7bb-d3c2-40f2-9a6b-c9f18ab795cb"
+                    "adminId": "c7606347-1666-4123-8acd-21854ad18e52"
                   }
                 }
               }
@@ -1428,18 +882,18 @@
                 "example": {
                   "message": "Product retrieved successfully",
                   "data": {
-                    "id": "fc46158a-eb0e-4624-a872-8d1c6ebb5fe2",
+                    "id": "503dcbd9-bf70-4984-9f05-e872536b9261",
                     "size": "small",
                     "name": "TEST PRODUCT NAME CREATED",
-                    "createdAt": "2023-12-28T19:54:20.153Z",
+                    "createdAt": "2023-12-28T22:30:04.497Z",
                     "photo": "url-photo",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-28T19:54:20.153Z",
+                    "updatedAt": "2023-12-28T22:30:04.497Z",
                     "available": true,
                     "price": 1.99,
                     "maxCreamsAllowed": 1,
                     "maxToppingsAllowed": 1,
-                    "adminId": "bd59f7bb-d3c2-40f2-9a6b-c9f18ab795cb"
+                    "adminId": "c7606347-1666-4123-8acd-21854ad18e52"
                   }
                 }
               }
@@ -1533,18 +987,18 @@
                 "example": {
                   "message": "Product updated successfully",
                   "data": {
-                    "id": "fc46158a-eb0e-4624-a872-8d1c6ebb5fe2",
+                    "id": "503dcbd9-bf70-4984-9f05-e872536b9261",
                     "size": "Update size product test",
                     "name": "Test Product updated as Admin",
-                    "createdAt": "2023-12-28T19:54:20.153Z",
+                    "createdAt": "2023-12-28T22:30:04.497Z",
                     "photo": "some-photo.jpg",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-28T19:54:20.319Z",
+                    "updatedAt": "2023-12-28T22:30:04.667Z",
                     "available": false,
                     "price": 12.5,
                     "maxCreamsAllowed": 2,
                     "maxToppingsAllowed": 2,
-                    "adminId": "bd59f7bb-d3c2-40f2-9a6b-c9f18ab795cb"
+                    "adminId": "c7606347-1666-4123-8acd-21854ad18e52"
                   }
                 }
               }
@@ -1671,7 +1125,7 @@
                 "example": {
                   "message": "Cream created successfully",
                   "data": {
-                    "id": "85bf4f7a-8bcb-41d2-aaae-6f46ee7a6c98",
+                    "id": "8997612a-0d40-48cc-a4f4-70884684f0c6",
                     "photo": "URL PHOTO",
                     "name": "Test Cream",
                     "isSpecial": false,
@@ -1679,10 +1133,10 @@
                     "price": 9.99,
                     "amount": 1,
                     "unit": "unit",
-                    "createdAt": "2023-12-28T19:54:21.492Z",
+                    "createdAt": "2023-12-28T22:30:05.837Z",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-28T19:54:21.492Z",
-                    "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    "updatedAt": "2023-12-28T22:30:05.837Z",
+                    "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                   }
                 }
               }
@@ -1771,35 +1225,7 @@
                 "example": {
                   "data": [
                     {
-                      "id": "520a63c1-1df6-4264-b9d4-3aebbc6e8c5a",
-                      "photo": null,
-                      "name": "Test to list creams 1",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 11,
-                      "amount": 2,
-                      "unit": "bag",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
-                    },
-                    {
-                      "id": "4136e2e1-d484-4893-aa3c-98b34c51265d",
-                      "photo": null,
-                      "name": "Test to list creams 2",
-                      "isSpecial": false,
-                      "available": false,
-                      "price": 12,
-                      "amount": 3,
-                      "unit": "box",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
-                      "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
-                    },
-                    {
-                      "id": "637a224f-5eb8-4ba5-9dbd-7f5f36378f40",
+                      "id": "07f79d96-46fa-4199-9e8d-1b1c3fe4be6e",
                       "photo": null,
                       "name": "Test to list creams 3",
                       "isSpecial": false,
@@ -1807,13 +1233,13 @@
                       "price": 13,
                       "amount": 4,
                       "unit": "bag",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                     },
                     {
-                      "id": "d91b2fdf-be34-4770-8bab-e9aaf388d0e4",
+                      "id": "249780c4-557a-4a1c-9569-b66dcdd0c357",
                       "photo": null,
                       "name": "Test to list creams 4",
                       "isSpecial": false,
@@ -1821,13 +1247,13 @@
                       "price": 14,
                       "amount": 5,
                       "unit": "box",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                     },
                     {
-                      "id": "f4264e32-78fb-4b99-9bb1-6661273d1cd8",
+                      "id": "342c74f4-0107-4c5a-98cb-6e1fa29648ec",
                       "photo": null,
                       "name": "Test to list creams 5",
                       "isSpecial": false,
@@ -1835,13 +1261,13 @@
                       "price": 15,
                       "amount": 6,
                       "unit": "bag",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                     },
                     {
-                      "id": "2235bcfb-cdd4-4a78-be08-f44581b51732",
+                      "id": "e17e3e17-0987-4738-9d6a-5fbfec6095ed",
                       "photo": null,
                       "name": "Test to list creams 6",
                       "isSpecial": false,
@@ -1849,13 +1275,13 @@
                       "price": 16,
                       "amount": 7,
                       "unit": "box",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                     },
                     {
-                      "id": "45f87092-41ce-4917-ba51-5bbf53d3ce42",
+                      "id": "8785406b-5c74-4713-a10a-d4a598cafc43",
                       "photo": null,
                       "name": "Test to list creams 7",
                       "isSpecial": false,
@@ -1863,13 +1289,13 @@
                       "price": 17,
                       "amount": 8,
                       "unit": "bag",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                     },
                     {
-                      "id": "90fe0985-da4e-4050-bf25-1c9ba47f83ed",
+                      "id": "27273c52-2a3b-4acf-af20-c525d9018237",
                       "photo": null,
                       "name": "Test to list creams 8",
                       "isSpecial": false,
@@ -1877,13 +1303,13 @@
                       "price": 18,
                       "amount": 9,
                       "unit": "box",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                     },
                     {
-                      "id": "eb7f6cdc-0c8b-4c7f-9b2d-2bfea3acbbf8",
+                      "id": "df66e917-ea06-4628-b981-74382dd52c0e",
                       "photo": null,
                       "name": "Test to list creams 9",
                       "isSpecial": false,
@@ -1891,24 +1317,52 @@
                       "price": 19,
                       "amount": 10,
                       "unit": "bag",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                     },
                     {
-                      "id": "c85f9878-59a4-49e1-a595-4bda03395a9f",
+                      "id": "c828dc48-be91-4b73-8fcd-120e21947596",
                       "photo": null,
-                      "name": "Test to list creams 0",
+                      "name": "Test to list creams 10",
                       "isSpecial": false,
                       "available": false,
-                      "price": 10,
-                      "amount": 1,
+                      "price": 20,
+                      "amount": 11,
                       "unit": "box",
-                      "createdAt": "2023-12-28T19:54:21.424Z",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:21.424Z",
-                      "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
+                    },
+                    {
+                      "id": "76115c54-599e-4197-a9ea-55b8fdfb57a2",
+                      "photo": null,
+                      "name": "Test to list creams 11",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 21,
+                      "amount": 12,
+                      "unit": "bag",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
+                    },
+                    {
+                      "id": "98429a46-9ec5-423d-b4e1-a6eba4d2c053",
+                      "photo": null,
+                      "name": "Test to list creams 2",
+                      "isSpecial": false,
+                      "available": false,
+                      "price": 12,
+                      "amount": 3,
+                      "unit": "box",
+                      "createdAt": "2023-12-28T22:30:05.772Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:05.772Z",
+                      "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                     }
                   ],
                   "hasNextPage": true,
@@ -2005,7 +1459,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "id": "85bf4f7a-8bcb-41d2-aaae-6f46ee7a6c98",
+                  "id": "8997612a-0d40-48cc-a4f4-70884684f0c6",
                   "photo": "URL PHOTO",
                   "name": "Test Cream",
                   "isSpecial": false,
@@ -2013,10 +1467,10 @@
                   "price": 9.99,
                   "amount": 1,
                   "unit": "unit",
-                  "createdAt": "2023-12-28T19:54:21.492Z",
+                  "createdAt": "2023-12-28T22:30:05.837Z",
                   "deletedAt": null,
-                  "updatedAt": "2023-12-28T19:54:21.492Z",
-                  "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                  "updatedAt": "2023-12-28T22:30:05.837Z",
+                  "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                 }
               }
             }
@@ -2097,7 +1551,7 @@
                 "example": {
                   "message": "Cream updated successfully",
                   "data": {
-                    "id": "85bf4f7a-8bcb-41d2-aaae-6f46ee7a6c98",
+                    "id": "8997612a-0d40-48cc-a4f4-70884684f0c6",
                     "photo": "URL PHOTO",
                     "name": "Test Cream Edited",
                     "isSpecial": false,
@@ -2105,10 +1559,10 @@
                     "price": 9.99,
                     "amount": 1,
                     "unit": "unit",
-                    "createdAt": "2023-12-28T19:54:21.492Z",
+                    "createdAt": "2023-12-28T22:30:05.837Z",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-28T19:54:21.570Z",
-                    "adminId": "8df71a1a-c3b7-4896-9667-861c33e782e0"
+                    "updatedAt": "2023-12-28T22:30:05.930Z",
+                    "adminId": "017d5195-afc5-4019-9987-5b755104c332"
                   }
                 }
               }
@@ -2245,10 +1699,10 @@
                 "example": {
                   "message": "Topping created successfully",
                   "data": {
-                    "id": "534d99ed-d665-4241-b8d2-c9da3e7cca2b",
-                    "createdAt": "2023-12-28T19:54:23.977Z",
+                    "id": "eb1308ad-659e-45ea-b97f-154229e308f2",
+                    "createdAt": "2023-12-28T22:30:07.122Z",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-28T19:54:23.977Z",
+                    "updatedAt": "2023-12-28T22:30:07.122Z",
                     "name": "Test Topping created as Admin",
                     "photo": "URL-PHOTO",
                     "isSpecial": false,
@@ -2256,7 +1710,7 @@
                     "price": 12.99,
                     "amount": 2,
                     "unit": "unidade",
-                    "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                   }
                 }
               }
@@ -2345,10 +1799,10 @@
                 "example": {
                   "data": [
                     {
-                      "id": "534d99ed-d665-4241-b8d2-c9da3e7cca2b",
-                      "createdAt": "2023-12-28T19:54:23.977Z",
+                      "id": "eb1308ad-659e-45ea-b97f-154229e308f2",
+                      "createdAt": "2023-12-28T22:30:07.122Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:23.977Z",
+                      "updatedAt": "2023-12-28T22:30:07.122Z",
                       "name": "Test Topping created as Admin",
                       "photo": "URL-PHOTO",
                       "isSpecial": false,
@@ -2356,13 +1810,13 @@
                       "price": 12.99,
                       "amount": 2,
                       "unit": "unidade",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     },
                     {
-                      "id": "927e01df-74f8-4c30-a68a-b97c75b70d67",
-                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "id": "f7115ba6-cd74-483a-a2ab-bec3b293fef5",
+                      "createdAt": "2023-12-28T22:30:07.204Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "updatedAt": "2023-12-28T22:30:07.204Z",
                       "name": "Test topping creating odd many 1",
                       "photo": null,
                       "isSpecial": false,
@@ -2370,13 +1824,13 @@
                       "price": 1,
                       "amount": 1,
                       "unit": "litros",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     },
                     {
-                      "id": "9ed7f538-fbad-4cfc-8dbc-fbea2688a2c6",
-                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "id": "0978a521-46d4-47cc-9e05-4401b5f2f63c",
+                      "createdAt": "2023-12-28T22:30:07.204Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "updatedAt": "2023-12-28T22:30:07.204Z",
                       "name": "Test topping creating even many 6",
                       "photo": null,
                       "isSpecial": true,
@@ -2384,13 +1838,13 @@
                       "price": 106,
                       "amount": 26,
                       "unit": "bag",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     },
                     {
-                      "id": "373f195b-05cf-4792-a6e6-87f3671fdb9f",
-                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "id": "ca18e8d7-d552-4ec9-b461-5c80181d4a2d",
+                      "createdAt": "2023-12-28T22:30:07.204Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "updatedAt": "2023-12-28T22:30:07.204Z",
                       "name": "Test topping creating odd many 3",
                       "photo": null,
                       "isSpecial": false,
@@ -2398,13 +1852,13 @@
                       "price": 3,
                       "amount": 3,
                       "unit": "litros",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     },
                     {
-                      "id": "ad04fdfa-6d33-42a0-8512-2827da28cc6d",
-                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "id": "49546a16-1677-4177-b88a-70619b5a4933",
+                      "createdAt": "2023-12-28T22:30:07.204Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "updatedAt": "2023-12-28T22:30:07.204Z",
                       "name": "Test topping creating even many 4",
                       "photo": null,
                       "isSpecial": true,
@@ -2412,13 +1866,13 @@
                       "price": 104,
                       "amount": 24,
                       "unit": "bag",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     },
                     {
-                      "id": "439651b4-e695-4f25-aac1-3a6e9cef31fe",
-                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "id": "1cabf0f2-3245-4e56-ae4a-cb31fea3b8ce",
+                      "createdAt": "2023-12-28T22:30:07.204Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "updatedAt": "2023-12-28T22:30:07.204Z",
                       "name": "Test topping creating odd many 5",
                       "photo": null,
                       "isSpecial": false,
@@ -2426,13 +1880,13 @@
                       "price": 5,
                       "amount": 5,
                       "unit": "litros",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     },
                     {
-                      "id": "f3b4c327-dd0e-4e32-9a24-24fc09cddfa9",
-                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "id": "257eeb14-81d4-4475-a5f4-7b922b0049df",
+                      "createdAt": "2023-12-28T22:30:07.204Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "updatedAt": "2023-12-28T22:30:07.204Z",
                       "name": "Test topping creating even many 2",
                       "photo": null,
                       "isSpecial": true,
@@ -2440,13 +1894,13 @@
                       "price": 102,
                       "amount": 22,
                       "unit": "bag",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     },
                     {
-                      "id": "a6de0673-5daa-41d0-b1ce-ba800d609114",
-                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "id": "e7fa689a-95df-41ee-b5b0-a81511cd7f6c",
+                      "createdAt": "2023-12-28T22:30:07.204Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "updatedAt": "2023-12-28T22:30:07.204Z",
                       "name": "Test topping creating odd many 7",
                       "photo": null,
                       "isSpecial": false,
@@ -2454,13 +1908,13 @@
                       "price": 7,
                       "amount": 7,
                       "unit": "litros",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     },
                     {
-                      "id": "c79a3f51-6882-4cb5-ae59-b6edb5634b06",
-                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "id": "75d06e6e-9fdb-46a4-952c-98600ab87e11",
+                      "createdAt": "2023-12-28T22:30:07.204Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "updatedAt": "2023-12-28T22:30:07.204Z",
                       "name": "Test topping creating even many 8",
                       "photo": null,
                       "isSpecial": true,
@@ -2468,13 +1922,13 @@
                       "price": 108,
                       "amount": 28,
                       "unit": "bag",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     },
                     {
-                      "id": "67057d62-3a6a-43e4-b4cd-241e7d23f917",
-                      "createdAt": "2023-12-28T19:54:24.055Z",
+                      "id": "d78200ff-896e-48fa-96c5-8cb8ffa28a08",
+                      "createdAt": "2023-12-28T22:30:07.204Z",
                       "deletedAt": null,
-                      "updatedAt": "2023-12-28T19:54:24.055Z",
+                      "updatedAt": "2023-12-28T22:30:07.204Z",
                       "name": "Test topping creating even many 0",
                       "photo": null,
                       "isSpecial": true,
@@ -2482,7 +1936,7 @@
                       "price": 100,
                       "amount": 20,
                       "unit": "bag",
-                      "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                      "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                     }
                   ],
                   "hasNextPage": true,
@@ -2581,10 +2035,10 @@
                 "example": {
                   "message": "Topping retrieved successfully",
                   "data": {
-                    "id": "534d99ed-d665-4241-b8d2-c9da3e7cca2b",
-                    "createdAt": "2023-12-28T19:54:23.977Z",
+                    "id": "eb1308ad-659e-45ea-b97f-154229e308f2",
+                    "createdAt": "2023-12-28T22:30:07.122Z",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-28T19:54:23.977Z",
+                    "updatedAt": "2023-12-28T22:30:07.122Z",
                     "name": "Test Topping created as Admin",
                     "photo": "URL-PHOTO",
                     "isSpecial": false,
@@ -2592,7 +2046,7 @@
                     "price": 12.99,
                     "amount": 2,
                     "unit": "unidade",
-                    "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                   }
                 }
               }
@@ -2686,10 +2140,10 @@
                 "example": {
                   "message": "Topping updated successfully",
                   "data": {
-                    "id": "534d99ed-d665-4241-b8d2-c9da3e7cca2b",
-                    "createdAt": "2023-12-28T19:54:23.977Z",
+                    "id": "eb1308ad-659e-45ea-b97f-154229e308f2",
+                    "createdAt": "2023-12-28T22:30:07.122Z",
                     "deletedAt": null,
-                    "updatedAt": "2023-12-28T19:54:24.137Z",
+                    "updatedAt": "2023-12-28T22:30:07.287Z",
                     "name": "Test Topping updated as Admin",
                     "photo": "some-photo.jpg",
                     "isSpecial": true,
@@ -2697,7 +2151,7 @@
                     "price": 12.5,
                     "amount": 2,
                     "unit": "unit",
-                    "adminId": "65c73458-1d0a-4a2f-b467-2cb65f77ca99"
+                    "adminId": "c3575ca0-9e98-471e-8802-19d1a6aaa411"
                   }
                 }
               }
@@ -2765,6 +2219,704 @@
         ]
       }
     },
+    "/api/v1/resources/users/admins": {
+      "post": {
+        "summary": "Create Admin",
+        "description": "Endpoint to add a new Admin to the system.",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "description": "Admin details for creation",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Admin Created",
+                    "require": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "123",
+                    "require": true
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "admin@example.com",
+                    "require": false
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "123",
+                    "require": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful creating admin",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User created successfully",
+                  "data": {
+                    "user": {
+                      "id": "2bbc07fa-5369-42a6-92c0-b1d068321f03",
+                      "createdAt": "2023-12-28T22:30:08.346Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.346Z",
+                      "name": "Test Admin Created",
+                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": {
+                        "id": "4abe4c27-5d9d-457d-89e6-c70a32e727a8",
+                        "createdAt": "2023-12-28T22:30:08.346Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T22:30:08.346Z",
+                        "email": "admin@example.com",
+                        "phone": "123",
+                        "userId": "2bbc07fa-5369-42a6-92c0-b1d068321f03"
+                      },
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No authorization required"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "password must be a string and not empty"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "List Admins",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page to list admins",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "How many admins to return per page",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 10
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Order by some field table",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "createdAt:asc"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Filter admins by some fields table",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO"
+          }
+        ],
+        "description": "Retrieve a list of admins based on optional query parameters.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting admin",
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": [
+                    {
+                      "id": "c8a31381-4cca-401f-8f7a-6e853e6128ac",
+                      "createdAt": "2023-12-28T22:30:08.278Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.278Z",
+                      "name": "Test Admin Authenticate to admin crud test",
+                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": {
+                        "id": "a32f0f26-92f4-4c0c-b11d-32121c3b5321",
+                        "createdAt": "2023-12-28T22:30:08.278Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T22:30:08.399Z",
+                        "email": "testadminupdated@mail.com",
+                        "phone": "(00)000000000",
+                        "userId": "c8a31381-4cca-401f-8f7a-6e853e6128ac"
+                      },
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    },
+                    {
+                      "id": "2bbc07fa-5369-42a6-92c0-b1d068321f03",
+                      "createdAt": "2023-12-28T22:30:08.346Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.346Z",
+                      "name": "Test Admin Created",
+                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": {
+                        "id": "4abe4c27-5d9d-457d-89e6-c70a32e727a8",
+                        "createdAt": "2023-12-28T22:30:08.346Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T22:30:08.346Z",
+                        "email": "admin@example.com",
+                        "phone": "123",
+                        "userId": "2bbc07fa-5369-42a6-92c0-b1d068321f03"
+                      },
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    },
+                    {
+                      "id": "bf256d52-0afc-467b-907d-20180a66eef5",
+                      "createdAt": "2023-12-28T22:30:08.460Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.460Z",
+                      "name": "Test Many Admins 1",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    },
+                    {
+                      "id": "76b2a165-53b0-48b0-b966-e97b696db71c",
+                      "createdAt": "2023-12-28T22:30:08.460Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.460Z",
+                      "name": "Test Many Admins 2",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    },
+                    {
+                      "id": "3ae9a7a3-350d-4190-b0ca-06cb7e7c0be1",
+                      "createdAt": "2023-12-28T22:30:08.460Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.460Z",
+                      "name": "Test Many Admins 3",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    },
+                    {
+                      "id": "e2605f43-18df-447a-904a-2990d25b96fb",
+                      "createdAt": "2023-12-28T22:30:08.460Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.460Z",
+                      "name": "Test Many Admins 4",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    },
+                    {
+                      "id": "fab5394c-bc31-4614-8f1f-9decf181e78c",
+                      "createdAt": "2023-12-28T22:30:08.460Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.460Z",
+                      "name": "Test Many Admins 5",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    },
+                    {
+                      "id": "6c50d1dd-bb85-4475-b761-733f25176fe2",
+                      "createdAt": "2023-12-28T22:30:08.460Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.460Z",
+                      "name": "Test Many Admins 6",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    },
+                    {
+                      "id": "5e59d7bf-d6c6-4018-b51e-3b8e70865a6b",
+                      "createdAt": "2023-12-28T22:30:08.460Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.460Z",
+                      "name": "Test Many Admins 7",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    },
+                    {
+                      "id": "d6d2e737-1eb0-4227-aaa0-58eed9e8f081",
+                      "createdAt": "2023-12-28T22:30:08.460Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.460Z",
+                      "name": "Test Many Admins 8",
+                      "password": "123",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "admin": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      }
+                    }
+                  ],
+                  "hasNextPage": true,
+                  "page": 1,
+                  "totalPages": 2
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No authorization required"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "invalid parameters"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Many Admins",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "description": "ids of admins to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "id-1,id-2"
+            }
+          }
+        ],
+        "description": "Delete admins based on ids query parameter.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deleting admins"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials"
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/resources/users/{userId}/admins/{id}": {
+      "get": {
+        "summary": "Get Admin by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Admin to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of the User that is a Admin to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Retrieve details of a specific Admin by its ID.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful getting admin",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User founded successfully",
+                  "data": {
+                    "user": {
+                      "id": "c8a31381-4cca-401f-8f7a-6e853e6128ac",
+                      "createdAt": "2023-12-28T22:30:08.278Z",
+                      "deletedAt": null,
+                      "updatedAt": "2023-12-28T22:30:08.278Z",
+                      "name": "Test Admin Authenticate to admin crud test",
+                      "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+                      "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                      "adminId": null,
+                      "clientId": null,
+                      "memberId": null,
+                      "role": {
+                        "id": "65bccb40-8221-467b-bea6-c9ba84adabf4",
+                        "createdAt": "2023-12-02T20:46:23.880Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-02T20:46:23.880Z",
+                        "name": "ADMIN"
+                      },
+                      "admin": {
+                        "id": "a32f0f26-92f4-4c0c-b11d-32121c3b5321",
+                        "createdAt": "2023-12-28T22:30:08.278Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T22:30:08.399Z",
+                        "email": "testadminupdated@mail.com",
+                        "phone": "(00)000000000",
+                        "userId": "c8a31381-4cca-401f-8f7a-6e853e6128ac"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No authorization required"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": {
+                    "message": "Error get a userAdmin does not belongs to this user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Admin",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Admin to update",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of the User that is a Admin to update",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Endpoint to update a Admin to the system.",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "description": "Admin details for updating",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Test Admin Updated"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "(00)000000000"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "testadminupdated@mail.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful updating admin",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User updated successfully",
+                  "data": {
+                    "user": {
+                      "name": "Test Admin Updated",
+                      "admin": {
+                        "id": "a32f0f26-92f4-4c0c-b11d-32121c3b5321",
+                        "createdAt": "2023-12-28T22:30:08.278Z",
+                        "deletedAt": null,
+                        "updatedAt": "2023-12-28T22:30:08.399Z",
+                        "email": "testadminupdated@mail.com",
+                        "phone": "(00)000000000",
+                        "userId": "c8a31381-4cca-401f-8f7a-6e853e6128ac"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No authorization required"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "At least one property must exist in the request body"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Admin",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of admin to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "id of user that is a admin to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Delete admin based on id path parameter.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deleting admin"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials"
+          },
+          "422": {
+            "description": "Unprocessable Entity - parameters are invalid"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/v1/signin": {
       "post": {
         "summary": "User Sign In",
@@ -2804,10 +2956,10 @@
               "application/json": {
                 "example": {
                   "message": "Token session created successfully",
-                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEzMTkwYjU4LWI4Y2MtNDA3NC1iM2Q4LTBlZGNmOTVmNjRjMiIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzc5MzI2NiwiZXhwIjoxNzAzNzkzMjcxfQ.76_UG5RRlYauxFNPAkAuksW7m8gXp8pJ523Hmxkdo8I",
-                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEzMTkwYjU4LWI4Y2MtNDA3NC1iM2Q4LTBlZGNmOTVmNjRjMiIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzc5MzI2NiwiZXhwIjoxNzAzNzkzMjc2fQ.FwigyBVKm1zr1LwigDgyMTmbjlNVF-PCRJdFMSYd_NE",
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNkMTUzNTQ2LTM4YWEtNGJlMy1hZjk5LWUzOTQ0NDI3Y2U3ZCIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzgwMjYxMCwiZXhwIjoxNzAzODAyNjE1fQ.qcyqi_-R2GWYP3fn8sv75zPycU2O4ZP9qwI-vMOgj_M",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNkMTUzNTQ2LTM4YWEtNGJlMy1hZjk5LWUzOTQ0NDI3Y2U3ZCIsIm5hbWUiOiJUZXN0IFVzZXIgQWRtaW4gdG8gc2lnbiBpbiB0ZXN0Iiwicm9sZUlkIjoiNjViY2NiNDAtODIyMS00NjdiLWJlYTYtYzliYTg0YWRhYmY0Iiwicm9sZSI6eyJpZCI6IjY1YmNjYjQwLTgyMjEtNDY3Yi1iZWE2LWM5YmE4NGFkYWJmNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMDJUMjA6NDY6MjMuODgwWiIsImRlbGV0ZWRBdCI6bnVsbCwidXBkYXRlZEF0IjoiMjAyMy0xMi0wMlQyMDo0NjoyMy44ODBaIiwibmFtZSI6IkFETUlOIn0sImlhdCI6MTcwMzgwMjYxMCwiZXhwIjoxNzAzODAyNjIwfQ.jAKWdIP1JS2w-fKfvhrwTEQoBknTIZIQ5q8JbW1zefw",
                   "user": {
-                    "id": "13190b58-b8cc-4074-b3d8-0edcf95f64c2",
+                    "id": "cd153546-38aa-4be3-af99-e3944427ce7d",
                     "name": "Test User Admin to sign in test",
                     "roleId": "65bccb40-8221-467b-bea6-c9ba84adabf4",
                     "role": {

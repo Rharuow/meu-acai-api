@@ -8,6 +8,12 @@ import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
 import { prismaClient } from "@libs/prisma";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
+import swaggerDefinition from "@/swagger-spec.json";
+import { CreateAdminRequestBody } from "@/types/user/admin/createRequestBody";
+import { CreateClientRequestBody } from "@/types/user/client/createRequestBody";
+import { CreateMemberRequestBody } from "@/types/user/member/createRequestBody";
+import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 
 let userAdminToAuthentication: User & { role: Role; admin: Admin };
 let userClientToAuthentication: User & { role: Role; client: Client };
@@ -22,14 +28,15 @@ let refreshTokenAsClient: string;
 let accessTokenAsMember: string;
 let refreshTokenAsMember: string;
 
-const userAdminCreateBody = {
-  name: "Test Admin to change address",
+const userAdminCreateBody: Omit<CreateAdminRequestBody, "roleId"> = {
+  name: "Test Admin Created",
   password: "123",
-  email: "test@example.com",
+  email: "admin@example.com",
   phone: "123",
 };
 
-const userClientCreateBody = {
+const userClientCreateBody: Omit<CreateClientRequestBody, "roleId"> &
+  Omit<CreateUserRequestBody, "roleId"> = {
   name: "Test Client to change address",
   password: "123",
   address: {
@@ -40,10 +47,14 @@ const userClientCreateBody = {
   phone: "123",
 };
 
-const userMemberCreateBody = {
+const userMemberCreateBody: Omit<
+  CreateMemberRequestBody,
+  "roleId" | "clientId"
+> = {
   name: "Test Member to change address",
   password: "123",
   email: "test@example.com",
+  relationship: "Filho",
   phone: "123",
 };
 
@@ -112,6 +123,18 @@ beforeAll(async () => {
   refreshTokenAsMember = "Bearer " + responseMemberSignIn.body.refreshToken;
 });
 
+let updateSuccessBodyResponse = {};
+let updateBadRequestBodyResponse = {};
+let updateUnprocessableEntityBodyResponse = {};
+let updateUnauthorizedBodyResponse = {};
+
+let newAddress = {
+  address: {
+    house: "new house create by admin",
+    square: "new house create by admin",
+  },
+};
+
 afterAll(async () => {
   await prismaClient.user.deleteMany({
     where: {
@@ -124,6 +147,92 @@ afterAll(async () => {
       },
     },
   });
+
+  return await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/resources/users/clients/{id}/change-address": {
+        put: {
+          summary: "Update Address Client",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Client that address to update",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description:
+            "Endpoint to update Address belongs to a Client to the system.",
+          tags: ["Client"],
+          requestBody: {
+            description: "Client's Address details for updating",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    address: {
+                      type: "object",
+                      properties: {
+                        house: {
+                          type: "stirng",
+                          example: newAddress.address.house,
+                        },
+                        square: {
+                          type: "stirng",
+                          example: newAddress.address.square,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful updating address of the client",
+              content: {
+                "application/json": { example: updateSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: updateUnprocessableEntityBodyResponse,
+                },
+              },
+            },
+            "400": {
+              description: "Bad request",
+              content: {
+                "application/json": {
+                  example: updateBadRequestBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: updateUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+    },
+  });
 });
 
 describe("CHANGE ADDRESS", () => {
@@ -131,12 +240,6 @@ describe("CHANGE ADDRESS", () => {
   const setBasePath = (id: string) =>
     `/api/v1/resources/users/clients/${id}/change-address`;
   describe("CHANGE ADDRESS AS ADMIN", () => {
-    const newAddress = {
-      address: {
-        house: "new house create by admin",
-        square: "new house create by admin",
-      },
-    };
     test(
       `When an Admin accesses PUT ${basePath}` +
         " and sends a request body the new address with house and square that not exist" +
@@ -148,6 +251,8 @@ describe("CHANGE ADDRESS", () => {
           .set("authorization", accessTokenAsAdmin)
           .set("refreshToken", refreshTokenAsAdmin)
           .expect(200);
+
+        updateSuccessBodyResponse = response.body;
 
         const clientWithAddressUpdated = await prismaClient.client.findUnique({
           where: {
@@ -205,6 +310,8 @@ describe("CHANGE ADDRESS", () => {
           .set("refreshToken", refreshTokenAsAdmin)
           .expect(422);
 
+        updateUnprocessableEntityBodyResponse = response.body;
+
         expect(response.body).toHaveProperty(
           "message",
           "Address house must be a string and not empty"
@@ -215,17 +322,17 @@ describe("CHANGE ADDRESS", () => {
   });
 
   describe("CHANGE ADDRESS AS CLIENT", () => {
-    const newAddress = {
-      address: {
-        house: "new house create by client",
-        square: "new house create by client",
-      },
-    };
     test(
       `When a Client accesses PUT ${basePath}` +
         " and sends a request body the new address with house and square that not exist and it own address" +
         " then the response should have a status code 200 and the new address will be created and set to the client resource",
       async () => {
+        newAddress = {
+          address: {
+            house: "new house create by client",
+            square: "new house create by client",
+          },
+        };
         const response = await request(app)
           .put(setBasePath(userClientToAuthentication.client.id))
           .send(newAddress)
@@ -287,6 +394,8 @@ describe("CHANGE ADDRESS", () => {
           .set("refreshToken", refreshTokenAsClient)
           .expect(400);
 
+        updateBadRequestBodyResponse = response.body;
+
         await prismaClient.user.delete({
           where: {
             id: newClient.id,
@@ -340,23 +449,25 @@ describe("CHANGE ADDRESS", () => {
   });
 
   describe("CHANGE ADDRESS AS MEMBER", () => {
-    const newAddress = {
-      address: {
-        house: "new house create by member",
-        square: "new house create by member",
-      },
-    };
     test(
       `When an Member accesses PUT ${basePath}` +
         " and sends a request body the clientId of member and the address.house and address.square that doesn't exists " +
         " then the response should have a status code 401 and the message in the body should contain the following message 'User has no permissions'",
       async () => {
+        newAddress = {
+          address: {
+            house: "new house create by member",
+            square: "new house create by member",
+          },
+        };
         const response = await request(app)
           .put(setBasePath(userMemberToAuthentication.clientId))
           .set("authorization", accessTokenAsMember)
           .set("refreshToken", refreshTokenAsMember)
           .send(newAddress)
           .expect(401);
+
+        updateUnauthorizedBodyResponse = response.body;
 
         return expect(response.body).toHaveProperty(
           "message",

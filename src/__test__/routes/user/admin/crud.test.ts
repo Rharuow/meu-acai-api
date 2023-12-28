@@ -33,8 +33,6 @@ const createAdminBody: Omit<CreateAdminRequestBody, "roleId"> = {
   phone: "123",
 };
 
-let admin: User;
-
 const updateAdminBody: UpdateAdminRequestBody = {
   name: "Test Admin Updated",
   email: "testadminupdated@mail.com",
@@ -74,17 +72,17 @@ beforeAll(async () => {
   ] = await Promise.all([
     request(app)
       .post("/api/v1/signin")
-      .send({ name: user.userAdmin.name, password: "123" })
+      .send({ name: userAdmin.name, password: "123" })
       .set("Accept", "application/json")
       .expect(200),
     request(app)
       .post("/api/v1/signin")
-      .send({ name: user.userClient.name, password: "123" })
+      .send({ name: userClient.name, password: "123" })
       .set("Accept", "application/json")
       .expect(200),
     request(app)
       .post("/api/v1/signin")
-      .send({ name: user.userMember.name, password: "123" })
+      .send({ name: userMember.name, password: "123" })
       .set("Accept", "application/json")
       .expect(200),
   ]);
@@ -494,8 +492,6 @@ describe("CRUD ADMIN RESOURCE", () => {
             .set("authorization", `Bearer ${accessTokenAsAdmin}`)
             .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
             .expect(200);
-
-          admin = response.body.data;
 
           createSuccessBodyResponse = response.body;
 
