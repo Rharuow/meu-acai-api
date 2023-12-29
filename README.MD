@@ -99,7 +99,7 @@ To get started with the Meu Açai API, follow these steps:
     - [x] Get
     - [x] Delete
     - [x] Delete Many
-  - [x] USER
+  - USER
     - [x] ADMIN
       - [x] Create
       - [x] Update
@@ -404,3 +404,8 @@ To get started with the Meu Açai API, follow these steps:
           - [x] Router to list with pagination and filters Product ( GET "/api/v1/resources/products" )
           - [x] Router to delete Product ( DELETE "/api/v1/resources/products/:id" )
           - [x] Router to delete many Product ( DELETE "/api/v1/resources/products/delteMany?ids=id1&id2" )
+
+### KAFKA
+
+- [ ] Add Kafka to the project
+  - [ ] create a producer in the group 'producer-order-api'
