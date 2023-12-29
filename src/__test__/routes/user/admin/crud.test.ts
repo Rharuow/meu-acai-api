@@ -824,7 +824,7 @@ describe("CRUD ADMIN RESOURCE", () => {
 
     describe("GETTING ADMIN AS A MEMBER", () => {
       test(
-        `When an authenticated MEMBER accesses GET ${adminResourcePath}/:id ` +
+        `When an authenticated MEMBER accesses GET ${userResourcePath}/:userId/admins/:id ` +
           "with the ID of the first admin, " +
           "then it should return 401 status code",
         async () => {
@@ -835,6 +835,26 @@ describe("CRUD ADMIN RESOURCE", () => {
             .set("authorization", "Bearer " + accessTokenAsMember)
             .set("refreshToken", "Bearer " + refreshTokenAsMember)
             .expect(401);
+
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
+
+    describe("GETTING CLIENT WITHOUT AUTHENTICATION", () => {
+      test(
+        `When accesses GET ${userResourcePath}/:userId/admins/:id without authentication` +
+          "with the ID of the first client, " +
+          "then it should return 401 status code",
+        async () => {
+          const response = await request(app)
+            .get(
+              userResourcePath +
+                `/${userClient.id}/admins/${userClient.clientId}`
+            )
+            .expect(401);
+
+          getUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }

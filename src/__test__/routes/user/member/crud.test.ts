@@ -12,6 +12,8 @@ import {
   presetToMemberTests,
 } from "@/__test__/presets/routes/member";
 import { createMember } from "@repositories/user/member";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
+import swaggerDefinition from "@/swagger-spec.json";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -31,6 +33,8 @@ let clientReferenceToMemberAsClient: User & { client: Client; role: Role };
 const createMemberBody = {
   name: "Test Member Created",
   password: "123",
+  email: "test@example.com",
+  phone: "123",
 };
 
 const createMemberBodyMissingName = {
@@ -157,6 +161,23 @@ beforeAll(async () => {
   });
 });
 
+let createSuccessBodyResponse = {};
+let createUnprocessableBodyResponse = {};
+let createUnauthorizedBodyResponse = {};
+
+let getSuccessBodyResponse = {};
+let getBadRequestBodyResponse = {};
+let getUnauthorizedBodyResponse = {};
+
+let listSuccessBodyResponse = {};
+let listUnprocessableBodyResponse = {};
+let listUnauthorizedBodyResponse = {};
+
+let updateSuccessBodyResponse = {};
+let updateBadRequestBodyResponse = {};
+let updateUnprocessableBodyResponse = {};
+let updateUnauthorizedBodyResponse = {};
+
 afterAll(async () => {
   await cleanMemberTestDatabase();
   await prismaClient.user.deleteMany({
@@ -174,6 +195,369 @@ afterAll(async () => {
           clientReferenceToMemberAsAdmin.id,
           clientReferenceToMemberAsClient.id,
         ],
+      },
+    },
+  });
+
+  return await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/resources/users/members": {
+        post: {
+          summary: "Create Member",
+          description: "Endpoint to add a new Member to the system.",
+          tags: ["Member"],
+          requestBody: {
+            description: "Member details for creation",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: createMemberBody.name,
+                      require: true,
+                    },
+                    password: {
+                      type: "string",
+                      example: createMemberBody.password,
+                      require: true,
+                    },
+                    email: {
+                      type: "string",
+                      example: createMemberBody.email,
+                      require: false,
+                    },
+                    phone: {
+                      type: "string",
+                      example: createMemberBody.phone,
+                      require: false,
+                    },
+                  },
+                  required: ["name", "password"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful creating member",
+              content: {
+                "application/json": { example: createSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: createUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: createUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        get: {
+          summary: "List Members",
+          parameters: [
+            {
+              name: "page",
+              in: "query",
+              description: "Page to list members",
+              required: false,
+              schema: {
+                type: "number",
+                default: 1,
+              },
+            },
+            {
+              name: "perPage",
+              in: "query",
+              description: "How many members to return per page",
+              required: false,
+              schema: {
+                type: "number",
+                default: 10,
+              },
+            },
+            {
+              name: "orderBy",
+              in: "query",
+              description: "Order by some field table",
+              required: false,
+              schema: {
+                type: "string",
+                default: "createdAt:asc",
+              },
+            },
+            {
+              name: "filter",
+              in: "query",
+              description: "Filter members by some fields table",
+              required: false,
+              schema: {
+                type: "string",
+              },
+              example:
+                "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO",
+            },
+          ],
+          description:
+            "Retrieve a list of members based on optional query parameters.",
+          tags: ["Member"],
+          responses: {
+            "200": {
+              description: "Successful getting member",
+              content: {
+                "application/json": { example: listSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: listUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: listUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Many Members",
+          parameters: [
+            {
+              name: "ids",
+              in: "query",
+              description: "ids of members to delete",
+              required: true,
+              schema: {
+                type: "string",
+                default: "id-1,id-2",
+              },
+            },
+          ],
+          description: "Delete members based on ids query parameter.",
+          tags: ["Member"],
+          responses: {
+            "204": {
+              description: "Successful deleting members",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+      "/api/v1/resources/users/{userId}/members/{id}": {
+        get: {
+          summary: "Get Member by ID",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Member to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "userId",
+              in: "path",
+              description: "ID of the User that is a Member to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Retrieve details of a specific Member by its ID.",
+          tags: ["Member"],
+          responses: {
+            "200": {
+              description: "Successful getting member",
+              content: {
+                "application/json": { example: getSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: getBadRequestBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: getUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        put: {
+          summary: "Update Member",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Member to update",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "userId",
+              in: "path",
+              description: "ID of the User that is a Member to update",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Endpoint to update a Member to the system.",
+          tags: ["Member"],
+          requestBody: {
+            description: "Member details for updating",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: updateMemberBody.name,
+                    },
+                    phone: {
+                      type: "string",
+                      example: updateMemberBody.phone,
+                    },
+                    email: {
+                      type: "string",
+                      example: updateMemberBody.email,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful updating member",
+              content: {
+                "application/json": { example: updateSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: updateBadRequestBodyResponse,
+                },
+              },
+            },
+            "400": {
+              description: "Bad Request",
+              content: {
+                "application/json": {
+                  example: updateUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: updateUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Member",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "id of member to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "userId",
+              in: "path",
+              description: "id of user that is a member to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Delete member based on id path parameter.",
+          tags: ["Member"],
+          responses: {
+            "204": {
+              description: "Successful deleting member",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
       },
     },
   });
@@ -197,6 +581,9 @@ describe("CRUD MEMBER RESOURCE", () => {
             .set("authorization", `Bearer ${accessTokenAsAdmin}`)
             .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
             .expect(200);
+
+          createSuccessBodyResponse = response.body;
+
           userMemberAdmin = await getUserByNameAndPassword(
             {
               name: "Test Member Created For Admin",
@@ -237,6 +624,8 @@ describe("CRUD MEMBER RESOURCE", () => {
             .set("authorization", `Bearer ${accessTokenAsAdmin}`)
             .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
             .expect(422);
+
+          createUnprocessableBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(422);
         }
@@ -283,6 +672,8 @@ describe("CRUD MEMBER RESOURCE", () => {
             .post(memberResourcePath)
             .send(createMemberBodyMissingName)
             .expect(401);
+
+          createUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }
@@ -430,6 +821,8 @@ describe("CRUD MEMBER RESOURCE", () => {
             .set("refreshToken", "Bearer " + accessTokenAsAdmin)
             .expect(200);
 
+          getSuccessBodyResponse = response.body;
+
           expect(response.body).toHaveProperty("data");
           expect(response.body.data).toHaveProperty("user");
           expect(response.body.data.user).toHaveProperty(
@@ -458,6 +851,23 @@ describe("CRUD MEMBER RESOURCE", () => {
             "id",
             userMemberAdmin.id
           );
+        }
+      );
+
+      test(
+        `When an authenticated ADMIN accesses GET ${userResourcePath}/:userId/members/:id ` +
+          "with invalid id in path parameter, " +
+          "then it should return the first admin and associated user created",
+        async () => {
+          const response = await request(app)
+            .get(userResourcePath + `/${userAdmin.id}/admins/invalid-id`)
+            .set("authorization", "Bearer " + accessTokenAsAdmin)
+            .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+            .expect(422);
+
+          getBadRequestBodyResponse = response.body;
+
+          return expect(response.statusCode).toBe(422);
         }
       );
     });
@@ -553,6 +963,26 @@ describe("CRUD MEMBER RESOURCE", () => {
         }
       );
     });
+
+    describe("GETTING CLIENT WITHOUT AUTHENTICATION", () => {
+      test(
+        `When accesses GET ${userResourcePath}/:userId/members/:id without authentication` +
+          "with the ID of the first client, " +
+          "then it should return 401 status code",
+        async () => {
+          const response = await request(app)
+            .get(
+              userResourcePath +
+                `/${userClient.id}/members/${userClient.clientId}`
+            )
+            .expect(401);
+
+          getUnauthorizedBodyResponse = response.body;
+
+          return expect(response.statusCode).toBe(401);
+        }
+      );
+    });
   });
 
   describe("TEST TO LIST MEMBERS RESOURCE", () => {
@@ -567,6 +997,8 @@ describe("CRUD MEMBER RESOURCE", () => {
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + accessTokenAsAdmin)
             .expect(200);
+
+          listSuccessBodyResponse = response.body;
 
           expect(response.statusCode).toBe(200);
           expect(response.body).toHaveProperty("data");
@@ -642,6 +1074,23 @@ describe("CRUD MEMBER RESOURCE", () => {
       );
 
       test(
+        `When an authenticated admin accesses GET ${memberResourcePath}?page=-1 ` +
+          "sending invalid page param in query" +
+          "then it should return 422 status code",
+        async () => {
+          const response = await request(app)
+            .get(memberResourcePath + "?page=-1")
+            .set("authorization", "Bearer " + accessTokenAsAdmin)
+            .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+            .expect(422);
+
+          listUnprocessableBodyResponse = response.body;
+
+          return expect(response.statusCode).toBe(422);
+        }
+      );
+
+      test(
         `When acess the GET endpoint ${memberResourcePath} ` +
           "without authentication " +
           "the expected behavior is to return a status code of 401.",
@@ -649,6 +1098,8 @@ describe("CRUD MEMBER RESOURCE", () => {
           const response = await request(app)
             .get(memberResourcePath)
             .expect(401);
+
+          listUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }
@@ -790,6 +1241,8 @@ describe("CRUD MEMBER RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(200);
 
+          updateSuccessBodyResponse = response.body;
+
           userMemberAdmin = {
             ...userMemberAdmin,
             ...updateMemberBody,
@@ -822,6 +1275,8 @@ describe("CRUD MEMBER RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(400);
 
+          updateBadRequestBodyResponse = response.body;
+
           return expect(response.statusCode).toBe(400);
         }
       );
@@ -841,6 +1296,8 @@ describe("CRUD MEMBER RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsClient)
             .expect(401);
 
+          updateUnauthorizedBodyResponse = response.body;
+
           return expect(response.statusCode).toBe(401);
         }
       );
@@ -859,6 +1316,9 @@ describe("CRUD MEMBER RESOURCE", () => {
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(422);
+
+          updateUnprocessableBodyResponse = response.body;
+
           return expect(response.statusCode).toBe(422);
         }
       );

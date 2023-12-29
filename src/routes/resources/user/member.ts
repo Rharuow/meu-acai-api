@@ -108,6 +108,7 @@ const memberRouter = Router();
 
 memberRouter.get(
   "/:userId/members/:id",
+  validationUserAccessToken,
   addIncludesMemberAndRoleAtBody,
   getUserController
 );
