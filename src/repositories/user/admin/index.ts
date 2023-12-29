@@ -34,7 +34,6 @@ export const createAdmin = async ({
         },
       },
     },
-
     include: {
       admin: true,
       role: true,

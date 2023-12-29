@@ -14,7 +14,7 @@ export const createMember = async ({
   email,
   phone,
   relationship,
-}: CreateMemberRequestBody & CreateUserRequestBody) => {
+}: CreateMemberRequestBody) => {
   const member = await prismaClient.user.create({
     data: {
       name,

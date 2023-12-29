@@ -9,6 +9,8 @@ import { prismaClient } from "@libs/prisma";
 import { createAdminRoleIfNotExist } from "../presets/createAdminRoleIfNotExists";
 import { createClientRoleIfNotExist } from "../presets/createClientRoleIfNotExists";
 import { createMemberRoleIfNotExist } from "../presets/createMemberRoleIfNotExists";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
+import swaggerDefinition from "@/swagger-spec.json";
 
 let accessToken: string;
 let refreshToken: string;
@@ -77,11 +79,66 @@ beforeAll(async () => {
   });
 });
 
+let responseSuccessBodyExample = {};
+let responseUnprocessableEntityBodyExample = {};
+let responseUnautorazedBodyExample = {};
+
 afterAll(async () => {
   await prismaClient.user.deleteMany({
     where: {
       id: {
         in: [userAdmin.id, userClient.id, userMember.id],
+      },
+    },
+  });
+
+  await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/signin": {
+        post: {
+          summary: "User Sign In",
+          description: "Authenticate and sign in a user.",
+          tags: ["Authentication"],
+          requestBody: {
+            description: "User credentials for sign-in",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    username: { type: "string", example: "john_doe" },
+                    password: { type: "string", example: "securepassword" },
+                  },
+                  required: ["username", "password"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful sign-in",
+              content: {
+                "application/json": { example: responseSuccessBodyExample },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: responseUnprocessableEntityBodyExample,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: responseUnautorazedBodyExample },
+              },
+            },
+          },
+        },
       },
     },
   });
@@ -95,6 +152,8 @@ describe("Sign in route", () => {
         .send({ name: userAdmin.name, password: "123" })
         .set("Accept", "application/json")
         .expect(200);
+
+      responseSuccessBodyExample = response.body;
 
       expect(response.body).toHaveProperty("accessToken");
       expect(response.body).toHaveProperty("refreshToken");
@@ -139,6 +198,8 @@ describe("Sign in route", () => {
         .send({ name: userAdmin.name, password: "123", unpermittedParam: true })
         .set("Accept", "application/json")
         .expect(422);
+
+      responseUnprocessableEntityBodyExample = response.body;
 
       expect(response.body).toHaveProperty("message", "Param(s) not permitted");
 
@@ -205,6 +266,8 @@ describe("Sign in route", () => {
       .send({ name: "wrong", password: userAdmin.password })
       .set("Accept", "application/json")
       .expect(401);
+
+    responseUnautorazedBodyExample = responseWithNameWrong.body;
 
     const responseWithPasswordWrong = await request(app)
       .post("/api/v1/signin")

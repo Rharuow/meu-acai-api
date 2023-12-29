@@ -6,11 +6,10 @@ import { listUsersSerializer } from "@serializer/resources/user";
 import { unprocessableEntity } from "@serializer/erros/422";
 
 export const listUserController = async (
-  req: Request<{}, {}, {}, qs.ParsedQs & QueryParms>,
+  req: Request<{}, {}, {}, qs.ParsedQs & QueryParms & ParamsUser>,
   res: Response
 ) => {
-  const { page, perPage, orderBy, filter, includes, customFilter } =
-    req.query as ParamsUser;
+  const { page, perPage, orderBy, filter, includes, customFilter } = req.query;
 
   try {
     const [users, totalUsers] = await listUsers({

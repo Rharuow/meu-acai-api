@@ -9,6 +9,8 @@ import {
   createTwentyCreams,
   presetToCreamTests,
 } from "@/__test__/presets/routes/creams";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
+import swaggerDefinition from "@/swagger-spec.json";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -60,15 +62,12 @@ beforeAll(async () => {
   refreshTokenAsMember = responseSignInAsMember.body.refreshToken;
 });
 
-afterAll(async () => {
-  await cleanCreamTestDatabase();
-});
-
 const createCreamRequestBody: Omit<CreateCreamRequestBody, "adminId"> = {
   name: "Test Cream",
   price: 9.99,
   amount: 1,
   unit: "unit",
+  photo: "URL PHOTO",
 };
 
 const updateCreamRequestBody: UpdateCreamRequestBody = {
@@ -76,6 +75,356 @@ const updateCreamRequestBody: UpdateCreamRequestBody = {
 };
 
 const creamResourcePath = "/api/v1/resources/creams";
+
+let createSuccessBodyResponse = {};
+let createUnprocessableBodyResponse = {};
+let createUnauthorizedBodyResponse = {};
+
+let getSuccessBodyResponse = {};
+let getUnprocessableBodyResponse = {};
+let getUnauthorizedBodyResponse = {};
+
+let listSuccessBodyResponse = {};
+let listUnprocessableBodyResponse = {};
+let listUnauthorizedBodyResponse = {};
+
+let updateSuccessBodyResponse = {};
+let updateUnprocessableBodyResponse = {};
+let updateUnauthorizedBodyResponse = {};
+
+afterAll(async () => {
+  await cleanCreamTestDatabase();
+  await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/resources/creams": {
+        post: {
+          summary: "Create Cream",
+          description: "Endpoint to add a new Cream to the system.",
+          tags: ["Cream"],
+          requestBody: {
+            description: "Cream details for creation",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: createCreamRequestBody.name,
+                      require: true,
+                    },
+                    amount: {
+                      type: "number",
+                      example: createCreamRequestBody.amount,
+                      require: true,
+                    },
+                    price: {
+                      type: "number",
+                      example: createCreamRequestBody.price,
+                      require: true,
+                    },
+                    unit: {
+                      type: "string",
+                      example: createCreamRequestBody.unit,
+                      require: true,
+                    },
+                    photo: {
+                      type: "string",
+                      example: createCreamRequestBody.photo,
+                      require: false,
+                    },
+                  },
+                  required: ["name", "amount", "price", "unit"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful creating cream",
+              content: {
+                "application/json": { example: createSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: createUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: createUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        get: {
+          summary: "List Creams",
+          parameters: [
+            {
+              name: "page",
+              in: "query",
+              description: "Page to list creams",
+              required: false,
+              schema: {
+                type: "number",
+                default: 1,
+              },
+            },
+            {
+              name: "perPage",
+              in: "query",
+              description: "How many creams to return per page",
+              required: false,
+              schema: {
+                type: "number",
+                default: 10,
+              },
+            },
+            {
+              name: "orderBy",
+              in: "query",
+              description: "Order by some field table",
+              required: false,
+              schema: {
+                type: "string",
+                default: "createdAt:asc",
+              },
+            },
+            {
+              name: "filter",
+              in: "query",
+              description: "Filter creams by some fields table",
+              required: false,
+              schema: {
+                type: "string",
+              },
+              example:
+                "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO",
+            },
+          ],
+          description:
+            "Retrieve a list of creams based on optional query parameters.",
+          tags: ["Cream"],
+          responses: {
+            "200": {
+              description: "Successful getting cream",
+              content: {
+                "application/json": { example: listSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: listUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: listUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Many Creams",
+          parameters: [
+            {
+              name: "ids",
+              in: "query",
+              description: "ids of creams to delete",
+              required: true,
+              schema: {
+                type: "string",
+                default: "id-1,id-2",
+              },
+            },
+          ],
+          description: "Delete creams based on ids query parameter.",
+          tags: ["Cream"],
+          responses: {
+            "204": {
+              description: "Successful deleting creams",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+      "/api/v1/resources/creams/{id}": {
+        get: {
+          summary: "Get Cream by ID",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Cream to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Retrieve details of a specific Cream by its ID.",
+          tags: ["Cream"],
+          responses: {
+            "200": {
+              description: "Successful getting cream",
+              content: {
+                "application/json": { example: getSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: getUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: getUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        put: {
+          summary: "Update Cream",
+          description: "Endpoint to update a Cream to the system.",
+          tags: ["Cream"],
+          requestBody: {
+            description: "Cream details for updating",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: updateCreamRequestBody.name,
+                    },
+                    amount: {
+                      type: "number",
+                      example: updateCreamRequestBody.amount,
+                    },
+                    price: {
+                      type: "number",
+                      example: updateCreamRequestBody.price,
+                    },
+                    unit: {
+                      type: "string",
+                      example: updateCreamRequestBody.unit,
+                    },
+                    photo: {
+                      type: "string",
+                      example: updateCreamRequestBody.photo,
+                    },
+                  },
+                  required: ["name", "amount", "price", "unit"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful updating cream",
+              content: {
+                "application/json": { example: updateSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: updateUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: updateUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Cream",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "id of cream to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Delete cream based on id path parameter.",
+          tags: ["Cream"],
+          responses: {
+            "204": {
+              description: "Successful deleting cream",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+    },
+  });
+});
 
 describe("CRUD CREAM RESOURCE", () => {
   describe("TEST TO CREATE CREAM RESOURCE", () => {
@@ -98,6 +447,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .send(createCreamRequestBody)
           .expect(200);
 
+        createSuccessBodyResponse = response.body;
+
         return expect(response.statusCode).toBe(200);
       });
 
@@ -108,6 +459,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
           .send(createCreamRequestBody)
           .expect(422);
+
+        createUnprocessableBodyResponse = response.body;
 
         expect(response.body).toHaveProperty(
           "message",
@@ -126,6 +479,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
           .send(createCreamRequestBody)
           .expect(401);
+
+        createUnauthorizedBodyResponse = response.body;
 
         return expect(response.statusCode).toBe(401);
       });
@@ -169,6 +524,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
           .expect(200);
 
+        getSuccessBodyResponse = response.body;
+
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty("name", cream.name);
         expect(response.body).toHaveProperty("amount", cream.amount);
@@ -176,6 +533,25 @@ describe("CRUD CREAM RESOURCE", () => {
         expect(response.body).toHaveProperty("available", cream.available);
         expect(response.body).toHaveProperty("unit", cream.unit);
         return expect(response.body).toHaveProperty("price", cream.price);
+      });
+
+      test(`when access GET ${creamResourcePath}/:id with authentication as ADMIN and invalid id in router, return 422 and the message 'No Cream found' in body response`, async () => {
+        cream = await prismaClient.cream.findFirst({
+          where: { name: "Test Cream" },
+        });
+
+        const response = await request(app)
+          .get(creamResourcePath + `/invalid-id`)
+          .set("authorization", "Bearer " + accessTokenAsAdmin)
+          .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+          .expect(422);
+
+        getUnprocessableBodyResponse = response.body;
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "No Cream found"
+        );
       });
     });
 
@@ -221,6 +597,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .get(creamResourcePath + `/${cream.id}`)
           .expect(401);
 
+        getUnauthorizedBodyResponse = response.body;
+
         return expect(response.statusCode).toBe(401);
       });
     });
@@ -235,6 +613,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
           .send(updateCreamRequestBody)
           .expect(200);
+
+        updateSuccessBodyResponse = response.body;
 
         return expect(response.statusCode).toBe(200);
       });
@@ -270,6 +650,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
           .expect(422);
 
+        updateUnprocessableBodyResponse = response.body;
+
         expect(response.body).toHaveProperty(
           "message",
           "At least one property must exist in the request body"
@@ -287,6 +669,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshToken", "Bearer " + refreshTokenAsClient)
           .send(updateCreamRequestBody)
           .expect(401);
+
+        updateUnauthorizedBodyResponse = responseAsClient.body;
 
         const responseAsMember = await request(app)
           .put(creamResourcePath + `/${cream.id}`)
@@ -322,6 +706,8 @@ describe("CRUD CREAM RESOURCE", () => {
           .set("refreshtoken", `Bearer ${refreshTokenAsAdmin}`)
           .expect(200);
 
+        listSuccessBodyResponse = response.body;
+
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty("data");
         expect(response.body).toHaveProperty("hasNextPage", true);
@@ -343,6 +729,21 @@ describe("CRUD CREAM RESOURCE", () => {
         expect(response.body).toHaveProperty("totalPages", 5);
         expect(response.body).toHaveProperty("page", 2);
         return expect(response.body.data.length).toBe(5);
+      });
+
+      test(`when access GET ${creamResourcePath}?filter=invalidField:some-value authenticated as ADMIN role, the response status will be 422 and in the body as property message with 'Filter parameters not permitted'`, async () => {
+        const response = await request(app)
+          .get(creamResourcePath + "?filter=invalidField:some value")
+          .set("authorization", `Bearer ${accessTokenAsAdmin}`)
+          .set("refreshtoken", `Bearer ${refreshTokenAsAdmin}`)
+          .expect(422);
+
+        listUnprocessableBodyResponse = response.body;
+
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Filter parameters not permitted"
+        );
       });
     });
 
@@ -387,6 +788,8 @@ describe("CRUD CREAM RESOURCE", () => {
         const response = await request(app)
           .get("/api/v1/resources/creams")
           .expect(401);
+
+        listUnauthorizedBodyResponse = response.body;
 
         return expect(response.statusCode).toBe(401);
       });
@@ -562,7 +965,7 @@ describe("CRUD CREAM RESOURCE", () => {
 
     describe("DELETING MANY AS AN ADMIN", () => {
       test(
-        `when an autenticated ADMIN accesses DELETE ${creamResourcePath}/deleteMany?ids=id1&id2 ` +
+        `when an autenticated ADMIN accesses DELETE ${creamResourcePath}/deleteMany?ids=id1,id2 ` +
           "where the ids are ids of creams " +
           "should return 204 and delete all the creams thats contains the ids.",
         async () => {
@@ -605,7 +1008,7 @@ describe("CRUD CREAM RESOURCE", () => {
 
     describe("DELETING MANY AS A CLIENT", () => {
       test(
-        `When an autenticated CLIENT accesses DELETE ${creamResourcePath}/deleteMany?ids=id1&id2` +
+        `When an autenticated CLIENT accesses DELETE ${creamResourcePath}/deleteMany?ids=id1,id2` +
           "then it should return a 401 status code",
         async () => {
           const response = await request(app)
@@ -625,7 +1028,7 @@ describe("CRUD CREAM RESOURCE", () => {
 
     describe("DELETING MANY AS A MEMBER", () => {
       test(
-        `When an autenticated MEMBER accesses DELETE ${creamResourcePath}/deleteMany?ids=id1&id2` +
+        `When an autenticated MEMBER accesses DELETE ${creamResourcePath}/deleteMany?ids=id1,id2` +
           "then it should return a 401 status code",
         async () => {
           const response = await request(app)
@@ -645,7 +1048,7 @@ describe("CRUD CREAM RESOURCE", () => {
 
     describe("DELETING MANY WITHOUT AUTHENTICATION", () => {
       test(
-        `When accesses DELETE ${creamResourcePath}/deleteMany?ids=id1&id2 without authentication ` +
+        `When accesses DELETE ${creamResourcePath}/deleteMany?ids=id1,id2 without authentication ` +
           "then it should return a 401 status code",
         async () => {
           const response = await request(app)

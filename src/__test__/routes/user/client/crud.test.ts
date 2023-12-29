@@ -9,6 +9,10 @@ import {
   cleanClientTestDatabase,
   presetToClientTests,
 } from "@/__test__/presets/routes/client";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
+import swaggerDefinition from "@/swagger-spec.json";
+import { CreateClientRequestBody } from "@/types/user/client/createRequestBody";
+import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 
 let accessTokenAsAdmin: string;
 let refreshTokenAsAdmin: string;
@@ -25,9 +29,12 @@ const userResourcePath = "/api/v1/resources/users";
 
 const clientResourcePath = "/api/v1/resources/users/clients";
 
-const createClientBody = {
+const createClientBody: CreateClientRequestBody &
+  Omit<CreateUserRequestBody, "roleId"> = {
   name: "Test Client Created",
   password: "123",
+  email: "test@example.com",
+  phone: "123",
   address: {
     square: "createClientBody 2",
     house: "createClientBody 2",
@@ -117,8 +124,392 @@ beforeAll(async () => {
   );
 });
 
+let createSuccessBodyResponse = {};
+let createUnprocessableBodyResponse = {};
+let createUnauthorizedBodyResponse = {};
+
+let getSuccessBodyResponse = {};
+let getUnprocessableEntityBodyResponse = {};
+let getUnauthorizedBodyResponse = {};
+
+let listSuccessBodyResponse = {};
+let listUnprocessableBodyResponse = {};
+let listUnauthorizedBodyResponse = {};
+
+let updateSuccessBodyResponse = {};
+let updateUnprocessableEntityBodyResponse = {};
+let updateUnauthorizedBodyResponse = {};
+
 afterAll(async () => {
   await cleanClientTestDatabase();
+
+  return await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/resources/users/clients": {
+        post: {
+          summary: "Create Client",
+          description: "Endpoint to add a new Client to the system.",
+          tags: ["Client"],
+          requestBody: {
+            description: "Client details for creation",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: createClientBody.name,
+                      require: true,
+                    },
+                    password: {
+                      type: "string",
+                      example: createClientBody.password,
+                      require: true,
+                    },
+                    address: {
+                      type: "object",
+                      properties: {
+                        house: {
+                          type: "string",
+                          example: createClientBody.address.house,
+                        },
+                        square: {
+                          type: "string",
+                          example: createClientBody.address.square,
+                        },
+                      },
+                    },
+                    email: {
+                      type: "string",
+                      example: createClientBody.email,
+                      require: false,
+                    },
+                    phone: {
+                      type: "string",
+                      example: createClientBody.phone,
+                      require: false,
+                    },
+                  },
+                  required: ["name", "password"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful creating client",
+              content: {
+                "application/json": { example: createSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: createUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: createUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        get: {
+          summary: "List Clients",
+          parameters: [
+            {
+              name: "page",
+              in: "query",
+              description: "Page to list clients",
+              required: false,
+              schema: {
+                type: "number",
+                default: 1,
+              },
+            },
+            {
+              name: "perPage",
+              in: "query",
+              description: "How many clients to return per page",
+              required: false,
+              schema: {
+                type: "number",
+                default: 10,
+              },
+            },
+            {
+              name: "orderBy",
+              in: "query",
+              description: "Order by some field table",
+              required: false,
+              schema: {
+                type: "string",
+                default: "createdAt:asc",
+              },
+            },
+            {
+              name: "filter",
+              in: "query",
+              description: "Filter clients by some fields table",
+              required: false,
+              schema: {
+                type: "string",
+              },
+              example:
+                "name:like:some text here,id:some id here,price:gt:1000,amount:lt:5,createdAt:egt:some date ISO",
+            },
+          ],
+          description:
+            "Retrieve a list of clients based on optional query parameters.",
+          tags: ["Client"],
+          responses: {
+            "200": {
+              description: "Successful getting client",
+              content: {
+                "application/json": { example: listSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: listUnprocessableBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: listUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Many Clients",
+          parameters: [
+            {
+              name: "ids",
+              in: "query",
+              description: "ids of clients to delete",
+              required: true,
+              schema: {
+                type: "string",
+                default: "id-1,id-2",
+              },
+            },
+          ],
+          description: "Delete clients based on ids query parameter.",
+          tags: ["Client"],
+          responses: {
+            "204": {
+              description: "Successful deleting clients",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+      "/api/v1/resources/users/{userId}/clients/{id}": {
+        get: {
+          summary: "Get Client by ID",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Client to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "userId",
+              in: "path",
+              description: "ID of the User that is a Client to retrieve",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Retrieve details of a specific Client by its ID.",
+          tags: ["Client"],
+          responses: {
+            "200": {
+              description: "Successful getting client",
+              content: {
+                "application/json": { example: getSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: getUnprocessableEntityBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: getUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        put: {
+          summary: "Update Client",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Client to update",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "userId",
+              in: "path",
+              description: "ID of the User that is a Client to update",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Endpoint to update a Client to the system.",
+          tags: ["Client"],
+          requestBody: {
+            description: "Client details for updating",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      example: updateClientBody.name,
+                    },
+                    phone: {
+                      type: "string",
+                      example: updateClientBody.phone,
+                    },
+                    email: {
+                      type: "string",
+                      example: updateClientBody.email,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful updating client",
+              content: {
+                "application/json": { example: updateSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: updateUnprocessableEntityBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: updateUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+        delete: {
+          summary: "Delete Client",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "id of client to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "userId",
+              in: "path",
+              description: "id of user that is a client to delete",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description: "Delete client based on id path parameter.",
+          tags: ["Client"],
+          responses: {
+            "204": {
+              description: "Successful deleting client",
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+    },
+  });
 });
 
 describe("CRUD CLIENT RESOURCE", () => {
@@ -135,6 +526,8 @@ describe("CRUD CLIENT RESOURCE", () => {
             .set("authorization", `Bearer ${accessTokenAsAdmin}`)
             .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
             .expect(200);
+
+          createSuccessBodyResponse = response.body;
 
           userClient = await getUserByNameAndPassword(
             {
@@ -173,6 +566,8 @@ describe("CRUD CLIENT RESOURCE", () => {
             .set("authorization", `Bearer ${accessTokenAsAdmin}`)
             .set("refreshToken", `Bearer ${refreshTokenAsAdmin}`)
             .expect(422);
+
+          createUnprocessableBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(422);
         }
@@ -223,6 +618,8 @@ describe("CRUD CLIENT RESOURCE", () => {
             .set("authorization", `Bearer ${accessTokenAsClient}`)
             .set("refreshToken", `Bearer ${refreshTokenAsClient}`)
             .expect(401);
+
+          createUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }
@@ -281,6 +678,8 @@ describe("CRUD CLIENT RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(200);
 
+          updateSuccessBodyResponse = response.body;
+
           userClient = {
             ...userClient,
             ...updateClientBody,
@@ -328,6 +727,8 @@ describe("CRUD CLIENT RESOURCE", () => {
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(422);
+
+          updateUnprocessableEntityBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(422);
         }
@@ -429,6 +830,8 @@ describe("CRUD CLIENT RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsMember)
             .expect(401);
 
+          updateUnauthorizedBodyResponse = response.body;
+
           return expect(response.statusCode).toBe(401);
         }
       );
@@ -464,16 +867,37 @@ describe("CRUD CLIENT RESOURCE", () => {
           const response = await request(app)
             .get(
               userResourcePath +
-                `/${userClient.id}/clients/${userClient.clientId}`
+                `/${userClient.id}/clients/${userClient.client.id}`
             )
             .set("authorization", "Bearer " + accessTokenAsAdmin)
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(200);
 
+          getSuccessBodyResponse = response.body;
+
           expect(response.body.data.user.name).toBe(userClient.name);
           expect(response.body.data.user.client.id).toBe(userClient.client.id);
           expect(response.body.data.user.roleId).toBe(userClient.roleId);
           return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an authenticated ADMIN accesses GET ${userResourcePath}/:userId/clients/:id ` +
+          "with invalid id in path parameter, " +
+          "then it should return the first admin and associated user created",
+        async () => {
+          const response = await request(app)
+            .get(
+              userResourcePath + `/${clientAuthenticated.id}/admins/invalid-id`
+            )
+            .set("authorization", "Bearer " + accessTokenAsAdmin)
+            .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+            .expect(422);
+
+          getUnprocessableEntityBodyResponse = response.body;
+
+          return expect(response.statusCode).toBe(422);
         }
       );
     });
@@ -487,7 +911,7 @@ describe("CRUD CLIENT RESOURCE", () => {
           const response = await request(app)
             .get(
               userResourcePath +
-                `/${clientAuthenticated.id}/clients/${clientAuthenticated.clientId}`
+                `/${clientAuthenticated.id}/clients/${clientAuthenticated.client.id}`
             )
             .set("authorization", "Bearer " + accessTokenAsClient)
             .set("refreshToken", "Bearer " + refreshTokenAsClient)
@@ -536,6 +960,8 @@ describe("CRUD CLIENT RESOURCE", () => {
             .set("authorization", "Bearer " + accessTokenAsClient)
             .set("refreshToken", "Bearer " + refreshTokenAsClient)
             .expect(401);
+
+          getUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }
@@ -625,10 +1051,29 @@ describe("CRUD CLIENT RESOURCE", () => {
             .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
             .expect(200);
 
+          listSuccessBodyResponse = response.body;
+
           expect(response.body.data.length).toBe(10);
           expect(response.body.page).toBe(1);
           expect(response.body.hasNextPage).toBe(true);
           return expect(response.statusCode).toBe(200);
+        }
+      );
+
+      test(
+        `When an authenticated admin accesses GET ${clientResourcePath} ` +
+          "sending invalid page param in query" +
+          "then it should return 422 status code",
+        async () => {
+          const response = await request(app)
+            .get(clientResourcePath + "?page=-1")
+            .set("authorization", "Bearer " + accessTokenAsAdmin)
+            .set("refreshToken", "Bearer " + refreshTokenAsAdmin)
+            .expect(422);
+
+          listUnprocessableBodyResponse = response.body;
+
+          return expect(response.statusCode).toBe(422);
         }
       );
     });
@@ -643,6 +1088,8 @@ describe("CRUD CLIENT RESOURCE", () => {
             .set("authorization", "Bearer " + accessTokenAsClient)
             .set("refreshToken", "Bearer " + refreshTokenAsClient)
             .expect(401);
+
+          listUnauthorizedBodyResponse = response.body;
 
           return expect(response.statusCode).toBe(401);
         }

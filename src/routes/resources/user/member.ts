@@ -108,6 +108,7 @@ const memberRouter = Router();
 
 memberRouter.get(
   "/:userId/members/:id",
+  validationUserAccessToken,
   addIncludesMemberAndRoleAtBody,
   getUserController
 );
@@ -186,6 +187,7 @@ memberRouter.delete(
     query([], "Query parameters unpermitted"),
     param(["id"], "Router parameters unpermitted"),
   ]),
+  validationParams,
   validationAdminOrClientAccessToken,
   deleteUserController
 );

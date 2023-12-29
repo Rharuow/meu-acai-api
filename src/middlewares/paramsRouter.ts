@@ -33,6 +33,9 @@ export const validationQueryParams = (
 
   const { page, perPage, orderBy } = req.query;
 
+  if (page < 0 || perPage < 0)
+    return unprocessableEntity(res, "invalid parameters");
+
   // Set default values if not provided
   req.query.page = page ? Number(page) : 1;
   req.query.perPage = perPage ? Number(perPage) : 10;

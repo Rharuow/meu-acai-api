@@ -9,6 +9,8 @@ import { createAdmin } from "@repositories/user/admin";
 import { createClient } from "@repositories/user/client";
 import { createMember } from "@repositories/user/member";
 import { app } from "@/app";
+import { saveSwaggerDefinitions } from "@/generateSwagger";
+import swaggerDefinition from "@/swagger-spec.json";
 
 const adminCreateBody = {
   name: "Test Admin to swap between Client and Member",
@@ -113,7 +115,89 @@ beforeAll(async () => {
   return;
 });
 
+let updateSuccessBodyResponse = {};
+let updateBadRequestBodyResponse = {};
+let updateUnprocessableEntityBodyResponse = {};
+let updateUnauthorizedBodyResponse = {};
+
 afterAll(async () => {
+  await saveSwaggerDefinitions({
+    paths: {
+      ...swaggerDefinition.paths,
+      "/api/v1/resources/users/clients/swap/{id}": {
+        put: {
+          summary: "SWAP role between Client and Member",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              description: "ID of the Client that the will be swapped",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          description:
+            "Endpoint to swap the Client with its associated member.",
+          tags: ["Client"],
+          requestBody: {
+            description: "Details to swap the client",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    memberId: {
+                      type: "stirng",
+                      example: "some-id-of-member-belongs-to-this-client",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Successful swapping the client",
+              content: {
+                "application/json": { example: updateSuccessBodyResponse },
+              },
+            },
+            "422": {
+              description: "Unprocessable Entity - parameters are invalid",
+              content: {
+                "application/json": {
+                  example: updateUnprocessableEntityBodyResponse,
+                },
+              },
+            },
+            "400": {
+              description: "Bad request",
+              content: {
+                "application/json": {
+                  example: updateBadRequestBodyResponse,
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized - Invalid credentials",
+              content: {
+                "application/json": { example: updateUnauthorizedBodyResponse },
+              },
+            },
+          },
+          security: [
+            {
+              BearerAuth: [],
+            },
+          ],
+        },
+      },
+    },
+  });
+
   return await prismaClient.user.deleteMany({
     where: {
       id: {
@@ -178,6 +262,8 @@ describe("SWAP BETWEEN CLIENT AND MEMBER", () => {
           .set("refreshToken", refreshTokenAdmin)
           .expect(400);
 
+        updateBadRequestBodyResponse = response.body;
+
         return expect(response.body).toHaveProperty(
           "message",
           "Member not belongs to this client."
@@ -195,6 +281,8 @@ describe("SWAP BETWEEN CLIENT AND MEMBER", () => {
           .set("authorization", accessTokenAdmin)
           .set("refreshTojken", refreshTokenAdmin)
           .expect(422);
+
+        updateUnprocessableEntityBodyResponse = response.body;
 
         expect(response.body).toHaveProperty(
           "message",
@@ -259,6 +347,8 @@ describe("SWAP BETWEEN CLIENT AND MEMBER", () => {
           .set("refreshToken", refreshTokenAdmin)
           .expect(200);
 
+        updateSuccessBodyResponse = response.body;
+
         const clientSwappedToMember = await prismaClient.user.findUnique({
           where: {
             id: userClientAuthenticated.id,
@@ -311,6 +401,8 @@ describe("SWAP BETWEEN CLIENT AND MEMBER", () => {
           .set("authorization", accessTokenClient)
           .set("refreshToken", refreshTokenClient)
           .expect(401);
+
+        updateUnauthorizedBodyResponse = response.body;
 
         expect(response.body).toHaveProperty(
           "message",

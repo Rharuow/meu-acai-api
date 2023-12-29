@@ -13,10 +13,10 @@ import {
   createQuery,
   createReferenceMemoryCacheQuery,
 } from "./utils/queryBuilder";
-import { orderCreamByOptions } from "@/routes/resources/cream";
+import { paramsCreamByOptions } from "@/routes/resources/cream";
 
 export type ParamsCream = Params & {
-  orderBy: (typeof orderCreamByOptions)[number];
+  orderBy: (typeof paramsCreamByOptions)[number];
 };
 
 export const listCreams: (

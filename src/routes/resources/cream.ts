@@ -23,6 +23,7 @@ import {
 } from "@controllers/cream/delete";
 import { idsInQueryParams } from "@middlewares/resources/idsInQueryParams";
 import { validationListQueryParamsSchema } from "./list/schema";
+import { validationFilterParams } from "@middlewares/resources/cream/validationFilterParams";
 
 export const validationCreateCreamBodySchema: Schema = {
   name: {
@@ -95,11 +96,13 @@ export const validationUpdateCreamBodySchema: Schema = {
   },
 };
 
-export const orderCreamByOptions = [
+export const paramsCreamByOptions = [
   "id",
   "name",
   "price",
   "amount",
+  "available",
+  "isSpecial",
   "createdAt",
 ] as const;
 
@@ -107,9 +110,10 @@ const creamRouter = Router();
 
 creamRouter.get(
   "/creams",
+  validationFilterParams,
   checkExact(
     [
-      checkSchema(validationListQueryParamsSchema(orderCreamByOptions), [
+      checkSchema(validationListQueryParamsSchema(paramsCreamByOptions), [
         "query",
       ]),
       body([], "Query parameters unpermitted"), // check if has any query parameters
@@ -119,8 +123,8 @@ creamRouter.get(
       message: "Param(s) not permitted",
     }
   ),
-  validationUserAccessToken,
   validationQueryParams,
+  validationUserAccessToken,
   listCreamController
 );
 
