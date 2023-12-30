@@ -7,7 +7,7 @@ export const createServiceOrder = async (req: Request, res: Response) => {
   await producer.connect();
   await producer.send({
     topic: "createServiceOrder",
-    messages: [{ value: "TESTING CREATE SERVICE ORDER MESSAGE" }],
+    messages: [{ value: JSON.stringify(req.body) }],
   });
 
   await producer.disconnect();

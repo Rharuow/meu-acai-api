@@ -6,7 +6,7 @@ import { VerifyErrors, verify } from "jsonwebtoken";
 import { prismaClient } from "@libs/prisma";
 
 export const validationUserAccessToken = async (
-  req: Request<{}, {}, {}, qs.ParsedQs & ParamsUser>,
+  req: Request<{}, {}, { userId: string }, qs.ParsedQs & ParamsUser>,
   res: Response,
   next: NextFunction
 ) => {
@@ -35,6 +35,8 @@ export const validationUserAccessToken = async (
     });
 
     if (!user) return unauthorized(res);
+
+    req.body.userId = user.id;
 
     return next();
   } catch (error) {
