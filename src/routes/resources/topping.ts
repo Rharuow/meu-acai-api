@@ -118,7 +118,6 @@ export const orderToppingByOptions = [
 
 toppingRouter.get(
   "/toppings",
-  validationUserAccessToken,
   checkExact([
     body([], "Body parameters unpermitted"),
     checkSchema(validationListQueryParamsSchema(orderToppingByOptions), [
@@ -127,18 +126,19 @@ toppingRouter.get(
     param([], "Router parameters unpermitted"),
   ]),
   validationQueryParams,
+  validationUserAccessToken,
   listToppingsController
 );
 
 toppingRouter.get(
   "/toppings/:id",
-  validationUserAccessToken,
   checkExact([
     body([], "Body parameters unpermitted"),
     query([], "Query parameters unpermitted"),
     param(["id"], "id parameter is required"),
   ]),
   validationParams,
+  validationUserAccessToken,
   getToppingController
 );
 

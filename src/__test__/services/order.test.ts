@@ -118,15 +118,12 @@ describe("SERVICE ORDER TESTS", () => {
         " sending in the body request the valid params name, price, creams, maxCreamsAllowed, maxToppingsAllowed, size, totalPrice, extras and toppings" +
         " the response body is 200 and ...",
       async () => {
-        console.log(createServiceOrderRequestBody);
         const response = await request(app)
           .post(basePath)
           .send(createServiceOrderRequestBody)
           .set("Authorization", accessTokenAsAdmin)
           .set("refreshToken", refreshTokenAsAdmin)
-          .expect(401);
-
-        console.log(response.body);
+          .expect(200);
 
         return expect(response.statusCode).toBe(200);
       }

@@ -151,7 +151,6 @@ productRouter.put(
 
 productRouter.get(
   "/products",
-  validationUserAccessToken,
   checkExact([
     body([], "Body parameters unpermitted"),
     checkSchema(validationListQueryParamsSchema(orderProductByOptions), [
@@ -160,18 +159,19 @@ productRouter.get(
     param([], "Router parameters unpermitted"),
   ]),
   validationQueryParams,
+  validationUserAccessToken,
   listProductsController
 );
 
 productRouter.get(
   "/products/:id",
-  validationUserAccessToken,
   checkExact([
     body([], "Body parameters unpermitted"),
     query([], "Query parameters unpermitted"),
     param(["id"], "id parameter required"),
   ]),
   validationParams,
+  validationUserAccessToken,
   getProductController
 );
 
