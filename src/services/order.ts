@@ -1,23 +1,47 @@
 import { kafka } from "@libs/kafka";
 import { KafkaJSConnectionError } from "kafkajs";
 import { Request, Response } from "express";
+import { ResponseKafka } from "@/types/services/response";
 
-const producer = kafka.producer();
+const producer = kafka.producer({ allowAutoTopicCreation: true });
+const consumer = kafka.consumer({ groupId: "createServiceOrderResponse" });
 
 export const createServiceOrder = async (req: Request, res: Response) => {
   try {
     await producer.connect();
+    await consumer.connect();
+    await consumer.subscribe({
+      topic: "responseCreateOrder",
+      fromBeginning: true,
+    });
+
+    let response: ResponseKafka;
+
+    await consumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        try {
+          response = JSON.parse(String(message.value));
+          console.log("topic =", topic);
+          console.log("partition =", partition);
+          console.log("message =", JSON.parse(String(message.value)));
+        } catch (error) {
+          console.error("Error processing message:", error);
+          // Optionally handle the error, e.g., log it or take necessary actions
+          throw new Error("Error processing message:" + error);
+        }
+      },
+    });
 
     await producer.send({
       topic: "createServiceOrder",
       messages: [{ value: JSON.stringify(req.body) }],
     });
 
-    console.log("Message sent successfully");
-
     await producer.disconnect();
 
-    return res.status(200).send("testServiceOrder");
+    return res
+      .status(response.status || 200)
+      .json({ message: response.message });
   } catch (error) {
     console.error("Error producing message:", error);
     if (error instanceof KafkaJSConnectionError) {

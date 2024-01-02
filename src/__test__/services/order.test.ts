@@ -125,7 +125,10 @@ describe("SERVICE ORDER TESTS", () => {
           .set("refreshToken", refreshTokenAsAdmin)
           .expect(200);
 
-        return expect(response.statusCode).toBe(200);
+        return expect(response.body).toHaveProperty(
+          "message",
+          "Order created successfully"
+        );
       }
     );
   });

@@ -6,9 +6,7 @@ import {
   usersInMemory,
 } from "@libs/memory-cache";
 import { prismaClient } from "@libs/prisma";
-import { UpdateUserRequestBody } from "@/types/user/updateRequestBody";
 import { Admin, Client, Member, ROLE, Role, User } from "@prisma/client";
-import { CreateUserRequestBody } from "@/types/user/createRequestbody";
 import {
   Params as FilterParams,
   createOrder,
