@@ -21,6 +21,17 @@ export const validationCreateOrderBodySchema: Schema = {
     isString: true,
     errorMessage: "size must be a string and not empty",
   },
+  paymentMethod: {
+    notEmpty: true,
+    isIn: { options: [["cash", "pix", "card"]] },
+    errorMessage:
+      "paymentMethod must be a string, not empty and must be 'cash', 'pix' or 'card'",
+  },
+  isPaid: {
+    notEmpty: true,
+    isBoolean: true,
+    errorMessage: "isPaid must be a boolean and not empty",
+  },
   maxCreamsAllowed: {
     notEmpty: true,
     isNumeric: true,

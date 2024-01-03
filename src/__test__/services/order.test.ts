@@ -59,6 +59,8 @@ const createServiceOrderRequestBody: Omit<
 > = {
   name: "Test ServiceOrder",
   price: 9.99,
+  paymentMethod: "card",
+  isPaid: true,
   creams: Array(2)
     .fill(null)
     .map((cream, index) => ({
@@ -115,8 +117,8 @@ describe("SERVICE ORDER TESTS", () => {
   describe("CREATE SERVICE ORDER", () => {
     test(
       `When an Admin access POST ${basePath}` +
-        " sending in the body request the valid params name, price, creams, maxCreamsAllowed, maxToppingsAllowed, size, totalPrice, extras and toppings" +
-        " the response body is 200 and ...",
+        " sending in the body request the valid params name, price, creams, maxCreamsAllowed, maxToppingsAllowed, size, paymentMethod, isPaid, totalPrice, extras and toppings" +
+        " the response body is 200 and a message property that will be 'Order created successfully'",
       async () => {
         const response = await request(app)
           .post(basePath)
