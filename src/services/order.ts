@@ -21,9 +21,7 @@ export const createServiceOrder = async (req: Request, res: Response) => {
       eachMessage: async ({ topic, partition, message }) => {
         try {
           response = JSON.parse(String(message.value));
-          console.log("topic =", topic);
-          console.log("partition =", partition);
-          console.log("message =", JSON.parse(String(message.value)));
+          console.log("response =", response);
         } catch (error) {
           console.error("Error processing message:", error);
           // Optionally handle the error, e.g., log it or take necessary actions
