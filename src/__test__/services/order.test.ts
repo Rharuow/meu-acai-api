@@ -88,7 +88,7 @@ const createServiceOrderRequestBody: Omit<
     })),
 };
 
-const creamResourcePath = "/api/v1/resources/creams";
+let orderId: string;
 
 let createSuccessBodyResponse = {};
 let createUnprocessableBodyResponse = {};
@@ -118,19 +118,41 @@ describe("SERVICE ORDER TESTS", () => {
     test(
       `When an Admin access POST ${basePath}` +
         " sending in the body request the valid params name, price, creams, maxCreamsAllowed, maxToppingsAllowed, size, paymentMethod, isPaid, totalPrice, extras and toppings" +
-        " the response body is 200 and a message property that will be 'Order created successfully'",
+        " the response status code will be 200 and a message property that will be 'Order created successfully'",
       async () => {
         const response = await request(app)
           .post(basePath)
           .send(createServiceOrderRequestBody)
           .set("Authorization", accessTokenAsAdmin)
-          .set("refreshToken", refreshTokenAsAdmin)
-          .expect(200);
+          .set("refreshToken", refreshTokenAsAdmin);
 
+        console.info("[CREATE AS ADMIN] response.body = ", response.body);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("data");
+        expect(response.body.data).toHaveProperty("id");
+        orderId = response.body.data.id;
         return expect(response.body).toHaveProperty(
           "message",
           "Order created successfully"
         );
+      }
+    );
+  });
+
+  describe("DELETE SERVICE ORDER", () => {
+    test(
+      `When an Admin access DELETE ${basePath}/:id` +
+        " sending, in the path param, the valid id of order " +
+        " the response status code will be 204",
+      async () => {
+        console.info("[DELETE AS ADMIN] orderId = ", orderId);
+        const response = await request(app)
+          .delete(setIdInBasePath(orderId))
+          .set("Authorization", accessTokenAsAdmin)
+          .set("refreshToken", refreshTokenAsAdmin);
+
+        return expect(response.statusCode).toBe(204);
       }
     );
   });

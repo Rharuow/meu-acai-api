@@ -4,14 +4,17 @@ import { Request, Response } from "express";
 import { ResponseKafka } from "@/types/services/response";
 
 const producer = kafka.producer({ allowAutoTopicCreation: true });
-const consumer = kafka.consumer({ groupId: "createServiceOrderResponse" });
+const consumer = kafka.consumer({ groupId: "deleteServiceOrderResponse" });
 
-export const createServiceOrder = async (req: Request, res: Response) => {
+export const deleteServiceOrder = async (
+  req: Request<{ id: string }, {}, {}, {}>,
+  res: Response
+) => {
   try {
     await producer.connect();
     await consumer.connect();
     await consumer.subscribe({
-      topic: "responseCreateOrder",
+      topic: "responseDeleteOrder",
       fromBeginning: true,
     });
 
@@ -21,7 +24,6 @@ export const createServiceOrder = async (req: Request, res: Response) => {
       eachMessage: async ({ topic, partition, message }) => {
         try {
           response = JSON.parse(String(message.value));
-          console.log("response =", response);
         } catch (error) {
           console.error("Error processing message:", error);
           // Optionally handle the error, e.g., log it or take necessary actions
@@ -31,14 +33,14 @@ export const createServiceOrder = async (req: Request, res: Response) => {
     });
 
     await producer.send({
-      topic: "createServiceOrder",
-      messages: [{ value: JSON.stringify(req.body) }],
+      topic: "deleteServiceOrder",
+      messages: [{ value: req.params.id }],
     });
 
     await producer.disconnect();
 
     return res
-      .status(response.status || 200)
+      .status(response.status || 204)
       .json({ message: response.message });
   } catch (error) {
     console.error("Error producing message:", error);
