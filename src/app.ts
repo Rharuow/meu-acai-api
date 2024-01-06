@@ -5,6 +5,7 @@ import cors from "cors";
 import { router } from "./routes";
 
 import swaggerDef from "./swagger-spec.json";
+import { kafka } from "@libs/kafka";
 
 const PORT = process.env.PORT || 8080;
 
@@ -39,9 +40,12 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDef));
 // Adding middleware to instance of all the routes.
 app.use("/api/v1", router);
 
+const kafkaAdmin = kafka.admin();
+
 // Methods to start server.
-const start = () => {
+const start = async () => {
   try {
+    console.log(await kafkaAdmin.listTopics());
     // Method to make express service start to listen requests in port defined by const PORT.
     if (process.env.NODE_ENV !== "test")
       app.listen(PORT, () => {

@@ -1,47 +1,25 @@
 import { kafka } from "@libs/kafka";
 import { KafkaJSConnectionError } from "kafkajs";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ResponseKafka } from "@/types/services/response";
 
 const producer = kafka.producer({ allowAutoTopicCreation: true });
-const consumer = kafka.consumer({ groupId: "deleteServiceOrderResponse" });
+const consumer = kafka.consumer({ groupId: "deleteOrder" });
 
-export const deleteServiceOrder = async (
+export const producerDeleteServiceOrder = async (
   req: Request<{ id: string }, {}, {}, {}>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     await producer.connect();
-    await consumer.connect();
-    await consumer.subscribe({
-      topic: "responseDeleteOrder",
-      fromBeginning: true,
-    });
-
-    let response: ResponseKafka;
-
-    await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        try {
-          response = JSON.parse(String(message.value));
-        } catch (error) {
-          console.error("Error processing message:", error);
-          // Optionally handle the error, e.g., log it or take necessary actions
-          throw new Error("Error processing message:" + error);
-        }
-      },
-    });
-
     await producer.send({
-      topic: "deleteServiceOrder",
+      topic: "deletingOrder",
       messages: [{ value: req.params.id }],
     });
 
     await producer.disconnect();
-
-    return res
-      .status(response.status || 204)
-      .json({ message: response.message });
+    return next();
   } catch (error) {
     console.error("Error producing message:", error);
     if (error instanceof KafkaJSConnectionError) {
@@ -54,4 +32,35 @@ export const deleteServiceOrder = async (
       return res.status(500).send("Internal Server Error");
     }
   }
+};
+
+export const consumerDeleteServiceOrder = async (
+  req: Request,
+  res: Response
+) => {
+  let response: ResponseKafka;
+  await consumer.connect();
+  await consumer.subscribe({ topic: "deletedOrder" });
+
+  await consumer.run({
+    eachMessage: async ({ topic, partition, message }) => {
+      try {
+        response = JSON.parse(String(message.value));
+      } catch (error) {
+        console.error("Error processing message:", error);
+        // Optionally handle the error, e.g., log it or take necessary actions
+        throw new Error("Error processing message:" + error);
+      }
+    },
+  });
+
+  if (response)
+    return res.status(response.status).json({
+      message: response.message,
+      ...(response.data && { data: response.data }),
+    });
+
+  return res
+    .status(500)
+    .json({ message: "Some error in consumer the create service order" });
 };

@@ -126,12 +126,13 @@ describe("SERVICE ORDER TESTS", () => {
           .set("Authorization", accessTokenAsAdmin)
           .set("refreshToken", refreshTokenAsAdmin);
 
-        console.info("[CREATE AS ADMIN] response.body = ", response.body);
+        // console.warn("[CREATE AS ADMIN] response.body = ", response.body);
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty("data");
         expect(response.body.data).toHaveProperty("id");
         orderId = response.body.data.id;
+        console.warn("[CREATE AS ADMIN] orderId = ", orderId);
         return expect(response.body).toHaveProperty(
           "message",
           "Order created successfully"
@@ -140,17 +141,39 @@ describe("SERVICE ORDER TESTS", () => {
     );
   });
 
+  // describe("GET SERVICE ORDER", () => {
+  //   test(
+  //     `When an Admin access GET ${basePath}/:id` +
+  //       " sending, in the path param, the valid id of order " +
+  //       " the response status code will be 200 and the response body will contain the order object",
+  //     async () => {
+  //       console.info(`[GET AS ADMIN] orderId = ${orderId}`);
+  //       const response = await request(app)
+  //         .get(setIdInBasePath(orderId))
+  //         .set("Authorization", accessTokenAsAdmin)
+  //         .set("refreshToken", refreshTokenAsAdmin);
+
+  //       console.info("[GET AS ADMIN] response.body = ", response.body);
+  //       expect(response.body).toHaveProperty("data");
+  //       expect(response.body.data).toHaveProperty("id", orderId);
+  //       return expect(response.statusCode).toBe(200);
+  //     }
+  //   );
+  // });
+
   describe("DELETE SERVICE ORDER", () => {
     test(
       `When an Admin access DELETE ${basePath}/:id` +
         " sending, in the path param, the valid id of order " +
         " the response status code will be 204",
       async () => {
-        console.info("[DELETE AS ADMIN] orderId = ", orderId);
+        console.warn("[DELETE AS ADMIN] orderId = ", orderId);
         const response = await request(app)
           .delete(setIdInBasePath(orderId))
           .set("Authorization", accessTokenAsAdmin)
           .set("refreshToken", refreshTokenAsAdmin);
+
+        // console.warn(response.body);
 
         return expect(response.statusCode).toBe(204);
       }

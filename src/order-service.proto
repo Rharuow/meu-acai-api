@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package orderservice;
+
+service OrderService {
+  rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrder (GetOrderRequest) returns (GetOrderResponse);
+  rpc ListOrder (ListOrderRequest) returns (ListOrderResponse);
+}
+
+message ListOrderRequest {}
+
+message GetOrderRequest {
+  string id = 1;
+}
+
+message GetOrderRequest {
+  id: 1;
+  string name = 2;
+  string size = 3;
+  string paymentMethod = 4;
+  bool isPaid = 5;
+  int32 maxCreamsAllowed = 6; 
+  int32 maxToppingsAllowed = 7; 
+  int32 price = 8; 
+  int32 totalPrice = 9; 
+  repeated Cream creams = 10; 
+  repeated Extra extras = 11; 
+  repeated Topping toppings = 12; 
+}
+
+message CreateOrderRequest {
+  string name = 1;
+  string size = 2;
+  string paymentMethod = 3;
+  bool isPaid = 4;
+  int32 maxCreamsAllowed = 5; 
+  int32 maxToppingsAllowed = 6; 
+  int32 price = 7; 
+  int32 totalPrice = 8; 
+  repeated Cream creams = 9; 
+  repeated Extra extras = 10; 
+  repeated Topping toppings = 11; 
+}
+
+message Cream {
+  string id = 1;
+  string name = 2;
+  int32 price = 3;
+}
+
+message Extra {
+  string id = 1;
+  string name = 2;
+  int32 price = 3;
+}
+
+message Topping {
+  string id = 1;
+  string name = 2;
+  int32 price = 3;
+}
+
+message CreateOrderResponse {
+  string id = 1;
+}

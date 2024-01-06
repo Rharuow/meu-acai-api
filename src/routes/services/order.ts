@@ -1,8 +1,12 @@
 import { validationAdminAccessToken } from "@middlewares/authorization/validationAdminAccessToken";
 import { validationUserAccessToken } from "@middlewares/authorization/validationUserAccessToken";
 import { validationParams } from "@middlewares/paramsRouter";
-import { createServiceOrder } from "@services/order/create";
-import { deleteServiceOrder } from "@services/order/delete";
+import { producerCreateServiceOrder } from "@services/order/create";
+import {
+  consumerDeleteServiceOrder,
+  producerDeleteServiceOrder,
+} from "@services/order/delete";
+import { getServiceOrder } from "@services/order/get";
 import { Router } from "express";
 import {
   Schema,
@@ -158,7 +162,7 @@ ordersRouter.post(
   ]),
   validationParams,
   validationUserAccessToken,
-  createServiceOrder
+  producerCreateServiceOrder
 );
 
 ordersRouter.delete(
@@ -170,7 +174,20 @@ ordersRouter.delete(
   ]),
   validationParams,
   validationAdminAccessToken,
-  deleteServiceOrder
+  producerDeleteServiceOrder,
+  consumerDeleteServiceOrder
+);
+
+ordersRouter.get(
+  "/orders/:id",
+  checkExact([
+    body([], "Body parameters unpermitted"),
+    query([], "Query parameters unpermitted"), // check if has any query parameters
+    param(["id"], "Just id is permitted in path params"), // check if 'id' is present in the route parameters
+  ]),
+  validationParams,
+  validationUserAccessToken,
+  getServiceOrder
 );
 
 export { ordersRouter };

@@ -14,8 +14,9 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: ${HOST_IP}
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_DELETE_TOPIC_ENABLE: "true"
-      KAFKA_CREATE_TOPICS: "topic-test:1:1,create-service-order:1:1"
+      KAFKA_CREATE_TOPICS: "deletingOrder:1:1,deletedOrder:1:1,updatingOrder:1:1,updatedOrder:1:1"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 # version: "2"
